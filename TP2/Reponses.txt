@@ -1,0 +1,16 @@
+1. Pourquoi est-ce nous semblons avoir deux niveaux de magnification et minification des
+textures avant même d’avoir construit des mipmaps ?
+2. Nous vous avons demandé de calculer l’ajout spéculaire du modèle de Blinn-Phong. Dans
+quelle(s) circonstance(s) est-ce que ce modèle est avantageux ?
+C'est avantageux parce que la contribution de Blinn comporte l'utilisation d'une bissectrice
+entre le vecteur sommet-lumiere et sommet-camera. Ce dernier vecteur ne change pas, alors il peut etre calcule 
+qu'une seule fois pour chaque lumiere et puis utilisee pour la frame au complet. La methode de Phong tout seul depend
+des normales des sommets, ce qui doit etre calcule pour chaque pixel de l'image.
+La deuxieme circonstance a avoir avec la distance entre la lumiere et les sommets approchants l'infini.
+
+3. Quel aurait été l’effet visuel de perturber les normales pour le bruit de Perlin dans le
+nuanceur de sommets ? Pourquoi ?
+4. Pourquoi utiliser l’espace tangent ?
+5. Comment pourriez-vous visualiser n’importe quelle fonction 2D d’un domaine connu et
+limité avec un programme de nuanceurs en vous basant sur ce que vous avez accompli
+dans ce TP ? Énumérez les étapes.
