@@ -51,26 +51,24 @@ void pointLight(in vec3 lightVect, in vec3 normal)
    vec3  VP;           // Vecteur lumière
 
    // Calculer vecteur lumière
-   // VP = ...
+   //VP = vec3(V[0][0], V[1][1], V[2][2]) - gl_position; // Not sure about the view position (or Camera position) and if I need to inverse V and P
    VP = lightVect;
 
-    // Calculer distance à la lumière
+   // Calculer distance à la lumière
    d = length(VP);
 
-    // Normaliser VP
-    // VP = ..
+   // Normaliser VP
    VP = normalize(VP);
-   // Calculer l'atténuation due à la distance
-   //attenuation = ...
-  
-   attenuation = 1.0f / (Lights[0].Attenuation[0] + Lights[0].Attenuation[1] * d + Lights[0].Attenuation[0] + Lights[0].Attenuation[2] * d * d);
 
-   // nDotVP = ...
-   nDotVP = max(0.0f, dot(normal, VP));
+   // Calculer l'atténuation due à la distance
+   attenuation = 1 / (Lights[0].Attenuation[0] + Lights[0].Attenuation[1] * d + Lights[0].Attenuation[2] * d * d); 
+   
+   
+   nDotVP = dot(vn, VP);
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient += vec4(Lights[0].Ambient, 1.0f) * attenuation;
-   Diffuse += vec4(Lights[0].Diffuse, 1.0f) * nDotVP * attenuation;
+   Ambient  += vec4(attenuation * (Lights[0].Ambient), 1);
+   Diffuse  += vec4(attenuation * (Lights[0].Diffuse * nDotVP), 1);
 }
 
 
@@ -80,11 +78,11 @@ void directionalLight(in vec3 lightVect, in vec3 normal)
    vec3  VP;             // Vecteur lumière
    float nDotVP;         // Produit scalaire entre VP et la normale
 
-   //nDotVP = ...
+   nDotVP = dot(vn, Lights[2].SpotDir);
 
    // Calculer les contributions ambiantes et diffuses
-   // Ambient  += ...
-   // Diffuse  += ...
+   Ambient  += vec4(Lights[2].Ambient, 1);
+   Diffuse  += vec4(Lights[2].Diffuse * nDotVP, 1);
 }
 
 
@@ -99,21 +97,21 @@ void spotLight(in vec3 lightVect, in vec3 normal)
    vec3  VP;                 // Vecteur lumière
 
    // Calculer le vecteur Lumière
-   // VP = ...
+   VP = lightVect;
 
    // Calculer la distance à al lumière
-   // d = ...
+   d = length(VP);
 
    // Normaliser VP
-   // ...
+   VP = normalize(VP);
 
    // Calculer l'atténuation due à la distance
-   // ...
+   attenuation = 1 / (Lights[1].Attenuation[0] + Lights[1].Attenuation[1] * d + Lights[1].Attenuation[2] * d * d); 
 
    // Le fragment est-il à l'intérieur du cône de lumière ?
-   // vec3 spotDir = ...
-   // vec3 lightDir = ...
-   // angleEntreLumEtSpot = ...
+   vec3 spotDir = normalize(Lights[1].SpotDir);
+   vec3 lightDir = normalize(lightVect);
+   angleEntreLumEtSpot = acos(dot(spotDir, lightVect));
 
    if (angleEntreLumEtSpot > Lights[1].SpotCutoff)
    {
@@ -121,18 +119,17 @@ void spotLight(in vec3 lightVect, in vec3 normal)
    }
    else
    {
-       //spotAttenuation = ...
-
+       spotAttenuation = pow(dot(spotDir, lightVect), Lights[1].SpotExp);
    }
 
    // Combine les atténuation du spot et de la distance
    attenuation *= spotAttenuation;
 
-   // nDotVP = ...
+   nDotVP = dot(vn, lightVect);
 
    // Calculer les contributions ambiantes et diffuses
-   // Ambient  += ...
-   // Diffuse  += ..
+   Ambient  += vec4(attenuation * (Lights[0].Ambient), 1);
+   Diffuse  += vec4(attenuation * (Lights[0].Diffuse * nDotVP), 1);
 }
 
 vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 normal)
@@ -158,6 +155,9 @@ vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 
     color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
     color = clamp( color, 0.0, 1.0 );
     
+    // À supprimer !
+    //color = vec4(0.0, 1.0, 0.0, 1.0);
+    
     return color;
 }
 
@@ -175,16 +175,15 @@ void main (void)
     csPosition3 = (csPosition.xyz);
     
     //Vecteurs de la surface vers la lumière
-    light0Vect = vec3(Lights[0].Position) - csPosition3;
-    light1Vect = vec3(Lights[1].Position) - csPosition3;
-    light2Vect = vec3(Lights[2].Position) - csPosition3;
+    light0Vect = Lights[0].Position.xyz - gl_Position.xyz;
+    light1Vect = Lights[1].Position.xyz - gl_Position.xyz;
+    light2Vect = Lights[2].Position.xyz - gl_Position.xyz;
 
     //Normale en référentiel caméra:
     normal_cameraSpace = normalize(MV_N * vn);
     
     //Coordonée de texture:
     // ...
-    fragTexCoord = vt;
     
     // Transformation de la position
     gl_Position = MVP * vec4(vp,1.0);
