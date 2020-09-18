@@ -506,7 +506,8 @@ void dessinerSkybox()
     glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scalingMatrix;
 
     // Matrice Model-Vue-Projection:
-    glm::mat4 mvp = CVar::projection * CVar::vue * modelMatrix;
+    // Remove rotation of the view by passing trough a mat3
+    glm::mat4 mvp = CVar::projection * glm::mat4(glm::mat3(CVar::vue)) * modelMatrix;
 
     GLint handle;
 
@@ -521,7 +522,9 @@ void dessinerScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Décommenter pour afficher!
-    // dessinerSkybox();
+    glDepthMask( GL_FALSE );
+    dessinerSkybox();
+    glDepthMask( GL_TRUE );
 
     dessinerGazon();
 
