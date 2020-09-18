@@ -1,8 +1,8 @@
 ﻿cl : ligne de commande warning D9035: l'option 'Gm' est déconseillée et sera supprimée dans une version ultérieure
   textfile.cpp
   noise.cpp
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\noise.cpp(408,29): warning C4305: '=' : troncation de 'double' à 'float'
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\noise.cpp(414,29): warning C4305: '=' : troncation de 'double' à 'float'
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\noise.cpp(408,29): warning C4305: '=' : troncation de 'double' à 'float'
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\noise.cpp(414,29): warning C4305: '=' : troncation de 'double' à 'float'
   Var.cpp
   TextureCubemap.cpp
   TextureAbstraite.cpp
@@ -10,19 +10,19 @@ C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\noise.cpp(414,29): warning C430
   SurfaceBSplinaire.cpp
   Skybox.cpp
   Vecteur3.cpp
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\ObjParser\MathUtils.h(27,18): warning C4305: 'initialisation' : troncation de 'double' à 'const Math3D::REAL'
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\ObjParser\MathUtils.h(27,18): warning C4305: 'initialisation' : troncation de 'double' à 'const Math3D::REAL'
   StringUtils.cpp
   ParserTextAbstrait.cpp
   ObjParser.cpp
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\ObjParser\MathUtils.h(27,18): warning C4305: 'initialisation' : troncation de 'double' à 'const Math3D::REAL'
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\ObjParser\MathUtils.h(27,18): warning C4305: 'initialisation' : troncation de 'double' à 'const Math3D::REAL'
   NuanceurProg.cpp
   Modele3DOBJ.cpp
   Modele3DAbstrait.cpp
   Materiau.cpp
   main.cpp
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\main.cpp(328,31): warning C4244: 'argument' : conversion de 'double' en 'GLfloat', perte possible de données
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\main.cpp(820,76): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
-C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\main.cpp(821,75): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(328,31): warning C4244: 'argument' : conversion de 'double' en 'GLfloat', perte possible de données
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(820,76): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(821,75): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
   Lumiere.cpp
   GrilleQuads.cpp
   Gazon.cpp
@@ -32,4 +32,4 @@ C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\main.cpp(821,75): warning C4244
   Génération de code en cours...
 Cst.obj : warning LNK4075: ' /EDITANDCONTINUE' ignoré à cause de la spécification '/SAFESEH'
 LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'MSVCRT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
-  TP2.vcxproj -> C:\Users\Utilisateur\Desktop\TPs\INF8702\TP2\TP2\Debug\TP2.exe
+  TP2.vcxproj -> C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\Debug\TP2.exe
