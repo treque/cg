@@ -50,8 +50,8 @@ uniform sampler2D normalMap;     // Unité de texture pour le bruit
 vec4 lightSpec(in int i, in vec3 normal, in vec3 halfVector, in float shininess)
 {
     // À compléter
-    // ...
-    return vec4(0.0);
+    float NdotH = max(0.0, dot(normal, halfVector));
+    return  vec4(Lights[i].Specular * pow(NdotH, shininess), 1.0);
 }
 
 void main(void)
@@ -108,7 +108,7 @@ void main(void)
     vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
     // À dé-commenter
-    /*
+    
     if (pointLightOn == 1) {
         specular +=  lightSpec(0, normal, Light0HV, 400.0);
     }
@@ -118,7 +118,7 @@ void main(void)
     if (spotLightOn == 1) {
         specular +=  lightSpec(1, normal, Light1HV, 400.0);
     }
-    */
+    
     
     // Ajout de la contribution spéculaire au fragement
     trueColor += specular * matSpecular;

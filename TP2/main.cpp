@@ -529,7 +529,7 @@ void dessinerScene()
     dessinerGazon();
 
     // Décommenter pour afficher!
-    // dessinerCarte();
+    dessinerCarte();
 
     // flush les derniers vertex du pipeline graphique
     glFlush();
