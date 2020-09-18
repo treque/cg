@@ -70,7 +70,7 @@ void main(void)
     {
         frontColor = frontFragColor;
         // Sampling de la texture
-        // ...
+        frontColor *= texture(frontColorMap, fragTexCoord);
         
         // Propriétés de la surface
         matSpecular  = frontMat.Specular;
@@ -94,7 +94,7 @@ void main(void)
     {
         backColor = backFragColor;
         // Sampling de la texture
-        // ...
+        backColor *= texture(backColorMap, vec2(1.0 - fragTexCoord.s, fragTexCoord.t));
 
         // Propriétés de la surface
         matSpecular  = backMat.Specular;

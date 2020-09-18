@@ -80,8 +80,8 @@ void pointLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += attenuation * vec4((Lights[0].Ambient), 1);
-   Diffuse  += attenuation * nDotVP * vec4((Lights[0].Diffuse), 1);
+   Ambient  += attenuation * vec4((Lights[0].Ambient), 1.0);
+   Diffuse  += attenuation * nDotVP * vec4((Lights[0].Diffuse), 1.0);
 }
 
 
@@ -110,7 +110,7 @@ void spotLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    // Le fragment est-il à l'intérieur du cône de lumière ?
    vec3 spotDir = normalize(Lights[1].SpotDir);
    vec3 lightDir = -VP;
-   angleEntreLumEtSpot = acos(dot(lightDir, spotDir)) * 360 / (2 * 3.1416);
+   angleEntreLumEtSpot = acos(dot(lightDir, spotDir)) * 360 / (2 * PI);
 
    if (angleEntreLumEtSpot > Lights[1].SpotCutoff)
    {
@@ -127,8 +127,8 @@ void spotLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += attenuation * vec4(Lights[0].Ambient, 1);
-   Diffuse  += attenuation * nDotVP * vec4(Lights[0].Diffuse, 1);
+   Ambient  += attenuation * vec4(Lights[1].Ambient, 1.0);
+   Diffuse  += attenuation * nDotVP * vec4(Lights[1].Diffuse, 1.0);
 }
 
 
@@ -141,14 +141,14 @@ void directionalLight(in int i, in vec3 normal)
    nDotVP = max(0.0, dot(normal, normalize(-Lights[2].Position.xyz)));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += vec4(Lights[2].Ambient, 1);
-   Diffuse  +=  nDotVP * vec4(Lights[2].Diffuse, 1);
+   Ambient  += vec4(Lights[2].Ambient, 1.0);
+   Diffuse  +=  nDotVP * vec4(Lights[2].Diffuse, 1.0);
 }
 
 // éclairage pour la surface du dessus
 void frontLighting(in vec3 normal, in vec3 csPosition)
 {
-    vec4       color = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
     const vec3 eye   = normalize(-csPosition);
 
     // Clear the light intensity accumulators
@@ -180,12 +180,12 @@ void frontLighting(in vec3 normal, in vec3 csPosition)
 // elairage pour la surface du dessous
 void backLighting(in vec3 invNormal, in vec3 csPosition)
 {
-    vec4       color;
+    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
     const vec3 eye = normalize(-csPosition);
 
     // Clear the light intensity accumulators
-    Ambient = vec4(0.0);
-    Diffuse = vec4(0.0);
+    Ambient = vec4(0.0, 0.0, 0.0, 1.0);
+    Diffuse = vec4(0.0, 0.0, 0.0, 1.0);
 
    // Calcul des 3 lumières
    if (pointLightOn == 1) {
@@ -315,7 +315,7 @@ void main () {
    vec3 Tangent_cameraSpace; 
   
    // Pasage des coordonées des textures
-   // fragTexCoord = ...
+   fragTexCoord = vt;
    
    // Transformation du vertex selon le temps
    // if (animOn == 1) {

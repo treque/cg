@@ -131,8 +131,8 @@ void spotLight(in vec3 lightVect, in vec3 normal)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += attenuation * vec4(Lights[0].Ambient, 1);
-   Diffuse  += attenuation * nDotVP * vec4(Lights[0].Diffuse, 1);
+   Ambient  += attenuation * vec4(Lights[1].Ambient, 1);
+   Diffuse  += attenuation * nDotVP * vec4(Lights[1].Diffuse, 1);
 }
 
 vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 normal)
