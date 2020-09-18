@@ -89,8 +89,8 @@ void CTexture2D::chargerTexture()
             else
             {
                 // À modifier pour la construction de mipmaps
-                glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB,
-                             GL_UNSIGNED_BYTE, TextureImage.data.data());
+                gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TextureImage.tailleX, TextureImage.tailleY, 
+                                  GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data());
             }
         }
         else
@@ -108,8 +108,8 @@ void CTexture2D::chargerTexture()
         else
         {
             //À modifier pour la construction de mipmaps
-            glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                         TextureImage.data.data());
+            gluBuild2DMipmaps( GL_TEXTURE_2D, 3, TextureImage.tailleX, TextureImage.tailleY,
+                               GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data() );
         }
     }
 }
