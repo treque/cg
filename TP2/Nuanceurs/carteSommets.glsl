@@ -249,17 +249,6 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 		 // TODO:
 		rotMat = mat3(0.0);
         rotMat = rotMatY(theta);
-        //rotMat[0][0] = cos(theta) + pow(tangent.x, 2) * (1 - cos(theta));
-        //rotMat[0][1] = tangent.x * tangent.y * (1 - cos(theta)) - ( tangent.z * sin(theta));
-        //rotMat[0][2] = tangent.x * tangent.z * (1 - cos(theta)) + ( tangent.y * sin(theta));
-        //
-        //rotMat[1][0] = tangent.x * tangent.y * (1 - cos(theta)) + ( tangent.z * sin(theta));
-        //rotMat[1][1] = tangent.y * tangent.y * (1 - cos(theta)) + cos(theta);
-        //rotMat[1][2] = tangent.y * tangent.z * (1 - cos(theta)) - ( tangent.x * sin(theta));
-        //
-        //rotMat[2][0] = tangent.z * tangent.x * (1 - cos(theta)) - ( tangent.y * sin(theta));
-        //rotMat[2][1] = tangent.z * tangent.y * (1 - cos(theta)) - ( tangent.x * sin(theta));
-        //rotMat[2][2] = cos(theta) + ( tangent.z * tangent.z * ( 1 - cos(theta)));
     } else {
         // Déformation sur l'axe des Y, selon la position Y
 		// TODO: 
@@ -268,18 +257,7 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 		float theta = 0.5 * (vt.y - 0.5) * PI * sin(amplitude);
 		 // TODO:
 		rotMat = mat3(0.0);
-        rotMat = rotMatX(theta);
-        //rotMat[0][0] = cos(theta) + pow(tangent.x, 2) * (1 - cos(theta));
-        //rotMat[0][1] = tangent.x * tangent.y * (1 - cos(theta)) - ( tangent.z * sin(theta));
-        //rotMat[0][2] = tangent.x * tangent.z * (1 - cos(theta)) + ( tangent.y * sin(theta));
-        //
-        //rotMat[1][0] = tangent.x * tangent.y * (1 - cos(theta)) + ( tangent.z * sin(theta));
-        //rotMat[1][1] = tangent.y * tangent.y * (1 - cos(theta)) + cos(theta);
-        //rotMat[1][2] = tangent.y * tangent.z * (1 - cos(theta)) - ( tangent.x * sin(theta));
-        //
-        //rotMat[2][0] = tangent.z * tangent.x * (1 - cos(theta)) - ( tangent.y * sin(theta));
-        //rotMat[2][1] = tangent.z * tangent.y * (1 - cos(theta)) - ( tangent.x * sin(theta));
-        //rotMat[2][2] = cos(theta) + ( tangent.z * tangent.z * ( 1 - cos(theta)));
+        rotMat = rotMatX(-theta);
     }
     // TODO:
     // Obtenir le déplacement du sommets en cours
