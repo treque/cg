@@ -244,27 +244,51 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
         // Déformation sur l'axe des X selon la position X
 		// TODO: 
 		// Remplacer le commentaire ci-bas par la valeur de position necessaire
-        deltaPos = amplitude * sin(/*position X * */ PI);
+        deltaPos = amplitude * sin(vt.x * PI);
 		theta = 0.5 * (vt.x - 0.5) * PI * sin(-amplitude);
 		 // TODO:
-		 //rotMat= ...
+		rotMat = mat3(0.0);
+        rotMat = rotMatY(theta);
+        //rotMat[0][0] = cos(theta) + pow(tangent.x, 2) * (1 - cos(theta));
+        //rotMat[0][1] = tangent.x * tangent.y * (1 - cos(theta)) - ( tangent.z * sin(theta));
+        //rotMat[0][2] = tangent.x * tangent.z * (1 - cos(theta)) + ( tangent.y * sin(theta));
+        //
+        //rotMat[1][0] = tangent.x * tangent.y * (1 - cos(theta)) + ( tangent.z * sin(theta));
+        //rotMat[1][1] = tangent.y * tangent.y * (1 - cos(theta)) + cos(theta);
+        //rotMat[1][2] = tangent.y * tangent.z * (1 - cos(theta)) - ( tangent.x * sin(theta));
+        //
+        //rotMat[2][0] = tangent.z * tangent.x * (1 - cos(theta)) - ( tangent.y * sin(theta));
+        //rotMat[2][1] = tangent.z * tangent.y * (1 - cos(theta)) - ( tangent.x * sin(theta));
+        //rotMat[2][2] = cos(theta) + ( tangent.z * tangent.z * ( 1 - cos(theta)));
     } else {
         // Déformation sur l'axe des Y, selon la position Y
 		// TODO: 
 		// Remplacer le commentaire ci-bas par la valeur de position necessaire
-        deltaPos = amplitude * sin(/*position Y * */ PI);
+        deltaPos = amplitude * sin(vt.y * PI);
 		float theta = 0.5 * (vt.y - 0.5) * PI * sin(amplitude);
 		 // TODO:
-		//rotMat = ...
+		rotMat = mat3(0.0);
+        rotMat = rotMatX(theta);
+        //rotMat[0][0] = cos(theta) + pow(tangent.x, 2) * (1 - cos(theta));
+        //rotMat[0][1] = tangent.x * tangent.y * (1 - cos(theta)) - ( tangent.z * sin(theta));
+        //rotMat[0][2] = tangent.x * tangent.z * (1 - cos(theta)) + ( tangent.y * sin(theta));
+        //
+        //rotMat[1][0] = tangent.x * tangent.y * (1 - cos(theta)) + ( tangent.z * sin(theta));
+        //rotMat[1][1] = tangent.y * tangent.y * (1 - cos(theta)) + cos(theta);
+        //rotMat[1][2] = tangent.y * tangent.z * (1 - cos(theta)) - ( tangent.x * sin(theta));
+        //
+        //rotMat[2][0] = tangent.z * tangent.x * (1 - cos(theta)) - ( tangent.y * sin(theta));
+        //rotMat[2][1] = tangent.z * tangent.y * (1 - cos(theta)) - ( tangent.x * sin(theta));
+        //rotMat[2][2] = cos(theta) + ( tangent.z * tangent.z * ( 1 - cos(theta)));
     }
     // TODO:
     // Obtenir le déplacement du sommets en cours
-    // position = ..
+    position.z = position.z + deltaPos;
 
     // TODO:
     // Trouver les nouvelles normale + tangente après déplacement du sommet
-    // normal = ...
-    // tangent = ...
+    normal = normal * rotMat;
+    tangent = tangent * rotMat;
 }
 
 // Transformation des coordonnées d'espace tangent
@@ -318,9 +342,9 @@ void main () {
    fragTexCoord = vt;
    
    // Transformation du vertex selon le temps
-   // if (animOn == 1) {
-   //   animate(position, normal, tangent);
-   // }
+   if (animOn == 1) {
+      animation(position, normal, tangent);
+   }
    
     //On passe au référenciel de caméra (ou eye-coordinate)
     VertexPosition_cameraSpace = ( V * M * position).xyz;
