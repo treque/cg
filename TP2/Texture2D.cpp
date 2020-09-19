@@ -89,9 +89,8 @@ void CTexture2D::chargerTexture()
             else
             {
                 // À modifier pour la construction de mipmaps
-                glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-                gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TextureImage.tailleX, TextureImage.tailleY, 
-                                  GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data());
+                glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data() );
+                glGenerateMipmap( GL_TEXTURE_2D );
             }
         }
         else
@@ -103,15 +102,13 @@ void CTexture2D::chargerTexture()
     {
         if (!mipmap_)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                         TextureImage.data.data());
+            glTexImage2D(GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data());
         }
         else
         {
             //À modifier pour la construction de mipmaps
-            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-            gluBuild2DMipmaps( GL_TEXTURE_2D, 3, TextureImage.tailleX, TextureImage.tailleY,
-                               GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data() );
+            glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage.tailleX, TextureImage.tailleY, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureImage.data.data() );
+            glGenerateMipmap( GL_TEXTURE_2D );
         }
     }
 }

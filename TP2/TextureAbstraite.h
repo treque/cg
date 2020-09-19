@@ -16,7 +16,6 @@
 #include <fstream>
 
 #include <GL/glew.h>
-#include <glut.h>
 
 #include "Cst.h"
 #include "Var.h"

@@ -1,16 +1,38 @@
 1. Pourquoi est-ce nous semblons avoir deux niveaux de magnification et minification des
 textures avant même d’avoir construit des mipmaps ?
-2. Nous vous avons demandé de calculer l’ajout spéculaire du modèle de Blinn-Phong. Dans
-quelle(s) circonstance(s) est-ce que ce modèle est avantageux ?
-C'est avantageux parce que la contribution de Blinn comporte l'utilisation d'une bissectrice
-entre le vecteur sommet-lumiere et sommet-camera. Ce dernier vecteur ne change pas, alors il peut etre calcule 
-qu'une seule fois pour chaque lumiere et puis utilisee pour la frame au complet. La methode de Phong tout seul depend
-des normales des sommets, ce qui doit etre calcule pour chaque pixel de l'image.
-La deuxieme circonstance a avoir avec la distance entre la lumiere et les sommets approchants l'infini.
+
+La raison est que malgré l'absenve de Mipmaps, la couleur du pixel doit tout de même être déterminé.
+Les fonctions par defauts pour le GL_TEXTURE_MIN_FILTER et GL_TEXTURE_MAG_FILTER sont donc utilisées 
+mais sur l'unique version de la texture.
+
+
+2. Nous vous avons demandé de calculer l’ajout spéculaire du modèle de Blinn-Phong. 
+Dans quelle(s) circonstance(s) est-ce que ce modèle est avantageux ?
+
+Le modèle Blinn-Phong est diminue grandement le nombre de calculs requis par l'ajout de la composante spéculaire.
+La raison est qu'il n'utilise pas le rayon réfléchie afin de déterminer l'intensité de la composante spéculaire.
+À la place c'est la bisectrice entre la direction de la caméra et la direction de la source de lumière qui est utilisé.
+Le calcul cette bisectrice ne nécessite pas la normal du fragment, le calcul de la bisectrice peut ainsi être fait par sommet.
+De plus le cas ou la lumière est infiniment loin, la direction vers la source de lumière ne varie pas d'un sommet à l'autre.
+Cette bisectrice n'a donc besoin d'être calculer que selon la position de la caméra.
+Ces deux raisons font en sorte que le calcul est plus légé.
 
 3. Quel aurait été l’effet visuel de perturber les normales pour le bruit de Perlin dans le
 nuanceur de sommets ? Pourquoi ?
+
+Des transitions abruptes aurait été perceptibles entre les primitives.
+Le resultat serait comparable au résultat obtenu lors du premier spot d'éclairage avec du gazon.
+Deplus l'utilisation d'une texture afin d'avoir un bruit précalculer n'aurait pas été possible.
+
 4. Pourquoi utiliser l’espace tangent ?
+
+L'espace tangeant est utilisé vu que la bisectrice a été calculer a partir de la direction 
+de la lumière de la caméra qui sont dans l'espace xyz de la scene. 
+Nous avons besoin de la valeur dans un espace semblable à celui la texture utilisé.
+D'ou le besoin de l'espace tangent.
+Dans notre program nous l'utilisons afin que les bisectrices calculer soient 
+dans le même espace que celui la texture contenant le bruit précalculé.
+
 5. Comment pourriez-vous visualiser n’importe quelle fonction 2D d’un domaine connu et
 limité avec un programme de nuanceurs en vous basant sur ce que vous avez accompli
 dans ce TP ? Énumérez les étapes.
