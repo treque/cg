@@ -80,8 +80,8 @@ void pointLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += attenuation * vec4((Lights[i].Ambient), 1.0);
-   Diffuse  += attenuation * nDotVP * vec4((Lights[i].Diffuse), 1.0);
+   Ambient  +=  vec4((Lights[i].Ambient), 1.0) * attenuation;
+   Diffuse  +=  vec4((Lights[i].Diffuse), 1.0) * nDotVP * attenuation;
 }
 
 
@@ -105,12 +105,12 @@ void spotLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    VP = normalize(VP);
 
    // Calculer l'atténuation due à la distance
-   attenuation = 1 / (Lights[i].Attenuation[0] + Lights[i].Attenuation[1] * d + Lights[i].Attenuation[2] * d * d); 
+   attenuation = 1.0 / (Lights[i].Attenuation[0] + Lights[i].Attenuation[1] * d + Lights[i].Attenuation[2] * d * d); 
 
    // Le fragment est-il à l'intérieur du cône de lumière ?
    vec3 spotDir = normalize(Lights[i].SpotDir);
    vec3 lightDir = -VP;
-   angleEntreLumEtSpot = acos(dot(lightDir, spotDir)) * 360 / (2 * PI);
+   angleEntreLumEtSpot = degrees(acos(dot(lightDir, spotDir)));
 
    if (angleEntreLumEtSpot > Lights[i].SpotCutoff)
    {
@@ -127,8 +127,8 @@ void spotLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += attenuation * vec4(Lights[i].Ambient, 1.0);
-   Diffuse  += attenuation * nDotVP * vec4(Lights[i].Diffuse, 1.0);
+   Ambient  += vec4(Lights[i].Ambient, 1.0) * attenuation;
+   Diffuse  += vec4(Lights[i].Diffuse, 1.0) * nDotVP * attenuation;
 }
 
 
@@ -142,7 +142,7 @@ void directionalLight(in int i, in vec3 normal)
 
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[i].Ambient, 1.0);
-   Diffuse  +=  nDotVP * vec4(Lights[i].Diffuse, 1.0);
+   Diffuse  += vec4(Lights[i].Diffuse, 1.0) * nDotVP;
 }
 
 // éclairage pour la surface du dessus
@@ -158,17 +158,17 @@ void frontLighting(in vec3 normal, in vec3 csPosition)
    // Calcul des 3 lumières
    if (pointLightOn == 1) 
    {
-    pointLight(0, normal, eye, csPosition);
+        pointLight(0, normal, eye, csPosition);
    }
     
    if (dirLightOn == 1) 
    {
-    directionalLight(2, normal);
+        directionalLight(2, normal);
    }
 
    if (spotLightOn == 1) 
    {
-    spotLight(1, normal, eye, csPosition);
+        spotLight(1, normal, eye, csPosition);
    }
 
    color = Ambient  * frontMat.Ambient + Diffuse  * frontMat.Diffuse;
@@ -188,15 +188,18 @@ void backLighting(in vec3 invNormal, in vec3 csPosition)
     Diffuse = vec4(0.0, 0.0, 0.0, 1.0);
 
    // Calcul des 3 lumières
-   if (pointLightOn == 1) {
-    pointLight(0, invNormal, eye, csPosition);
+   if (pointLightOn == 1) 
+   {
+        pointLight(0, invNormal, eye, csPosition);
    }
    
-   if (dirLightOn == 1) {
+   if (dirLightOn == 1) 
+   {
       directionalLight(2, invNormal);
    }
    
-   if (spotLightOn == 1) {
+   if (spotLightOn == 1) 
+   {
        spotLight(1, invNormal, eye, csPosition);
    }
 
@@ -249,7 +252,9 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 		 // TODO:
 		rotMat = mat3(0.0);
         rotMat = rotMatY(theta);
-    } else {
+    } 
+    else 
+    {
         // Déformation sur l'axe des Y, selon la position Y
 		// TODO: 
 		// Remplacer le commentaire ci-bas par la valeur de position necessaire
@@ -283,6 +288,10 @@ void tsTransform(in vec3 csNormal, vec3 csTangent, vec3 csPosition)
 
     // Construction de la matrice de transformation pour passer en espace tangent
     mat3 tsMatrix = mat3(csTangent, biTangeant, csNormal);
+
+   tsMatrix = mat3(csTangent.x, biTangeant.x, csNormal.x, 
+                   csTangent.y, biTangeant.y, csNormal.y, 
+                   csTangent.z, biTangeant.z, csNormal.z);
 
     // Construction et calcul des vecteurs pertinants
     // Nous sommes en coordonnées de visualisation
