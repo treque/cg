@@ -1,38 +1,41 @@
 1. Pourquoi est-ce nous semblons avoir deux niveaux de magnification et minification des
 textures avant même d’avoir construit des mipmaps ?
 
-La raison est que malgré l'absenve de Mipmaps, la couleur du pixel doit tout de même être déterminé.
-Les fonctions par defauts pour le GL_TEXTURE_MIN_FILTER et GL_TEXTURE_MAG_FILTER sont donc utilisées 
+La raison est que malgré l'absence de Mipmaps, la couleur du pixel doit tout de même être déterminé.
+Les filtres par défaut pour le GL_TEXTURE_MIN_FILTER et GL_TEXTURE_MAG_FILTER sont donc utilisés 
 mais sur l'unique version de la texture.
-
 
 2. Nous vous avons demandé de calculer l’ajout spéculaire du modèle de Blinn-Phong. 
 Dans quelle(s) circonstance(s) est-ce que ce modèle est avantageux ?
 
-Le modèle Blinn-Phong est diminue grandement le nombre de calculs requis par l'ajout de la composante spéculaire.
-La raison est qu'il n'utilise pas le rayon réfléchie afin de déterminer l'intensité de la composante spéculaire.
-À la place c'est la bisectrice entre la direction de la caméra et la direction de la source de lumière qui est utilisé.
-Le calcul cette bisectrice ne nécessite pas la normal du fragment, le calcul de la bisectrice peut ainsi être fait par sommet.
-De plus le cas ou la lumière est infiniment loin, la direction vers la source de lumière ne varie pas d'un sommet à l'autre.
-Cette bisectrice n'a donc besoin d'être calculer que selon la position de la caméra.
-Ces deux raisons font en sorte que le calcul est plus légé.
+Le modèle Blinn-Phong diminue grandement le nombre de calculs requis pour la composante spéculaire de la lumière.
+La raison est qu'il n'utilise pas le rayon réfléchi afin de déterminer l'intensité de la composante spéculaire.
+À la place c'est la bissectrice entre la direction de la caméra et la direction de la source de lumière qui est utilisée.
+Le calcul cette bisectrice ne nécessite pas la normale du fragment, le calcul de la bisectrice peut ainsi être fait par sommet.
+De plus le cas ou la lumière est infiniment loin, la direction vers la source de lumière ne varie pas d'un sommet à l'autre. Il est le même
+pour tous les points.
+Cette bissectrice n'a donc besoin d'être calculée que selon la position de la caméra.
+Ces deux raisons font en sorte que le calcul est plus léger.
 
 3. Quel aurait été l’effet visuel de perturber les normales pour le bruit de Perlin dans le
 nuanceur de sommets ? Pourquoi ?
 
 Des transitions abruptes aurait été perceptibles entre les primitives.
-Le resultat serait comparable au résultat obtenu lors du premier spot d'éclairage avec du gazon.
-Deplus l'utilisation d'une texture afin d'avoir un bruit précalculer n'aurait pas été possible.
+Le résultat serait comparable au résultat obtenu lors du premier spot d'éclairage avec du gazon et puisque les normales seront interpolées,
+le résultat visuel se retrouve donc à être moins lisse.
+De plus, l'utilisation d'une texture afin d'avoir un bruit précalculé n'aurait pas été possible (très difficile).
 
 4. Pourquoi utiliser l’espace tangent ?
 
-L'espace tangeant est utilisé vu que la bisectrice a été calculer a partir de la direction 
-de la lumière de la caméra qui sont dans l'espace xyz de la scene. 
-Nous avons besoin de la valeur dans un espace semblable à celui la texture utilisé.
-D'ou le besoin de l'espace tangent.
-Dans notre program nous l'utilisons afin que les bisectrices calculer soient 
-dans le même espace que celui la texture contenant le bruit précalculé.
+L'espace tangent est utilisé vu que la bisectrice a été calculée à partir de la direction 
+de la lumière et de la caméra qui sont dans le world space. Nous avons besoin de la valeur dans un espace semblable à celui 
+la texture utilisé, d'où le besoin de l'espace tangent.
+Dans notre programme nous l'utilisons afin que les bissectrices calculées soient 
+dans le même espace que celui la texture contenant le bruit précalculé. La normale sera toujours orthogonale à la bitangente et tangente, ce qui
+permet de calculer les normales dans un placage de déplacement.
 
 5. Comment pourriez-vous visualiser n’importe quelle fonction 2D d’un domaine connu et
 limité avec un programme de nuanceurs en vous basant sur ce que vous avez accompli
 dans ce TP ? Énumérez les étapes.
+
+wtf?
