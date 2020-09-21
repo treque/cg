@@ -236,7 +236,7 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 { 
 	float amplitude; // Amplitude selon le temps et l'espace (animation) 
 	float deltaPos;    // Variation de la hauteur du vertex
-	mat3 rotMat;     // Matrice de tranformation pour la normale et tangente
+	mat3 rotMat = mat3(0.0);     // Matrice de tranformation pour la normale et tangente
 	float theta;	 // Angle pour calculer la normale et la tangente
 	
 	amplitude = 2.0 * sin(time);
@@ -245,22 +245,24 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
         // Déformation sur l'axe des X selon la position X
 		// TODO: 
 		// Remplacer le commentaire ci-bas par la valeur de position necessaire
-        deltaPos = amplitude * sin(/*position X * */ PI);
+        deltaPos = amplitude * sin(vt.x * PI);
 		theta = 0.5 * (vt.x - 0.5) * PI * sin(-amplitude);
 		 // TODO:
-		 //rotMat= ...
+        rotMat = rotMatY(theta); 
     } else {
         // Déformation sur l'axe des Y, selon la position Y
 		// TODO: 
 		// Remplacer le commentaire ci-bas par la valeur de position necessaire
-        deltaPos = amplitude * sin(/*position Y * */ PI);
+        deltaPos = amplitude * sin(vt.y * PI);
 		float theta = 0.5 * (vt.y - 0.5) * PI * sin(amplitude);
 		 // TODO:
-		//rotMat = ...
+        rotMat = rotMatX(-theta);
     }
     // TODO:
     // Obtenir le déplacement du sommets en cours
-    // position = ..
+    position.z += deltaPos;
+    normal *= rotMat;
+    tangent *= rotMat;
 
     // TODO:
     // Trouver les nouvelles normale + tangente après déplacement du sommet
@@ -271,27 +273,14 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 // Transformation des coordonnées d'espace tangent
 void tsTransform(in vec3 csNormal, vec3 csTangent, vec3 csPosition)
 {
-    // Complétez cette fonction.
-    // Vous trouverez ci-bas un genre de pseudo-code commenté 
-    // qui vous aidera à structurer votre solution.
-
-    // Calcul de la binormale
     vec3 csBitangent = normalize(cross(csTangent, csNormal));
 
-
-    // Construction de la matrice de transformation pour passer en espace tangent
     mat3 tsMatrix = mat3(csTangent.x, csBitangent.x, csNormal.x, csTangent.y, csBitangent.y, csNormal.y, csTangent.z, csBitangent.z, csNormal.z);
 
-    // Construction et calcul des vecteurs pertinants
-    // Nous sommes en coordonnées de visualisation
-
-    // Light0HV  = ... en fonction de EyeDir et ...
-    // Light1HV  = ... 
-    // Light2HV  = ... en fonction de EyeDir et ...
     vec3 light0 = normalize(Lights[0].Position.xyz - csPosition);
     vec3 light1 = normalize(Lights[1].Position.xyz - csPosition);
     vec3 light2 = -normalize(Lights[2].Position.xyz);
-    // Transformation dans l'espace tangent (on applique la matrice tsMatrix)
+
     vec3 EyeDir = -normalize(csPosition);
     Light0HV = normalize(light0 + EyeDir);
     Light1HV = normalize(light1 + EyeDir);
@@ -300,7 +289,7 @@ void tsTransform(in vec3 csNormal, vec3 csTangent, vec3 csPosition)
     Light0HV = normalize(tsMatrix * Light0HV);
     Light1HV = normalize(tsMatrix * Light1HV);
     Light2HV = normalize(tsMatrix * Light2HV);
-  
+ 
 }
 
 float ffog(in float distance_cameraSpace)
@@ -320,9 +309,9 @@ void main () {
    fragTexCoord = vt;
    
    // Transformation du vertex selon le temps
-   // if (animOn == 1) {
-   //   animate(position, normal, tangent);
-   // }
+   if (animOn == 1) {
+     animation(position, normal, tangent);
+   }
    
     //On passe au référenciel de caméra (ou eye-coordinate)
     VertexPosition_cameraSpace = ( V * M * position).xyz;

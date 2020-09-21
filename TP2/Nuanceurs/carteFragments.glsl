@@ -71,24 +71,23 @@ void main(void)
     {
         frontColor = frontFragColor;
         // Sampling de la texture
-        //frontColor *= texture2D(frontColorMap, fragTexCoord);
+        frontColor *= texture2D(frontColorMap, fragTexCoord);
         
         // Propriétés de la surface
         matSpecular  = frontMat.Specular;
         matShininess = frontMat.Shininess;
 
         // Échantillonnage du bruit de perlin
-        // noise = ...
+        noise = texture2D(normalMap, fragTexCoord).rgb;
 
         // Perturbation de la normale
-        /*
+        
         if (perlinOn == 1) {
-            // normal = ...
+            normal = normalize(noise);
         } else {
-            // normal = ...
+            normal = vec3(0.0, 0.0, 1.0);
         }
-        */
-        normal = vec3(0.0, 0.0, 1.0);
+
         trueColor = frontColor;
     }
     else
