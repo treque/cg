@@ -501,7 +501,7 @@ void dessinerSkybox()
     // Effectuer la rotation pour être dans le même sense que le gazon et la caméra (Y+ = UP)
     glm::mat4 rotationMatrix(1.f);
 
-    glm::mat4 translationMatrix = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 translationMatrix = glm::translate(cam_position);
 
     glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scalingMatrix;
 
@@ -521,12 +521,14 @@ void dessinerScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Décommenter pour afficher!
-    // dessinerSkybox();
+    glDisable(GL_DEPTH_TEST);
+    dessinerSkybox();
+    glEnable(GL_DEPTH_TEST);
 
     dessinerGazon();
 
     // Décommenter pour afficher!
-    // dessinerCarte();
+    dessinerCarte();
 
     // flush les derniers vertex du pipeline graphique
     glFlush();

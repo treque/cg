@@ -51,7 +51,8 @@ vec4 lightSpec(in int i, in vec3 normal, in vec3 halfVector, in float shininess)
 {
     // À compléter
     // ...
-    return vec4(0.0);
+    float cos = max(0.0f, dot(normal, halfVector));
+    return vec4(Lights[i].Specular * pow(cos, shininess), 1.0f);
 }
 
 void main(void)
@@ -70,7 +71,7 @@ void main(void)
     {
         frontColor = frontFragColor;
         // Sampling de la texture
-        // ...
+        //frontColor *= texture2D(frontColorMap, fragTexCoord);
         
         // Propriétés de la surface
         matSpecular  = frontMat.Specular;
@@ -94,7 +95,7 @@ void main(void)
     {
         backColor = backFragColor;
         // Sampling de la texture
-        // ...
+        backColor *= texture2D(backColorMap, vec2(1.0f - fragTexCoord.x, fragTexCoord.y));
 
         // Propriétés de la surface
         matSpecular  = backMat.Specular;
@@ -108,7 +109,7 @@ void main(void)
     vec4 specular = vec4(0.0, 0.0, 0.0, 1.0);
 
     // À dé-commenter
-    /*
+    
     if (pointLightOn == 1) {
         specular +=  lightSpec(0, normal, Light0HV, 400.0);
     }
@@ -118,7 +119,7 @@ void main(void)
     if (spotLightOn == 1) {
         specular +=  lightSpec(1, normal, Light1HV, 400.0);
     }
-    */
+    
     
     // Ajout de la contribution spéculaire au fragement
     trueColor += specular * matSpecular;

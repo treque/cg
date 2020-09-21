@@ -73,20 +73,23 @@ void CSkybox::setupVAO()
     float sommets[] = {
         // Positions			//Normales
 
-        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  1.0f, -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  1.0f,
-        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  1.0f, 0.5f,  -0.5,  -0.5f, 0.0f,  0.0f,  1.0f,
+        -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  -1.0f, -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  -1.0f,
+        0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  -1.0f, 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  -1.0f,
 
-        -0.5f, 0.5f,  -0.5f, 0.0f,  -1.0f, 0.0f, -0.5f, 0.5f,  0.5f,  0.0f,  -1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  0.0f,  -1.0f, 0.0f, 0.5f,  0.5f,  -0.5f, 0.0f,  -1.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  1.0f,  -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  1.0f,
+        0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  1.0f,  0.5f,  -0.5,  -0.5f, 0.0f,  0.0f,  1.0f,
 
-        0.5f,  -0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.5f,  -0.5f, 0.5f,  0.0f,  1.0f,  0.0f,
-        -0.5f, -0.5f, 0.5f,  0.0f,  1.0f,  0.0f, -0.5f, -0.5f, -0.5f, 0.0f,  1.0f,  0.0f,
+        -0.5f, 0.5f,  -0.5f, 0.0f,  -1.0f, 0.0f,  -0.5f, 0.5f,  0.5f,  0.0f,  -1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  0.0f,  -1.0f, 0.0f,  0.5f,  0.5f,  -0.5f, 0.0f,  -1.0f, 0.0f,
 
-        -0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f, -0.5f, -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,
-        -0.5f, 0.5f,  0.5f,  1.0f,  0.0f,  0.0f, -0.5f, 0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,
+        0.5f,  -0.5f, -0.5f, 0.0f,  1.0f,  0.0f,  0.5f,  -0.5f, 0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f, -0.5f, 0.5f,  0.0f,  1.0f,  0.0f,  -0.5f, -0.5f, -0.5f, 0.0f,  1.0f,  0.0f,
 
-        0.5f,  -0.5f, -0.5f, -1.0f, 0.0f,  0.0f, 0.5f,  -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,  -1.0f, 0.0f,  0.0f, 0.5f,  0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  -0.5f, -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,
+        -0.5f, 0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  -0.5f, 0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,
+
+        0.5f,  -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  0.5f,  -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,
+        0.5f,  0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  0.5f,  0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,
 
     };
 
@@ -112,9 +115,9 @@ void CSkybox::setupVAO()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices_sommets), &indices_sommets[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (0));
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (char*)NULL + (16));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(16));
     glEnableVertexAttribArray(1);
 }
 
