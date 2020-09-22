@@ -76,12 +76,10 @@ void main(void)
         matSpecular  = frontMat.Specular;
         matShininess = frontMat.Shininess;
 
-        // Échantillonnage du bruit de perlin
-        //noise = 
-
         // Perturbation de la normale
         if (perlinOn == 1) {
-            normal = vec3(texture(normalMap, fragTexCoord));
+        // Échantillonnage du bruit de perlin
+            normal = normalize(vec3(texture(normalMap, fragTexCoord)));
         } else {
             normal = vec3(0.0, 0.0, 1.0);
         }
@@ -116,7 +114,6 @@ void main(void)
     if (spotLightOn == 1) {
         specular +=  lightSpec(1, normal, Light1HV, 400.0);
     }
-    
     
     // Ajout de la contribution spéculaire au fragement
     trueColor += specular * matSpecular;

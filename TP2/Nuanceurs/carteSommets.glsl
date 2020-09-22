@@ -80,8 +80,8 @@ void pointLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  +=  vec4((Lights[i].Ambient), 1.0) * attenuation;
-   Diffuse  +=  vec4((Lights[i].Diffuse), 1.0) * nDotVP * attenuation;
+   Ambient  +=  attenuation * vec4((Lights[i].Ambient), 1.0);
+   Diffuse  +=  nDotVP * attenuation * vec4((Lights[i].Diffuse), 1.0);
 }
 
 
@@ -127,8 +127,8 @@ void spotLight(in int i, in vec3 normal, in vec3 eye, in vec3 csPosition3)
    nDotVP = max(0.0, dot(normal, VP));
 
    // Calculer les contributions ambiantes et diffuses
-   Ambient  += vec4(Lights[i].Ambient, 1.0) * attenuation;
-   Diffuse  += vec4(Lights[i].Diffuse, 1.0) * nDotVP * attenuation;
+   Ambient  += attenuation * vec4(Lights[i].Ambient, 1.0);
+   Diffuse  += nDotVP * attenuation * vec4(Lights[i].Diffuse, 1.0);
 }
 
 
@@ -142,7 +142,7 @@ void directionalLight(in int i, in vec3 normal)
 
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[i].Ambient, 1.0);
-   Diffuse  += vec4(Lights[i].Diffuse, 1.0) * nDotVP;
+   Diffuse  += nDotVP * vec4(Lights[i].Diffuse, 1.0);
 }
 
 // éclairage pour la surface du dessus
@@ -245,30 +245,21 @@ void animation(inout vec4 position, inout vec3 normal, inout vec3 tangent)
 	// Déformation selon l'amplitude (time)
     if(amplitude < 0.0) {
         // Déformation sur l'axe des X selon la position X
-		// TODO: 
-		// Remplacer le commentaire ci-bas par la valeur de position necessaire
         deltaPos = amplitude * sin(vt.x * PI);
 		theta = 0.5 * (vt.x - 0.5) * PI * sin(-amplitude);
-		 // TODO:
-		rotMat = mat3(0.0);
         rotMat = rotMatY(theta);
     } 
     else 
     {
         // Déformation sur l'axe des Y, selon la position Y
-		// TODO: 
-		// Remplacer le commentaire ci-bas par la valeur de position necessaire
         deltaPos = amplitude * sin(vt.y * PI);
 		float theta = 0.5 * (vt.y - 0.5) * PI * sin(amplitude);
-		 // TODO:
-		rotMat = mat3(0.0);
         rotMat = rotMatX(-theta);
     }
-    // TODO:
+    
     // Obtenir le déplacement du sommets en cours
     position.z = position.z + deltaPos;
 
-    // TODO:
     // Trouver les nouvelles normale + tangente après déplacement du sommet
     normal = normal * rotMat;
     tangent = tangent * rotMat;

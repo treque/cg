@@ -1,3 +1,8 @@
 ﻿cl : ligne de commande warning D9035: l'option 'Gm' est déconseillée et sera supprimée dans une version ultérieure
-  Texture2D.cpp
+  main.cpp
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(328,31): warning C4244: 'argument' : conversion de 'double' en 'GLfloat', perte possible de données
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(822,76): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
+C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\main.cpp(823,75): warning C4244: '+=' : conversion de 'double' en 'float', perte possible de données
+Cst.obj : warning LNK4075: ' /EDITANDCONTINUE' ignorÚ Ó cause de la spÚcification '/SAFESEH'
+LINK : warning LNK4098: conflit entre la bibliothÞque par dÚfaut 'MSVCRT' et les autres bibliothÞquesá; utilisez /NODEFAULTLIB:library
   TP2.vcxproj -> C:\Users\Utilisateur\Desktop\TPs\INF8702\cg\TP2\Debug\TP2.exe

@@ -47,10 +47,6 @@ out vec3 normal_cameraSpace;
 void main (void)
 {
     vec3 csPosition3;
-    //vec3 light0Vect;
-    //vec3 light1Vect;
-    //vec3 light2Vect;
-    //vec3 normal_cameraSpace;
     
     // Transformation de la position
     gl_Position = MVP * vec4(vp,1.0);
@@ -65,7 +61,6 @@ void main (void)
     //Normale en référentiel caméra:
     normal_cameraSpace = normalize(MV_N * vn);
 
-    
     //Coordonée de texture:
     fragTexCoord = vt;
     

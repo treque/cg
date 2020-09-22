@@ -499,7 +499,7 @@ void dessinerSkybox()
     glm::mat4 scalingMatrix = glm::scale(s);
 
     // Effectuer la rotation pour être dans le même sense que le gazon et la caméra (Y+ = UP)
-    glm::mat4 rotationMatrix(1.f);
+    glm::mat4 rotationMatrix(1.0f);
 
     glm::mat4 translationMatrix = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
 

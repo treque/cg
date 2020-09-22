@@ -55,7 +55,6 @@ void pointLight(in vec3 lightVect, in vec3 normal)
    vec3  VP;           // Vecteur lumière
 
    // Calculer vecteur lumière
-   //VP = vec3(V[0][0], V[1][1], V[2][2]) - gl_position; // Not sure about the view position (or Camera position) and if I need to inverse V and P
    VP = lightVect;
 
    // Calculer distance à la lumière
@@ -109,7 +108,7 @@ void spotLight(in vec3 lightVect, in vec3 normal)
    VP = normalize(VP);
 
    // Calculer l'atténuation due à la distance
-   attenuation = 1 / (Lights[1].Attenuation[0] + Lights[1].Attenuation[1] * d + Lights[1].Attenuation[2] * d * d); 
+   attenuation = 1.0 / (Lights[1].Attenuation[0] + Lights[1].Attenuation[1] * d + Lights[1].Attenuation[2] * d * d); 
 
    // Le fragment est-il à l'intérieur du cône de lumière ?
    vec3 spotDir = normalize(Lights[1].SpotDir);
@@ -153,13 +152,9 @@ vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 
     if (dirLightOn == 1) {
         directionalLight(light2Vect, normal);
     }
-    
-    //À dé-commenter!
+
     color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
     color = clamp( color, 0.0, 1.0 );
-    
-    // À supprimer !
-    //color = vec4(0.0, 1.0, 0.0, 1.0);
     
     return color;
 }
