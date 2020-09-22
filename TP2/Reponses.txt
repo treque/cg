@@ -29,7 +29,6 @@ nuanceur de sommets ? Pourquoi ?
 Des transitions abruptes auraient été perceptibles entre les primitives.
 Le résultat serait comparable au résultat obtenu lors du premier spot d'éclairage avec du gazon et puisque les normales seront interpolées,
 le résultat visuel se retrouve donc à être moins lisse.
-De plus, l'utilisation d'une texture afin d'avoir un bruit précalculé n'aurait pas été possible (très difficile).
 
 4. Pourquoi utiliser l’espace tangent ?
 
@@ -46,4 +45,14 @@ permet de calculer les normales dans un placage de déplacement.
 limité avec un programme de nuanceurs en vous basant sur ce que vous avez accompli
 dans ce TP ? Énumérez les étapes.
 
-wtf?
+	1. Réaliser un fichier de texture contenant les déplacements dans l'axe z ainsi que le vecteur normal de la fonction 2d à afficher.
+	   Par exemple, le format pour un sommet pourrait être: [Déplacement z, Normale X, Normale Y, Normale Z]
+
+	2. Lire la texture dans le nuanceur de sommet pour une surface plate (Tel que la carte).
+
+	3. Changer les coordonnés du sommet sur l'axe z du modèle en fonction des valeurs de déplacement z lu à partir de la texture pour la position xy du modèle.
+
+	4. Transmettre la position du sommet modifié ainsi que la normale au prochain nuanceur.
+
+
+
