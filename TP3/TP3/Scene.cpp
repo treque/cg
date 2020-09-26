@@ -651,18 +651,37 @@ void CScene::LancerRayons(void)
             CRayon ray;
             ray.AjusterOrigine(m_Camera.Position);
 
-            float distance = 
-                CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise);
+            REAL distance = CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise);
+
+            //CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position);
+            CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position);
+
+            CVecteur3 right = CVecteur3::Normaliser( CVecteur3::ProdVect( toward, m_Camera.Up ) );
 
             CVecteur3 P1 = ray.ObtenirOrigine()
-                + distance * CVecteur3::Normaliser(m_Camera.PointVise)
-                - distance * tan( m_Camera.Angle / 2 ) * CVecteur3::Normaliser(m_Camera.Up);
+                + distance * toward
+                - distance * tan( m_Camera.Focale) * right;
 
             CVecteur3 P2 = ray.ObtenirOrigine()
-                + distance * CVecteur3::Normaliser( m_Camera.PointVise )
-                + distance * tan( m_Camera.Angle / 2 ) * CVecteur3::Normaliser( m_Camera.Up );
+                + distance * toward
+                + distance * tan( m_Camera.Focale) * right;
 
-            CVecteur3 P = P1 + ( ( px + 0.5 ) / this->m_ResLargeur ) * ( P2 - P1 );
+            CVecteur3 Px = P1 + ( ( px + 0.5 ) / this->m_ResLargeur ) * ( P2 - P1 );
+
+
+            CVecteur3 P3 = ray.ObtenirOrigine()
+                + distance * toward
+                - distance * tan( m_Camera.Focale) * m_Camera.Up;
+
+            CVecteur3 P4 = ray.ObtenirOrigine()
+                + distance * toward
+                + distance * tan( m_Camera.Focale) * m_Camera.Up;
+
+            CVecteur3 Py = P3 + ( ( py + 0.5 ) / this->m_ResHauteur ) * ( P4 - P3 );
+
+            CVecteur3 P = Px + Py;
+
+
             ray.AjusterDirection(( P - ray.ObtenirOrigine() )
                 / CVecteur3::Norme( P - ray.ObtenirOrigine() ));
 
@@ -676,9 +695,11 @@ void CScene::LancerRayons(void)
             ray.AjusterIndiceRefraction( 1 );
 
             CCouleur color = ObtenirCouleur( ray );
-            m_InfoPixel[(py + px * this->m_ResHauteur) * 3 ] =  color.r;
-            m_InfoPixel[ ( py + px * this->m_ResHauteur ) * 3 + 1] =  color.g;
-            m_InfoPixel[ ( py + px * this->m_ResHauteur ) * 3 + 2] =  color.b;
+
+            // Les pixel sont stocket dans l'ordre inverse ????
+            m_InfoPixel[ (m_InfoPixel.size() - 1) - ((px + py * this->m_ResLargeur) * 3 + 2 )] =  color.r;
+            m_InfoPixel[ ( m_InfoPixel.size() - 1 ) - (( px + py * this->m_ResLargeur ) * 3 + 1)] =  color.g;
+            m_InfoPixel[ ( m_InfoPixel.size() - 1 ) - (( px + py * this->m_ResLargeur ) * 3 + 0)] =  color.b;
             //m_InfoPixel.push_back( color.r );
             //m_InfoPixel.push_back( color.g );
             //m_InfoPixel.push_back( color.b );
