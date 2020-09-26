@@ -644,6 +644,47 @@ void CScene::LancerRayons(void)
     //      }
     //  }
 
+    for( int py = 0; py < this->m_ResHauteur; py++ )
+    {
+        for( int px = 0; px < this->m_ResLargeur; px++ )
+        {
+            CRayon ray;
+            ray.AjusterOrigine(m_Camera.Position);
+
+            float distance = 
+                CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise);
+
+            CVecteur3 P1 = ray.ObtenirOrigine()
+                + distance * CVecteur3::Normaliser(m_Camera.PointVise)
+                - distance * tan( m_Camera.Angle / 2 ) * CVecteur3::Normaliser(m_Camera.Up);
+
+            CVecteur3 P2 = ray.ObtenirOrigine()
+                + distance * CVecteur3::Normaliser( m_Camera.PointVise )
+                + distance * tan( m_Camera.Angle / 2 ) * CVecteur3::Normaliser( m_Camera.Up );
+
+            CVecteur3 P = P1 + ( ( px + 0.5 ) / this->m_ResLargeur ) * ( P2 - P1 );
+            ray.AjusterDirection(( P - ray.ObtenirOrigine() )
+                / CVecteur3::Norme( P - ray.ObtenirOrigine() ));
+
+            // TODO : Not sure about the adjust orientation part
+            //ray.AjusterDirection( m_Camera.Orientation * ray.ObtenirDirection );
+            //ray.AjusterDirection( CVecteur3::Normaliser( ray.ObtenirDirection() ) );
+            //ray.AjusterDirection( CVecteur3( m_Camera.Orientation[ 0 ][0], m_Camera.Orientation[ 1 ][1], m_Camera.Orientation[ 2 ][2] ) );
+
+            ray.AjusterEnergie( 1 );
+            ray.AjusterNbRebonds( 0 );
+            ray.AjusterIndiceRefraction( 1 );
+
+            CCouleur color = ObtenirCouleur( ray );
+            m_InfoPixel[(py + px * this->m_ResHauteur) * 3 ] =  color.r;
+            m_InfoPixel[ ( py + px * this->m_ResHauteur ) * 3 + 1] =  color.g;
+            m_InfoPixel[ ( py + px * this->m_ResHauteur ) * 3 + 2] =  color.b;
+            //m_InfoPixel.push_back( color.r );
+            //m_InfoPixel.push_back( color.g );
+            //m_InfoPixel.push_back( color.b );
+        }
+    }
+
     // Créer une texture openGL
     glGenTextures(1, &m_TextureScene);
     glBindTexture(GL_TEXTURE_2D, m_TextureScene);
