@@ -644,46 +644,41 @@ void CScene::LancerRayons(void)
     //      }
     //  }
 
-    for( int py = 0; py < this->m_ResHauteur; py++ )
+    for( int pixelY = 0; pixelY < this->m_ResHauteur; pixelY++ )
     {
+        REAL distance = CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise );
+        CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position );
+        CVecteur3 right = CVecteur3::Normaliser( CVecteur3::ProdVect( toward, m_Camera.Up ) );
+
+        CVecteur3 pointYMin = m_Camera.Position
+            + distance * toward
+            - distance * tan( m_Camera.Focale ) * m_Camera.Up;
+
+        CVecteur3 pointYMax = m_Camera.Position
+            + distance * toward
+            + distance * tan( m_Camera.Focale ) * m_Camera.Up;
+
+        CVecteur3 pointXMin = m_Camera.Position
+            + distance * toward
+            - distance * tan( m_Camera.Focale ) * right;
+
+        CVecteur3 pointXMax = m_Camera.Position
+            + distance * toward
+            + distance * tan( m_Camera.Focale ) * right;
+
+        CVecteur3 pointY = pointYMin + ( ( pixelY + 0.5 ) / this->m_ResHauteur ) * ( pointYMax - pointYMin );
+
         for( int px = 0; px < this->m_ResLargeur; px++ )
         {
             CRayon ray;
             ray.AjusterOrigine(m_Camera.Position);
 
-            REAL distance = CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise);
+            CVecteur3 pointX = pointXMin + ( ( px + 0.5 ) / this->m_ResLargeur ) * ( pointXMax - pointXMin );
 
-            //CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position);
-            CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position);
+            CVecteur3 point = pointX + pointY;
 
-            CVecteur3 right = CVecteur3::Normaliser( CVecteur3::ProdVect( toward, m_Camera.Up ) );
-
-            CVecteur3 P1 = ray.ObtenirOrigine()
-                + distance * toward
-                - distance * tan( m_Camera.Focale) * right;
-
-            CVecteur3 P2 = ray.ObtenirOrigine()
-                + distance * toward
-                + distance * tan( m_Camera.Focale) * right;
-
-            CVecteur3 Px = P1 + ( ( px + 0.5 ) / this->m_ResLargeur ) * ( P2 - P1 );
-
-
-            CVecteur3 P3 = ray.ObtenirOrigine()
-                + distance * toward
-                - distance * tan( m_Camera.Focale) * m_Camera.Up;
-
-            CVecteur3 P4 = ray.ObtenirOrigine()
-                + distance * toward
-                + distance * tan( m_Camera.Focale) * m_Camera.Up;
-
-            CVecteur3 Py = P3 + ( ( py + 0.5 ) / this->m_ResHauteur ) * ( P4 - P3 );
-
-            CVecteur3 P = Px + Py;
-
-
-            ray.AjusterDirection(( P - ray.ObtenirOrigine() )
-                / CVecteur3::Norme( P - ray.ObtenirOrigine() ));
+            ray.AjusterDirection(( point - ray.ObtenirOrigine() )
+                / CVecteur3::Norme( point - ray.ObtenirOrigine() ));
 
             // TODO : Not sure about the adjust orientation part
             //ray.AjusterDirection( m_Camera.Orientation * ray.ObtenirDirection );
@@ -697,9 +692,10 @@ void CScene::LancerRayons(void)
             CCouleur color = ObtenirCouleur( ray );
 
             // Les pixel sont stocket dans l'ordre inverse ????
-            m_InfoPixel[ (m_InfoPixel.size() - 1) - ((px + py * this->m_ResLargeur) * 3 + 2 )] =  color.r;
-            m_InfoPixel[ ( m_InfoPixel.size() - 1 ) - (( px + py * this->m_ResLargeur ) * 3 + 1)] =  color.g;
-            m_InfoPixel[ ( m_InfoPixel.size() - 1 ) - (( px + py * this->m_ResLargeur ) * 3 + 0)] =  color.b;
+            unsigned int index = ( m_InfoPixel.size() - 1 ) - ( ( px + pixelY * this->m_ResLargeur ) * 3);
+            m_InfoPixel[ index - 2 ] =  color.r;
+            m_InfoPixel[ index - 1] =  color.g;
+            m_InfoPixel[ index ] =  color.b;
             //m_InfoPixel.push_back( color.r );
             //m_InfoPixel.push_back( color.g );
             //m_InfoPixel.push_back( color.b );
