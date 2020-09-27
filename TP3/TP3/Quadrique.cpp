@@ -156,7 +156,6 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     double yO = Rayon.ObtenirOrigine().y;
     double zO = Rayon.ObtenirOrigine().z;
 
-
     double Aq = m_Quadratique.x * xD * xD
         + m_Mixte.z * xD * yD
         + m_Mixte.y * xD * zD
@@ -164,14 +163,14 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         + m_Mixte.x * yD * zD
         + m_Quadratique.z * zD * zD;
 
-    double Bq = 2 * m_Quadratique.x * xO * xD 
+    double Bq = 2.0 * m_Quadratique.x * xO * xD 
         + m_Mixte.z * (xO * yD + xD * yO)
         + m_Mixte.y * (xO * zD + xD * zO)
         + m_Lineaire.x * xD
-        + 2 * m_Quadratique.y * yO * yD
+        + 2.0 * m_Quadratique.y * yO * yD
         + m_Mixte.x * (yO * zD + yD * zO)
         + m_Lineaire.y * yD
-        + 2 * m_Quadratique.z * zO * zD
+        + 2.0 * m_Quadratique.z * zO * zD
         + m_Lineaire.z * zD;
 
     double Cq = m_Quadratique.x * xO * xO
@@ -193,18 +192,20 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         Result.AjusterDistance( -1 );
         return Result;
     }
-        
+    
+    double t0;
+    double t1;
 
-    if( Aq = 0 )
+    if( Aq != 0 )
     {
-        Result.AjusterDistance( -1 );
-        return Result;
+        t0 = ( -Bq + sqrt( rootPart ) ) / ( 2 * Aq );
+        t1 = ( -Bq - sqrt( rootPart ) ) / ( 2 * Aq );
     }
-
-
-    double t0 = ( -Bq + sqrt(rootPart) ) / ( 2 * Aq );
-    double t1 = ( -Bq - sqrt(rootPart) ) / ( 2 * Aq );
-
+    else
+    {
+        t0 = -Cq / Bq;
+        t1 = -Cq / Bq;
+    }
     
     if( ( t0 < 0 ) && ( t1 < 0 ) )
     {

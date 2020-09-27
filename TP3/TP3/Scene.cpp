@@ -696,9 +696,7 @@ void CScene::LancerRayons(void)
             m_InfoPixel[ index - 2 ] =  color.r;
             m_InfoPixel[ index - 1] =  color.g;
             m_InfoPixel[ index ] =  color.b;
-            //m_InfoPixel.push_back( color.r );
-            //m_InfoPixel.push_back( color.g );
-            //m_InfoPixel.push_back( color.b );
+
         }
     }
 
