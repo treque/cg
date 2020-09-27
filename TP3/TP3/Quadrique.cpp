@@ -148,6 +148,138 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
 {
     CIntersection Result;
 
+    double xD = Rayon.ObtenirDirection().x;
+    double yD = Rayon.ObtenirDirection().y;
+    double zD = Rayon.ObtenirDirection().z;
+
+    double xO = Rayon.ObtenirOrigine().x;
+    double yO = Rayon.ObtenirOrigine().y;
+    double zO = Rayon.ObtenirOrigine().z;
+
+
+    double Aq = m_Quadratique.x * xD * xD
+        + m_Mixte.z * xD * yD
+        + m_Mixte.y * xD * zD
+        + m_Quadratique.y * yD * yD
+        + m_Mixte.x * yD * zD
+        + m_Quadratique.z * zD * zD;
+
+    double Bq = 2 * m_Quadratique.x * xO * xD 
+        + m_Mixte.z * (xO * yD + xD * yO)
+        + m_Mixte.y * (xO * zD + xD * zO)
+        + m_Lineaire.x * xD
+        + 2 * m_Quadratique.y * yO * yD
+        + m_Mixte.x * (yO * zD + yD * zO)
+        + m_Lineaire.y * yD
+        + 2 * m_Quadratique.z * zO * zD
+        + m_Lineaire.z * zD;
+
+    double Cq = m_Quadratique.x * xO * xO
+        + m_Mixte.z * xO * yO
+        + m_Mixte.y * xO * zO
+        + m_Lineaire.x * xO
+        + m_Quadratique.y * yO * yO
+        + m_Mixte.x * yO * zO
+        + m_Lineaire.y * yO
+        + m_Quadratique.z * zO * zO
+        + m_Lineaire.z * zO
+        + m_Cst;
+
+    double rootPart = Bq * Bq - 4 * Aq * Cq;
+
+    // TODO : Maybe put something in result here?
+    if( rootPart < 0 )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+        
+
+    if( Aq = 0 )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+
+
+    double t0 = ( -Bq + sqrt(rootPart) ) / ( 2 * Aq );
+    double t1 = ( -Bq - sqrt(rootPart) ) / ( 2 * Aq );
+
+    
+    if( ( t0 < 0 ) && ( t1 < 0 ) )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+
+    CVecteur3 iPoint0;
+    iPoint0.x = xO + t0 * xD;
+    iPoint0.y = yO + t0 * yD;
+    iPoint0.z = zO + t0 * zD;
+
+    CVecteur3 iPoint1;
+    iPoint1.x = xO + t1 * xD;
+    iPoint1.y = yO + t1 * yD;
+    iPoint1.z = zO + t1 * zD;
+
+    CVecteur3 nPoint0;
+    nPoint0.x = 2 * m_Quadratique.x * iPoint0.x
+        + m_Mixte.z * iPoint0.y
+        + m_Mixte.y * iPoint0.z
+        + m_Lineaire.x;
+
+    nPoint0.y = m_Mixte.z * iPoint0.x
+        + 2 * m_Quadratique.y * iPoint0.y
+        + m_Mixte.x * iPoint0.z
+        + m_Lineaire.y;
+
+    nPoint0.z = m_Mixte.y * iPoint1.x
+        + m_Mixte.x * iPoint1.y
+        + 2 * m_Quadratique.z * iPoint1.z
+        + m_Lineaire.z;
+
+    if( CVecteur3::ProdScal( nPoint0, Rayon.ObtenirDirection() ) > 0 )
+        nPoint0 = -nPoint0;
+
+
+    CVecteur3 nPoint1;
+    nPoint1.x = 2 * m_Quadratique.x * iPoint1.x
+        + m_Mixte.z * iPoint1.y
+        + m_Mixte.y * iPoint1.z
+        + m_Lineaire.x;
+
+    nPoint1.y = m_Mixte.z * iPoint1.x
+        + 2 * m_Quadratique.y * iPoint1.y
+        + m_Mixte.x * iPoint1.z
+        + m_Lineaire.y;
+
+    nPoint1.z = m_Mixte.y * iPoint1.x
+        + m_Mixte.x * iPoint1.y
+        + 2 * m_Quadratique.z * iPoint1.z
+        + m_Lineaire.z;
+
+    if( CVecteur3::ProdScal( nPoint1, Rayon.ObtenirDirection() ) > 0 )
+        nPoint1 = -nPoint1;
+
+    double d;
+    CVecteur3 n;
+
+    if( t0 < t1 )
+    {
+        d = t0;
+        n = nPoint0;
+    }
+    else
+    {
+        d = t1;
+        n = nPoint1;
+    }
+    
+    Result.AjusterDistance( d );
+    Result.AjusterNormale( n );
+    Result.AjusterSurface( this );
+
+
     // TODO: À COMPLÉTER ...
 
     // La référence pour l'algorithme d'intersection des quadriques est :
