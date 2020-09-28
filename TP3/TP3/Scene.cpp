@@ -643,28 +643,29 @@ void CScene::LancerRayons(void)
     //          structure linéaire m_PixelInfo de taille ResolutionX * ResolutionY * 3
     //      }
     //  }
+    REAL distance = CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise );
+    CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position );
+    CVecteur3 right = CVecteur3::Normaliser( CVecteur3::ProdVect( toward, m_Camera.Up ) );
+
+    CVecteur3 pointYMin = m_Camera.Position
+        + distance * toward
+        - distance * tan( m_Camera.Angle * PI / 180 * m_ResHauteur / m_ResLargeur ) * m_Camera.Up;
+
+    CVecteur3 pointYMax = m_Camera.Position
+        + distance * toward
+        + distance * tan( m_Camera.Angle * PI / 180 * m_ResHauteur / m_ResLargeur ) * m_Camera.Up;
+
+    CVecteur3 pointXMin = m_Camera.Position
+        + distance * toward
+        - distance * tan( m_Camera.Angle * PI / 180 ) * right;
+
+    CVecteur3 pointXMax = m_Camera.Position
+        + distance * toward
+        + distance * tan( m_Camera.Angle * PI / 180 ) * right;
 
     for( int pixelY = 0; pixelY < this->m_ResHauteur; pixelY++ )
     {
-        REAL distance = CVecteur3::Distance( m_Camera.Position, this->m_Camera.PointVise );
-        CVecteur3 toward = CVecteur3::Normaliser( m_Camera.PointVise - m_Camera.Position );
-        CVecteur3 right = CVecteur3::Normaliser( CVecteur3::ProdVect( toward, m_Camera.Up ) );
 
-        CVecteur3 pointYMin = m_Camera.Position
-            + distance * toward
-            - distance * tan( m_Camera.Focale ) * m_Camera.Up;
-
-        CVecteur3 pointYMax = m_Camera.Position
-            + distance * toward
-            + distance * tan( m_Camera.Focale ) * m_Camera.Up;
-
-        CVecteur3 pointXMin = m_Camera.Position
-            + distance * toward
-            - distance * tan( m_Camera.Focale ) * right;
-
-        CVecteur3 pointXMax = m_Camera.Position
-            + distance * toward
-            + distance * tan( m_Camera.Focale ) * right;
 
         CVecteur3 pointY = pointYMin + ( ( pixelY + 0.5 ) / this->m_ResHauteur ) * ( pointYMax - pointYMin );
 
@@ -692,10 +693,10 @@ void CScene::LancerRayons(void)
             CCouleur color = ObtenirCouleur( ray );
 
             // Les pixel sont stocket dans l'ordre inverse ????
-            unsigned int index = ( m_InfoPixel.size() - 1 ) - ( ( px + pixelY * this->m_ResLargeur ) * 3);
-            m_InfoPixel[ index - 2 ] =  color.r;
-            m_InfoPixel[ index - 1] =  color.g;
-            m_InfoPixel[ index ] =  color.b;
+            unsigned int index = ( px + pixelY * this->m_ResLargeur ) * 3;
+            m_InfoPixel[ index ] =  color.r;
+            m_InfoPixel[ index + 1 ] =  color.g;
+            m_InfoPixel[ index + 2 ] =  color.b;
 
         }
     }
