@@ -265,15 +265,15 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     double d;
     CVecteur3 n;
 
-    if( t0 < t1 )
+    if( t0 <= t1 )
     {
         d = t0;
-        n = nPoint0;
+        n = CVecteur3::Normaliser(nPoint0);
     }
     else
     {
         d = t1;
-        n = nPoint1;
+        n = CVecteur3::Normaliser( nPoint1 );
     }
     
     Result.AjusterDistance( d );
