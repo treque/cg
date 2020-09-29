@@ -186,98 +186,59 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
 
     double rootPart = Bq * Bq - 4 * Aq * Cq;
 
-    // TODO : Maybe put something in result here?
+    // Imaginary result
     if( rootPart < 0 )
     {
         Result.AjusterDistance( -1 );
         return Result;
     }
     
-    double t0;
-    double t1;
+    double d;
 
     if( Aq != 0 )
     {
-        t0 = ( -Bq + sqrt( rootPart ) ) / ( 2 * Aq );
-        t1 = ( -Bq - sqrt( rootPart ) ) / ( 2 * Aq );
+        // Quadration equation (2 intersection, we take the min distance one)
+        d = ( -Bq - sqrt( rootPart ) ) / ( 2 * Aq );
     }
     else
     {
-        t0 = -Cq / Bq;
-        t1 = -Cq / Bq;
+        // Linear equation
+        d = -Cq / Bq;
     }
     
-    if( ( t0 < 0 ) && ( t1 < 0 ) )
+    // Behind the camera
+    if( d < 0 )
     {
         Result.AjusterDistance( -1 );
         return Result;
     }
 
-    CVecteur3 iPoint0;
-    iPoint0.x = xO + t0 * xD;
-    iPoint0.y = yO + t0 * yD;
-    iPoint0.z = zO + t0 * zD;
+    CVecteur3 intersectionPoint;
+    intersectionPoint.x = xO + d * xD;
+    intersectionPoint.y = yO + d * yD;
+    intersectionPoint.z = zO + d * zD;
 
-    CVecteur3 iPoint1;
-    iPoint1.x = xO + t1 * xD;
-    iPoint1.y = yO + t1 * yD;
-    iPoint1.z = zO + t1 * zD;
-
-    CVecteur3 nPoint0;
-    nPoint0.x = 2 * m_Quadratique.x * iPoint0.x
-        + m_Mixte.z * iPoint0.y
-        + m_Mixte.y * iPoint0.z
+    CVecteur3 normal;
+    normal.x = 2 * m_Quadratique.x * intersectionPoint.x
+        + m_Mixte.z * intersectionPoint.y
+        + m_Mixte.y * intersectionPoint.z
         + m_Lineaire.x;
 
-    nPoint0.y = m_Mixte.z * iPoint0.x
-        + 2 * m_Quadratique.y * iPoint0.y
-        + m_Mixte.x * iPoint0.z
+    normal.y = m_Mixte.z * intersectionPoint.x
+        + 2 * m_Quadratique.y * intersectionPoint.y
+        + m_Mixte.x * intersectionPoint.z
         + m_Lineaire.y;
 
-    nPoint0.z = m_Mixte.y * iPoint1.x
-        + m_Mixte.x * iPoint1.y
-        + 2 * m_Quadratique.z * iPoint1.z
+    normal.z = m_Mixte.y * intersectionPoint.x
+        + m_Mixte.x * intersectionPoint.y
+        + 2 * m_Quadratique.z * intersectionPoint.z
         + m_Lineaire.z;
 
-    if( CVecteur3::ProdScal( nPoint0, Rayon.ObtenirDirection() ) > 0 )
-        nPoint0 = -nPoint0;
-
-
-    CVecteur3 nPoint1;
-    nPoint1.x = 2 * m_Quadratique.x * iPoint1.x
-        + m_Mixte.z * iPoint1.y
-        + m_Mixte.y * iPoint1.z
-        + m_Lineaire.x;
-
-    nPoint1.y = m_Mixte.z * iPoint1.x
-        + 2 * m_Quadratique.y * iPoint1.y
-        + m_Mixte.x * iPoint1.z
-        + m_Lineaire.y;
-
-    nPoint1.z = m_Mixte.y * iPoint1.x
-        + m_Mixte.x * iPoint1.y
-        + 2 * m_Quadratique.z * iPoint1.z
-        + m_Lineaire.z;
-
-    if( CVecteur3::ProdScal( nPoint1, Rayon.ObtenirDirection() ) > 0 )
-        nPoint1 = -nPoint1;
-
-    double d;
-    CVecteur3 n;
-
-    if( t0 <= t1 )
-    {
-        d = t0;
-        n = CVecteur3::Normaliser(nPoint0);
-    }
-    else
-    {
-        d = t1;
-        n = CVecteur3::Normaliser( nPoint1 );
-    }
+    if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0 )
+        normal = -normal;
     
     Result.AjusterDistance( d );
-    Result.AjusterNormale( n );
+    Result.AjusterNormale( CVecteur3::Normaliser( normal ) );
     Result.AjusterSurface( this );
 
 
