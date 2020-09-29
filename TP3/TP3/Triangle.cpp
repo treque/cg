@@ -115,29 +115,26 @@ CIntersection CTriangle::Intersection(const CRayon& Rayon)
 {
     CIntersection Result;
 
-    // À COMPLÉTER ...
+    CVecteur3 edge1;
+    edge1 = m_Pts[ 1 ] - m_Pts[ 0 ];
 
-    CVecteur3 tempU;
-    tempU = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
-    double u = CVecteur3::ProdScal( tempU, Rayon.ObtenirOrigine() - m_Pts[ 0 ] );
+    CVecteur3 edge2;
+    edge2 = m_Pts[ 2 ] - m_Pts[ 0 ];
 
-    tempU = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
-    u = u / CVecteur3::ProdScal( tempU, m_Pts[ 1 ] - m_Pts[ 0 ] );
+    CVecteur3 pVect;
+    pVect = CVecteur3::ProdVect( Rayon.ObtenirDirection(), edge2 );
 
+    CVecteur3 tVect;
+    tVect = Rayon.ObtenirOrigine() - m_Pts[ 0 ];
 
-    CVecteur3 tempV;
-    tempV = CVecteur3::ProdVect( Rayon.ObtenirOrigine() - m_Pts[ 0 ], m_Pts[ 1 ] - m_Pts[ 0 ] );
-    double v = CVecteur3::ProdScal( tempV, Rayon.ObtenirDirection());
+    CVecteur3 qVect;
+    qVect = CVecteur3::ProdVect( tVect, edge1 );
 
-    tempV = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
-    v = v / CVecteur3::ProdScal( tempV, m_Pts[ 1 ] - m_Pts[ 0 ] );
+    double det;
+    det = CVecteur3::ProdScal( pVect, edge1 );
 
-
-    CVecteur3 tempT = CVecteur3::ProdVect( Rayon.ObtenirOrigine() - m_Pts[ 0 ], m_Pts[ 1 ] - m_Pts[ 0 ] );
-    double t = CVecteur3::ProdScal(tempT, m_Pts[ 2 ] - m_Pts[ 0 ] );
-
-    tempT = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
-    t = t / CVecteur3::ProdScal( tempT, m_Pts[ 1 ] - m_Pts[ 0 ] );
+    double u = CVecteur3::ProdScal( pVect, tVect );
+    u = u / det;
 
     if( ( u < 0.0 ) || u > 1.0 )
     {
@@ -145,11 +142,17 @@ CIntersection CTriangle::Intersection(const CRayon& Rayon)
         return Result;
     }
 
+    double v = CVecteur3::ProdScal( qVect, Rayon.ObtenirDirection() );
+    v = v / det;
+
     if( ( v < 0.0 ) || (u + v) > 1.0 )
     {
         Result.AjusterDistance( -1 );
         return Result;
     }
+
+    double t = CVecteur3::ProdScal( qVect, edge2 );
+    t = t / det;
 
     // Voici deux références pour acomplir le développement :
     // 1) Tomas Akenine-Moller and Eric Haines "Real-Time Rendering 2nd Ed." 2002, p.581
