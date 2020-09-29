@@ -758,6 +758,15 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
 
             // À COMPLÉTER
             // AJOUTER LA CONTRIBUTION SPÉCULAIRE DE PHONG...
+            CVecteur3 reflectedLightRay = CVecteur3::Reflect( LumiereRayon.ObtenirDirection(), Intersection.ObtenirNormale() );
+
+            double reflectedLightDotRay = CVecteur3::ProdScal( reflectedLightRay, Rayon.ObtenirDirection() );
+            if( reflectedLightDotRay > 0 )
+            {
+                Result += LumiereCouleur
+                    * pow( reflectedLightDotRay, Intersection.ObtenirSurface()->ObtenirCoeffBrillance() )
+                    * uneLumiere->GetIntensity() * Intersection.ObtenirSurface()->ObtenirCoeffSpeculaire();
+            }
         }
     }
 
