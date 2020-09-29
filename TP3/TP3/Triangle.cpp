@@ -117,13 +117,49 @@ CIntersection CTriangle::Intersection(const CRayon& Rayon)
 
     // À COMPLÉTER ...
 
+    CVecteur3 tempU;
+    tempU = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
+    double u = CVecteur3::ProdScal( tempU, Rayon.ObtenirOrigine() - m_Pts[ 0 ] );
+
+    tempU = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
+    u = u / CVecteur3::ProdScal( tempU, m_Pts[ 1 ] - m_Pts[ 0 ] );
+
+
+    CVecteur3 tempV;
+    tempV = CVecteur3::ProdVect( Rayon.ObtenirOrigine() - m_Pts[ 0 ], m_Pts[ 1 ] - m_Pts[ 0 ] );
+    double v = CVecteur3::ProdScal( tempV, Rayon.ObtenirDirection());
+
+    tempV = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
+    v = v / CVecteur3::ProdScal( tempV, m_Pts[ 1 ] - m_Pts[ 0 ] );
+
+
+    CVecteur3 tempT = CVecteur3::ProdVect( Rayon.ObtenirOrigine() - m_Pts[ 0 ], m_Pts[ 1 ] - m_Pts[ 0 ] );
+    double t = CVecteur3::ProdScal(tempT, m_Pts[ 2 ] - m_Pts[ 0 ] );
+
+    tempT = CVecteur3::ProdVect( Rayon.ObtenirDirection(), m_Pts[ 2 ] - m_Pts[ 0 ] );
+    t = t / CVecteur3::ProdScal( tempT, m_Pts[ 1 ] - m_Pts[ 0 ] );
+
+    if( ( u < 0.0 ) || u > 1.0 )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+
+    if( ( v < 0.0 ) || (u + v) > 1.0 )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+
     // Voici deux références pour acomplir le développement :
     // 1) Tomas Akenine-Moller and Eric Haines "Real-Time Rendering 2nd Ed." 2002, p.581
     // 2) Son article: http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
 
     // Notez que la normale du triangle est déjà calculée lors du prétraitement
     // il suffit que de la passer à la structure d'intersection.
-
+    Result.AjusterDistance( t );
+    Result.AjusterNormale( m_Normale );
+    Result.AjusterSurface( this );
     return Result;
 }
 
