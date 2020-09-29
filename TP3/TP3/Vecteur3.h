@@ -488,7 +488,8 @@ inline const CVecteur3 CVecteur3::Normaliser(const CVecteur3& Vecteur)
 inline const CVecteur3 CVecteur3::Reflect(const CVecteur3& Vecteur, const CVecteur3& Normal)
 {
     // À COMPLÉTER ...
-    return Vecteur;
+    CVecteur3 result = Vecteur - 2 * CVecteur3::ProdScal( Vecteur, Normal ) * Normal;
+    return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
