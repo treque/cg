@@ -187,7 +187,7 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     double rootPart = Bq * Bq - 4 * Aq * Cq;
 
     // Imaginary result
-    if( rootPart < 0 )
+    if( rootPart < 0.0 )
     {
         Result.AjusterDistance( -1 );
         return Result;
@@ -207,7 +207,7 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     }
     
     // Behind the camera
-    if( d < 0 )
+    if( d < EPSILON )
     {
         Result.AjusterDistance( -1 );
         return Result;
@@ -234,7 +234,7 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         + 2 * m_Quadratique.z * intersectionPoint.z
         + m_Lineaire.z;
 
-    if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0 )
+    if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0.0 )
         normal = -normal;
     
     Result.AjusterDistance( d );

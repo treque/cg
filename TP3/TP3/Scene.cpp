@@ -4,6 +4,7 @@
 #include "StringUtils.h"
 #include "Triangle.h"
 #include <fstream>
+#include <map>
 
 using namespace std;
 using namespace Math3D;
@@ -847,9 +848,28 @@ const CCouleur CScene::ObtenirFiltreDeSurface(CRayon& LumiereRayon) const
 
     // Tester le rayon de lumière avec chaque surface de la scène
     // pour vérifier s'il y a intersection
+    std::map<REAL, CIntersection> intersections;
+    for( ISurface* surface : m_Surfaces )
+    {
+        CIntersection intersection = surface->Intersection( LumiereRayon );
+        if( (intersection.ObtenirDistance() > EPSILON) 
+            && (intersection.ObtenirDistance() < Distance))
+        {
+            intersections[intersection.ObtenirDistance()] = intersection;
+        }
+    }
 
-    // S'il y a une intersection appliquer la translucidité de la surface
-    // intersectée sur le filtre
+    
+    while( intersections.size() > 0 )
+    {
+        map<REAL, CIntersection>::iterator intersection = intersections.lower_bound(0.0);
+        REAL coefRefraction = intersection->second.ObtenirSurface()->ObtenirCoeffRefraction();
+        CCouleur color = intersection->second.ObtenirSurface()->ObtenirCouleur();
+        Filter.r *= color.r * coefRefraction;
+        Filter.g *= color.g * coefRefraction;;
+        Filter.b *= color.b * coefRefraction;;
+        intersections.erase( intersection );
+    }
 
     return Filter;
 }
