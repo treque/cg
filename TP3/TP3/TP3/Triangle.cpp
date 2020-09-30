@@ -114,12 +114,45 @@ void CTriangle::Pretraitement(void)
 CIntersection CTriangle::Intersection(const CRayon& Rayon)
 {
     CIntersection Result;
-
+ 
     // À COMPLÉTER ...
 
     // Voici deux références pour acomplir le développement :
     // 1) Tomas Akenine-Moller and Eric Haines "Real-Time Rendering 2nd Ed." 2002, p.581
     // 2) Son article: http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
+
+    CVecteur3 AB(m_Pts[1] - m_Pts[0]);
+    CVecteur3 AC(m_Pts[2] - m_Pts[0]);
+
+    // de l'article... pour calculer le determinant et u
+    CVecteur3 pvec = CVecteur3::ProdVect(Rayon.ObtenirDirection(), AC);
+    REAL det = CVecteur3::ProdScal(AB, pvec);
+    REAL inv_det = 1.0 / det;
+
+    if (std::abs(det) < EPSILON)
+    {
+        // n'intersecte pas
+        return Result;
+    }
+
+    CVecteur3 tvec = Rayon.ObtenirOrigine() - m_Pts[0];
+    REAL u = CVecteur3::ProdScal(tvec, pvec) * inv_det;
+    if (u < 0.0 || u > 1.0)
+    {
+        return Result;
+    }
+
+    CVecteur3 qvec = CVecteur3::ProdVect(tvec, AB);
+    REAL v = CVecteur3::ProdScal(qvec, Rayon.ObtenirDirection()) * inv_det;
+    if (v < 0.0 || u + v > 1.0)
+    {
+        return Result;
+    }
+    REAL t = CVecteur3::ProdScal(AC, qvec) * inv_det;
+
+    Result.AjusterSurface(this);
+    Result.AjusterDistance(t);
+    Result.AjusterNormale(m_Normale);
 
     // Notez que la normale du triangle est déjà calculée lors du prétraitement
     // il suffit que de la passer à la structure d'intersection.
