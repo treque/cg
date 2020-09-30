@@ -28,6 +28,11 @@ private:
     /// Terme constant
     REAL m_Cst;
 
+    // Added utilities
+    REAL calculateDistance( const CRayon& Rayon );
+    CVecteur3 calculatePoint( const CRayon& Rayon, REAL distance );
+    CVecteur3 calculateNormal( const CRayon& Rayon, CVecteur3 intersectionPoint );
+
 protected:
     /// Protected interface implementation
     virtual std::ostream& AfficherInfoDebug(std::ostream& Out) const;
@@ -55,6 +60,7 @@ public:
 
     /// Public interface implementation
     virtual void          Pretraitement(void);
+    
     virtual CIntersection Intersection(const CRayon& Rayon);
     virtual CQuadrique*   Copier(void) const;
 };

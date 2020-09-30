@@ -134,20 +134,8 @@ void CQuadrique::Pretraitement(void)
     m_Lineaire.z    = Q[2][3] * REAL(2.0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///  @brief Effectue l'intersection Rayon/Quadrique
-///
-///  @param [in]       Rayon const CRayon &    Le rayon à tester
-///
-///  @return Scene::CIntersection Le résultat de l'ntersection
-///
-///  @author Olivier Dionne
-///  @date   13/08/2008
-///////////////////////////////////////////////////////////////////////////////
-CIntersection CQuadrique::Intersection(const CRayon& Rayon)
+REAL CQuadrique::calculateDistance( const CRayon& Rayon )
 {
-    CIntersection Result;
-
     double xD = Rayon.ObtenirDirection().x;
     double yD = Rayon.ObtenirDirection().y;
     double zD = Rayon.ObtenirDirection().z;
@@ -163,12 +151,12 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         + m_Mixte.x * yD * zD
         + m_Quadratique.z * zD * zD;
 
-    double Bq = 2.0 * m_Quadratique.x * xO * xD 
-        + m_Mixte.z * (xO * yD + xD * yO)
-        + m_Mixte.y * (xO * zD + xD * zO)
+    double Bq = 2.0 * m_Quadratique.x * xO * xD
+        + m_Mixte.z * ( xO * yD + xD * yO )
+        + m_Mixte.y * ( xO * zD + xD * zO )
         + m_Lineaire.x * xD
         + 2.0 * m_Quadratique.y * yO * yD
-        + m_Mixte.x * (yO * zD + yD * zO)
+        + m_Mixte.x * ( yO * zD + yD * zO )
         + m_Lineaire.y * yD
         + 2.0 * m_Quadratique.z * zO * zD
         + m_Lineaire.z * zD;
@@ -186,21 +174,20 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
 
     double rootPart = Bq * Bq - 4 * Aq * Cq;
 
-    // Imaginary result
+    // Verify if result is imaginary
     if( rootPart < 0.0 )
     {
-        Result.AjusterDistance( -1 );
-        return Result;
+        return -1.0;
     }
-    
-    double d;
 
+    double d;
     if( Aq != 0 )
     {
         // Quadration equation (2 intersection, we take the min distance one)
         d = ( -Bq - sqrt( rootPart ) ) / ( 2 * Aq );
 
-        if(d < EPSILON)
+        // The point is inside the sphere
+        if( d < EPSILON )
             d = ( -Bq + sqrt( rootPart ) ) / ( 2 * Aq );
 
     }
@@ -209,19 +196,21 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         // Linear equation
         d = -Cq / Bq;
     }
-    
-    // Behind the camera
-    if( d < EPSILON )
-    {
-        Result.AjusterDistance( -1 );
-        return Result;
-    }
 
-    CVecteur3 intersectionPoint;
-    intersectionPoint.x = xO + d * xD;
-    intersectionPoint.y = yO + d * yD;
-    intersectionPoint.z = zO + d * zD;
+    return d;
+}
 
+CVecteur3 CQuadrique::calculatePoint(const CRayon& Rayon, REAL distance )
+{
+    CVecteur3 point;
+    point.x = Rayon.ObtenirOrigine().x + distance * Rayon.ObtenirDirection().x;
+    point.y = Rayon.ObtenirOrigine().y + distance * Rayon.ObtenirDirection().y;
+    point.z = Rayon.ObtenirOrigine().z + distance * Rayon.ObtenirDirection().z;
+    return point;
+}
+
+CVecteur3 CQuadrique::calculateNormal(const CRayon& Rayon, CVecteur3 intersectionPoint )
+{
     CVecteur3 normal;
     normal.x = 2 * m_Quadratique.x * intersectionPoint.x
         + m_Mixte.z * intersectionPoint.y
@@ -238,22 +227,45 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
         + 2 * m_Quadratique.z * intersectionPoint.z
         + m_Lineaire.z;
 
+
     if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0.0 )
         normal = -normal;
+
+    return normal;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+///  @brief Effectue l'intersection Rayon/Quadrique
+///
+///  @param [in]       Rayon const CRayon &    Le rayon à tester
+///
+///  @return Scene::CIntersection Le résultat de l'ntersection
+///
+///  @author Olivier Dionne
+///  @date   13/08/2008
+///////////////////////////////////////////////////////////////////////////////
+CIntersection CQuadrique::Intersection(const CRayon& Rayon)
+{
+    CIntersection Result;
+
+    REAL distance = calculateDistance( Rayon );
     
-    Result.AjusterDistance( d );
+    // The point is behind the camera
+    if( distance < EPSILON )
+    {
+        Result.AjusterDistance( -1 );
+        return Result;
+    }
+
+    CVecteur3 intersectionPoint = calculatePoint( Rayon, distance );
+
+    CVecteur3 normal = calculateNormal( Rayon, intersectionPoint );
+    
+    Result.AjusterDistance( distance );
     Result.AjusterNormale( CVecteur3::Normaliser( normal ) );
     Result.AjusterSurface( this );
-
-
-    // TODO: À COMPLÉTER ...
-
-    // La référence pour l'algorithme d'intersection des quadriques est :
-    // Eric Haines, Paul Heckbert "An Introduction to Ray Tracing",
-    // Academic Press, Edited by Andrew S. Glassner, pp.68-73 & 288-293
-
-    // S'il y a collision, ajuster les variables suivantes de la structure intersection :
-    // Normale, Surface intersectée et la distance
 
     return Result;
 }
