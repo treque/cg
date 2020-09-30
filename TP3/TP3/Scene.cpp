@@ -820,10 +820,8 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
 
         RefractedRayon.AjusterDirection( refractedDirection );
 
-        // Enable to release on the otherside ???
-
+        // Rrelease on the otherside ?
         CIntersection Intersection2 = Intersection.ObtenirSurface()->Intersection( RefractedRayon );
-        
         if( Intersection2.ObtenirSurface() != NULL )
         {
             refractedDirection =

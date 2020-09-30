@@ -508,8 +508,8 @@ inline const CVecteur3
     CVecteur3 Result;
     REAL criticalAngle = asin(1/IndiceRefractionRatio);
     REAL vectorDotNormal = CVecteur3::ProdScal( Vecteur, Normal );
-    REAL vectorDotNormal2 = CVecteur3::ProdScal( Vecteur, -Normal );
-    REAL incidentAngle = acos( vectorDotNormal2 / CVecteur3::Norme( Vecteur ) / CVecteur3::Norme( Normal ) );
+    REAL vectorDotInvNormal = CVecteur3::ProdScal( Vecteur, -Normal );
+    REAL incidentAngle = acos( vectorDotInvNormal / CVecteur3::Norme( Vecteur ) / CVecteur3::Norme( Normal ) );
 
     if( (incidentAngle < criticalAngle) || IndiceRefractionRatio < 1.0 )
     {
@@ -520,8 +520,6 @@ inline const CVecteur3
     {
         Result = Reflect( Vecteur, Normal );
     }
-
-    // À COMPLÉTER ...
 
     return Result;
 }
