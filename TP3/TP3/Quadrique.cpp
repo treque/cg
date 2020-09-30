@@ -199,6 +199,10 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     {
         // Quadration equation (2 intersection, we take the min distance one)
         d = ( -Bq - sqrt( rootPart ) ) / ( 2 * Aq );
+
+        if(d < EPSILON)
+            d = ( -Bq + sqrt( rootPart ) ) / ( 2 * Aq );
+
     }
     else
     {
