@@ -799,7 +799,7 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
             // de l'intérieur, vers l'extérieur...
             RefractedRayon.AjusterIndiceRefraction(m_IndiceRefractionScene);
             IndiceRefractionRatio = Intersection.ObtenirSurface()->ObtenirIndiceRefraction() / m_IndiceRefractionScene;
-            SurfaceNormal         = -SurfaceNormal;
+            SurfaceNormal         = SurfaceNormal;
         }
         else
         {
@@ -816,23 +816,23 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
         CVecteur3 refractedDirection =
             CVecteur3::Refract( Rayon.ObtenirDirection(),
                                 Intersection.ObtenirNormale(),
-                                m_IndiceRefractionScene / Intersection.ObtenirSurface()->ObtenirIndiceRefraction() );
+                                IndiceRefractionRatio );
 
         RefractedRayon.AjusterDirection( refractedDirection );
 
-        // Rrelease on the otherside ?
-        CIntersection Intersection2 = Intersection.ObtenirSurface()->Intersection( RefractedRayon );
-        if( Intersection2.ObtenirSurface() != NULL )
-        {
-            refractedDirection =
-                CVecteur3::Refract( RefractedRayon.ObtenirDirection(),
-                                    Intersection2.ObtenirNormale(),
-                                    Intersection2.ObtenirSurface()->ObtenirIndiceRefraction() ) / m_IndiceRefractionScene ;
-        
-            
-            RefractedRayon.AjusterOrigine( RefractedRayon.ObtenirOrigine() + RefractedRayon.ObtenirDirection() * Intersection2.ObtenirDistance() );
-            RefractedRayon.AjusterDirection( refractedDirection );
-        }
+        //// Rrelease on the otherside ?
+        //CIntersection Intersection2 = Intersection.ObtenirSurface()->Intersection( RefractedRayon );
+        //if( Intersection2.ObtenirSurface() != NULL )
+        //{
+        //    refractedDirection =
+        //        CVecteur3::Refract( RefractedRayon.ObtenirDirection(),
+        //                            Intersection2.ObtenirNormale(),
+        //                            Intersection2.ObtenirSurface()->ObtenirIndiceRefraction() ) / m_IndiceRefractionScene ;
+        //
+        //    
+        //    RefractedRayon.AjusterOrigine( RefractedRayon.ObtenirOrigine() + RefractedRayon.ObtenirDirection() * Intersection2.ObtenirDistance() );
+        //    RefractedRayon.AjusterDirection( refractedDirection );
+        //}
 
         // A decommenter apres ajustement de la direction!
         Result += ObtenirCouleur( RefractedRayon ) * Intersection.ObtenirSurface()->ObtenirCoeffRefraction();
