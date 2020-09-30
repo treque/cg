@@ -154,14 +154,13 @@ CIntersection CTriangle::Intersection(const CRayon& Rayon)
     double t = CVecteur3::ProdScal( qVect, edge2 );
     t = t / det;
 
-    // Voici deux références pour acomplir le développement :
-    // 1) Tomas Akenine-Moller and Eric Haines "Real-Time Rendering 2nd Ed." 2002, p.581
-    // 2) Son article: http://www.graphics.cornell.edu/pubs/1997/MT97.pdf
+    // Verify the normal direction
+    CVecteur3 normal = m_Normale;
+    if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0.0 )
+        normal = -normal;
 
-    // Notez que la normale du triangle est déjà calculée lors du prétraitement
-    // il suffit que de la passer à la structure d'intersection.
     Result.AjusterDistance( t );
-    Result.AjusterNormale( m_Normale );
+    Result.AjusterNormale( normal );
     Result.AjusterSurface( this );
     return Result;
 }
