@@ -1,0 +1,12 @@
+1. Dans le code, vous utilisez un coefficient de réfraction et un indice de réfraction. En quoi
+leurs utilités sont-elles différentes ?
+Le coefficient de réfraction affecte l'énergie du rayon qui traverse une surface. L'énergie du rayon réfracté sera
+multiplié par cette valeur. L'indice de réfraction est la mesure que nous utilisons communément en physique optique,
+liée au matériau/milieu traversé. Elle affecte l'angle de réfraction, telle que spéculée par la loi de Snell-Descartes.
+
+2. Si vous vouliez implémenter un lanceur de rayon sur GPUs quelles seraient les étapes
+nécessaires pour y arriver ?
+
+3. Une fois cela fait, comment pourriez-vous appliquer un éclairage réaliste (lanceur de
+rayon) sur seulement quelques parties de la scène (comme les yeux d’un personnage) ?
+Il faut créer et associer des nuanceurs pour chaque partie spécifique à nuancer.
