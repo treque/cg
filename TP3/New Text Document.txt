@@ -6,7 +6,13 @@ liée au matériau/milieu traversé. Elle affecte l'angle de réfraction, telle 
 
 2. Si vous vouliez implémenter un lanceur de rayon sur GPUs quelles seraient les étapes
 nécessaires pour y arriver ?
+Il faut rendre deux triangles avec des coordonnées de textures entre 0 et 1 qui couvre l'écran au complet,
+puis exécuter un nuanceur de fragment pour texturer ceux-ci. Il faut, dans le nuanceur de sommets, billboard
+un plan face à la caméra. À l'intérieur de ce plant s'effectueront des calculs d'intersection (rayons de la caméra passant par le plan)
+dans le worldspace dans le nuanceur de fragments.
 
 3. Une fois cela fait, comment pourriez-vous appliquer un éclairage réaliste (lanceur de
 rayon) sur seulement quelques parties de la scène (comme les yeux d’un personnage) ?
-Il faut créer et associer des nuanceurs pour chaque partie spécifique à nuancer.
+Il faut créer et associer des nuanceurs pour chaque partie spécifique à nuancer. Par exemple,
+on écrit un nuanceur pour les yeux du personnage en suivant l'idée de la question 2.
+j'ai l'impression qu'il manque un élément de réponse..
