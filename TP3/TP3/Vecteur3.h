@@ -506,14 +506,12 @@ inline const CVecteur3
     CVecteur3::Refract(const CVecteur3& Vecteur, const CVecteur3& Normal, const REAL IndiceRefractionRatio)
 {
     CVecteur3 Result;
-    REAL criticalAngle = asin(1/IndiceRefractionRatio);
     REAL vectorDotNormal = CVecteur3::ProdScal( Vecteur, Normal );
-    REAL vectorDotInvNormal = CVecteur3::ProdScal( Vecteur, -Normal );
-    REAL incidentAngle = acos( vectorDotInvNormal / CVecteur3::Norme( Vecteur ) / CVecteur3::Norme( Normal ) );
+    CVecteur3 z = IndiceRefractionRatio * ( Vecteur - vectorDotNormal * Normal );
 
-    if( (incidentAngle < criticalAngle) || IndiceRefractionRatio < 1.0 )
+
+    if( CVecteur3::Norme(z) < 1.0 )
     {
-        CVecteur3 z = IndiceRefractionRatio * ( Vecteur - vectorDotNormal * Normal );
         Result = z - ( sqrt( 1 - CVecteur3::Norme( z ) * CVecteur3::Norme( z ) ) * Normal );
     }
     else

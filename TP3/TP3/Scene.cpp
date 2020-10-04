@@ -799,7 +799,7 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
             // de l'intérieur, vers l'extérieur...
             RefractedRayon.AjusterIndiceRefraction(m_IndiceRefractionScene);
             IndiceRefractionRatio = Intersection.ObtenirSurface()->ObtenirIndiceRefraction() / m_IndiceRefractionScene;
-            SurfaceNormal         = SurfaceNormal;
+            SurfaceNormal         = -SurfaceNormal;
         }
         else
         {
@@ -815,7 +815,7 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
         // Ajuster la direction du rayon réfracté
         CVecteur3 refractedDirection =
             CVecteur3::Refract( Rayon.ObtenirDirection(),
-                                Intersection.ObtenirNormale(),
+                                SurfaceNormal,
                                 IndiceRefractionRatio );
 
         RefractedRayon.AjusterDirection( refractedDirection );
