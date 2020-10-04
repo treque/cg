@@ -200,7 +200,7 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
     const REAL discriminant = Bq * Bq - 4 * Aq * Cq;
     REAL t0, t1, t;
 
-    if (abs(Aq) < EPSILON) 
+    if (abs(Aq) < EPSILON) // handle div/0
     {
         t = -Cq / Bq;
         if (t > EPSILON)
@@ -210,7 +210,7 @@ CIntersection CQuadrique::Intersection(const CRayon& Rayon)
             Result.AjusterNormale(ObtenirNormale(o + d * t));
         }
     }
-    else if (discriminant >= 0)
+    else if (discriminant >= 0) // on va rarement avoir une seule solution a cause de l'imprecision
     {
         t0 = (-Bq - sqrt(discriminant)) / (2 * Aq);
         t1 = (-Bq + sqrt(discriminant)) / (2 * Aq);

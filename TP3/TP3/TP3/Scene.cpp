@@ -769,6 +769,11 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
 
             // À COMPLÉTER
             // AJOUTER LA CONTRIBUTION SPÉCULAIRE DE PHONG...
+            CVecteur3 R = CVecteur3::Normaliser(CVecteur3::Reflect(LumiereRayon.ObtenirDirection(), Intersection.ObtenirNormale()));
+
+            REAL PhongFactor = Intersection.ObtenirSurface()->ObtenirCoeffSpeculaire()
+                * uneLumiere->GetIntensity() * std::pow(CVecteur3::ProdScal(R, Rayon.ObtenirDirection()), Intersection.ObtenirSurface()->ObtenirCoeffBrillance());
+            Result += PhongFactor * LumiereCouleur;
         }
     }
 
@@ -779,13 +784,13 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
         CRayon ReflectedRayon;
         // À COMPLÉTER
         // Ajuster la direction du rayon réfracté
-        // ReflectedRayon.AjusterDirection( ... );
+        ReflectedRayon.AjusterDirection(CVecteur3::Reflect(Rayon.ObtenirDirection(), Intersection.ObtenirNormale()));
         ReflectedRayon.AjusterOrigine(IntersectionPoint);
         ReflectedRayon.AjusterEnergie(ReflectedRayonEnergy);
         ReflectedRayon.AjusterNbRebonds(Rayon.ObtenirNbRebonds() + 1);
 
         //À decommenter apres ajustement de la direction!
-        // Result += ObtenirCouleur( ReflectedRayon ) * Intersection.ObtenirSurface()->ObtenirCoeffReflexion();
+        Result += ObtenirCouleur( ReflectedRayon ) * Intersection.ObtenirSurface()->ObtenirCoeffReflexion();
     }
 
     // Effectuer les réfractions de rayon
@@ -816,9 +821,9 @@ const CCouleur CScene::ObtenirCouleurSurIntersection(const CRayon& Rayon, const 
         // À COMPLÉTER
         // Ajuster la direction du rayon réfracté
         // ...
-
+        RefractedRayon.AjusterDirection(CVecteur3::Refract(Rayon.ObtenirDirection(), SurfaceNormal, IndiceRefractionRatio));
         // A decommenter apres ajustement de la direction!
-        // Result += ObtenirCouleur( RefractedRayon ) * Intersection.ObtenirSurface()->ObtenirCoeffRefraction();
+        Result += ObtenirCouleur( RefractedRayon ) * Intersection.ObtenirSurface()->ObtenirCoeffRefraction();
     }
 
     return Result;
@@ -849,7 +854,18 @@ const CCouleur CScene::ObtenirFiltreDeSurface(CRayon& LumiereRayon) const
 
     // Tester le rayon de lumière avec chaque surface de la scène
     // pour vérifier s'il y a intersection
-
+    for (auto surface : m_Surfaces)
+    {
+        LumiereIntersection = surface->Intersection(LumiereRayon);
+        // si l'intersection est pas en lancant le rayon vers l'arriere
+        // si l'intersection est plus proche que la distance entre la lumiere et le fragment
+        if (LumiereIntersection.ObtenirDistance() > EPSILON
+            && LumiereIntersection.ObtenirDistance() < Distance)
+        {
+            Filter *= LumiereIntersection.ObtenirSurface()->ObtenirCouleur()
+            * LumiereIntersection.ObtenirSurface()->ObtenirCoeffRefraction();
+        }
+    }
     // S'il y a une intersection appliquer la translucidité de la surface
     // intersectée sur le filtre
 

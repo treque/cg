@@ -509,8 +509,16 @@ inline const CVecteur3
     CVecteur3 Result;
 
     // À COMPLÉTER ...
-
-    return Result;
+    CVecteur3 Z = IndiceRefractionRatio * (Vecteur - (CVecteur3::ProdScal(Vecteur, Normal))* Normal);
+    // reflection totale interne
+    if (CVecteur3::Norme(Z) > REAL(1.0))
+    {
+        return Reflect(Vecteur, Normal);
+    }
+    else // refraction
+    {
+        return Z - (sqrt(1 - pow(CVecteur3::Norme(Z), 2))) * Normal;
+    }
 }
 } // namespace Math3D
 
