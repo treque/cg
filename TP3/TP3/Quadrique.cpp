@@ -227,10 +227,6 @@ CVecteur3 CQuadrique::calculateNormal(const CRayon& Rayon, CVecteur3 intersectio
         + 2 * m_Quadratique.z * intersectionPoint.z
         + m_Lineaire.z;
 
-
-    if( CVecteur3::ProdScal( normal, Rayon.ObtenirDirection() ) > 0.0 )
-        normal = -normal;
-
     return normal;
 }
 
