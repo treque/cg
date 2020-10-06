@@ -3,10 +3,11 @@
 L'indice de refraction représente la densité d'un matériau.
 Il est utilisé afin de connaitre le changement de direction
 que subira le rayon qui traverse ce matériau.
+En d'autres mots, elle affecte l'angle de réfraction telle que spéculée par la loi de Snell-Descartes.
 
-Le coefficient de refraction permet de calculer l'énergie utilisé et
+Le coefficient de réfraction permet de calculer l'énergie utilisée et
 la coloration que subira l'image traversant le matériau.
-Par exemple, une boule blanche vu à travers une fenêtre teinté bleu sera perçu comme bleu;
+Par exemple, une boule blanche vue à travers une fenêtre teintée bleue sera perçue comme bleu;
 
 
 2. Si vous vouliez implémenter un lanceur de rayon sur GPUs quelles seraient les étapes nécessaires pour y arriver ?
@@ -14,12 +15,12 @@ Par exemple, une boule blanche vu à travers une fenêtre teinté bleu sera per�
 Il faut dans le nuanceur de sommets, billboard un plan face à la caméra.
 Par la suite dans le nuanceurs de fragment, il faut effectuer des calculs
 d'intersection pour les pixels ce plan (rayons de la caméra passant par le plan).
-Ces calculs doivent être fait le worldspace dans le nuanceur de fragments.
-Au final l'on rend deux triangle ou un quad selon une texture resultante des calculs d'intersection.
-Les coordonnés de la texture doivent se situées entre [0, 1].
+Ces calculs doivent être faits le worldspace dans le nuanceur de fragments.
+Au final l'on rend deux triangles ou un quad selon une texture résultante des calculs d'intersection.
+Les coordonnés de la texture doivent se situer entre [0, 1].
 
 3. Une fois cela fait, comment pourriez-vous appliquer un éclairage réaliste (lanceur de rayon) sur seulement quelques parties de la scène (comme les yeux d’un personnage) ?
 
 Il faut créer et associer des nuanceurs pour chaque partie spécifique à nuancer. 
 Par exemple, on écrit un nuanceur pour les yeux du personnage en suivant l'idée de la question 2.
-De cette façon seul l'éclairage et la scene vu par le personnage est rendu.
+De cette façon seuls l'éclairage et la scène vus par le personnage sont rendus.
