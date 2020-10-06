@@ -512,7 +512,7 @@ inline const CVecteur3
 
     if( CVecteur3::Norme(z) < 1.0 )
     {
-        Result = z - ( sqrt( 1 - CVecteur3::Norme( z ) * CVecteur3::Norme( z ) ) * Normal );
+        Result = z - ( sqrt( 1 - pow(CVecteur3::Norme( z ) , 2) ) * Normal );
     }
     else
     {
