@@ -5,5 +5,6 @@ in vec3 fragTexCoord;
 out vec4 color;
 void main (void) 
 {
-    color = texture(colorMap, fragTexCoord);
+   // compl�ter le nuanceur ici pour texturer le cube
+   color = texture(colorMap, fragTexCoord);
 }

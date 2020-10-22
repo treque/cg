@@ -20,8 +20,6 @@ struct Mat
         float Shininess;
 };
 
-uniform sampler2D colorMap;
-
 uniform int pointLightOn;
 uniform int spotLightOn;
 uniform int dirLightOn;
@@ -33,6 +31,17 @@ uniform mat4 V;
 uniform Light Lights[3]; // 0:ponctuelle  1:spot  2:directionnelle
 uniform Mat Material;
 
+//Accumulateurs de contributions Ambiantes et Diffuses:
+vec4 Ambient;
+vec4 Diffuse;
+
+uniform sampler2D colorMap;
+
+in vec3 light0Vect;
+in vec3 light1Vect;
+in vec3 light2Vect;
+in vec3 normal_cameraSpace;
+
 in vec2 fragTexCoord;
 in vec3 fragNormal;
 in vec3 fragLight0Vect;
@@ -41,100 +50,92 @@ in vec3 fragLight2Vect;
 
 out vec4 color;
 
-//Accumulateurs de contributions Ambiantes et Diffuses:
-vec4 Ambient;
-vec4 Diffuse;
-
-// Calcul pour une lumière ponctuelle
+// Calcul pour une lumiï¿½re ponctuelle
 void pointLight(in vec3 lightVect, in vec3 normal)
 {
-    float nDotVP;       // Produit scalaire entre VP et la normale
-    float attenuation;  // facteur d'atténuation calculé
-    float d;            // distance entre lumière et fragment
-    vec3  VP;           // Vecteur lumière
+   float nDotVP;       // Produit scalaire entre VP et la normale
+   float attenuation;  // facteur d'attï¿½nuation calculï¿½
+   float d;            // distance entre lumiï¿½re et fragment
+   vec3  VP;           // Vecteur lumiï¿½re
 
-    // Calculer vecteur lumière
-    // VP = ...
-    VP = lightVect;
+   // Calculer vecteur lumiï¿½re
+   VP = lightVect;
 
-    // Calculer distance à la lumière
-    d = length(VP);
+   // Calculer distance ï¿½ la lumiï¿½re
+   d = length(VP);
 
-    // Normaliser VP
-    // VP = ..
-    VP = normalize(VP);
-    // Calculer l'atténuation due à la distance
-    //attenuation = ...
+   // Normaliser VP
+   VP = normalize(VP);
 
-    attenuation = 1.0f / (Lights[0].Attenuation[0] + Lights[0].Attenuation[1] * d + Lights[0].Attenuation[0] + Lights[0].Attenuation[2] * d * d);
+   // Calculer l'attï¿½nuation due ï¿½ la distance
+   attenuation = 1.0f / (Lights[0].Attenuation[0] + Lights[0].Attenuation[1] * d + Lights[0].Attenuation[2] * d * d); 
+   
+   nDotVP = max(0.0, dot(normal, VP));
 
-    // nDotVP = ...
-    nDotVP = max(0.0f, dot(normal, VP));
-
-    // Calculer les contributions ambiantes et diffuses
-    Ambient += vec4(Lights[0].Ambient, 1.0f) * attenuation;
-    Diffuse += vec4(Lights[0].Diffuse, 1.0f) * nDotVP * attenuation;
+   // Calculer les contributions ambiantes et diffuses
+   Ambient  += attenuation * vec4((Lights[0].Ambient), 1);
+   Diffuse  += attenuation * nDotVP * vec4((Lights[0].Diffuse), 1);
 }
 
 
-// Calcul pour une lumière directionnelle
+// Calcul pour une lumiï¿½re directionnelle
 void directionalLight(in vec3 lightVect, in vec3 normal)
 {
-    float nDotVP;         // Produit scalaire entre VP et la normale
+   vec3  VP;             // Vecteur lumiï¿½re
+   float nDotVP;         // Produit scalaire entre VP et la normale
 
-    vec3 VP = normalize(lightVect); // w = 1 
-    nDotVP = max(0.0f, dot(normal, VP));
+   nDotVP = max(0.0, dot(normal, normalize(lightVect)));
 
-    // Calculer les contributions ambiantes et diffuses
-    Ambient += vec4(Lights[2].Ambient, 1.0f);
-    Diffuse += vec4(Lights[2].Diffuse, 1.0f) * nDotVP;
+   // Calculer les contributions ambiantes et diffuses
+   Ambient  += vec4(Lights[2].Ambient, 1);
+   Diffuse  +=  nDotVP * vec4(Lights[2].Diffuse, 1);
 }
 
 
-// Calcul pour une lumière "spot"
+// Calcul pour une lumiï¿½re "spot"
 void spotLight(in vec3 lightVect, in vec3 normal)
 {
-    float nDotVP;             // Produit scalaire entre VP et la normale
-    float spotAttenuation;    // Facteur d'atténuation du spot
-    float attenuation;        // Facteur d'atténuation du à la distance
-    float angleEntreLumEtSpot;// Angle entre le rayon lumieux et le milieu du cone
-    float d;                  // Distance à la lumière
-    vec3  VP;                 // Vecteur lumière
+   float nDotVP;             // Produit scalaire entre VP et la normale
+   float spotAttenuation;    // Facteur d'attï¿½nuation du spot
+   float attenuation;        // Facteur d'attï¿½nuation du ï¿½ la distance
+   float angleEntreLumEtSpot;// Angle entre le rayon lumieux et le milieu du cone
+   float d;                  // Distance ï¿½ la lumiï¿½re
+   vec3  VP;                 // Vecteur lumiï¿½re
 
-    // Calculer le vecteur Lumière
-    // VP = ...
-    VP = lightVect;
+   // Calculer le vecteur Lumiï¿½re
+   VP = lightVect;
 
-    // Calculer la distance à al lumière
-    // d = ...
-    d = length(lightVect);
-    // Normaliser VP
-    // ...
-    VP = normalize(VP);
+   // Calculer la distance ï¿½ al lumiï¿½re
+   d = length(VP);
 
-    // Calculer l'atténuation due à la distance
-    // ...
-    attenuation = 1.0f / (Lights[1].Attenuation[0] + Lights[1].Attenuation[1] * d + Lights[1].Attenuation[0] + Lights[1].Attenuation[2] * d * d);
-    // Le fragment est-il à l'intérieur du cône de lumière ?
-    float spotDot = dot(-VP, normalize(Lights[1].SpotDir));
+   // Normaliser VP
+   VP = normalize(VP);
 
-    if (spotDot < cos(radians(Lights[1].SpotCutoff)))
-    {
-        spotAttenuation = 0.0; // en dehors... aucune contribution
-    }
-    else
-    {
-        spotAttenuation = pow(spotDot, Lights[1].SpotExp);
-    }
+   // Calculer l'attï¿½nuation due ï¿½ la distance
+   attenuation = 1.0 / (Lights[1].Attenuation[0] + Lights[1].Attenuation[1] * d + Lights[1].Attenuation[2] * d * d); 
 
-    // Combine les atténuation du spot et de la distance
-    attenuation *= spotAttenuation;
+   // Le fragment est-il ï¿½ l'intï¿½rieur du cï¿½ne de lumiï¿½re ?
+   vec3 spotDir = normalize(Lights[1].SpotDir);
+   vec3 lightDir = -VP;
+   angleEntreLumEtSpot = acos(dot(lightDir, spotDir)) * 360 / (2 * 3.1416);
 
-    nDotVP = max(0.0, dot(normal, VP));
+   if (angleEntreLumEtSpot > Lights[1].SpotCutoff)
+   {
+       spotAttenuation = 0.0; // en dehors... aucune contribution
+   }
+   else
+   {
+       spotAttenuation = pow(dot(lightDir, spotDir), Lights[1].SpotExp);
+   }
 
-    // Calculer les contributions ambiantes et diffuses
-    Ambient += vec4(Lights[1].Ambient, 1.0f) * attenuation;
-    Diffuse += vec4(Lights[1].Diffuse, 1.0f) * nDotVP * attenuation;
+   // Combine les attï¿½nuation du spot et de la distance
+   attenuation *= spotAttenuation;
+
+   nDotVP = max(0.0, dot(normal, VP));
+
+   // Calculer les contributions ambiantes et diffuses
+   Ambient  += attenuation * vec4(Lights[1].Ambient, 1);
+   Diffuse  += attenuation * nDotVP * vec4(Lights[1].Diffuse, 1);
 }
 
 vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 normal)
@@ -142,9 +143,9 @@ vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 
     vec4 color;
     vec3 ecPosition3;
 
-    // Réinitialiser les accumulateurs
-    Ambient = vec4(0.0);
-    Diffuse = vec4(0.0);
+    // Rï¿½initialiser les accumulateurs
+    Ambient  = vec4 (0.0);
+    Diffuse  = vec4 (0.0);
 
     if (pointLightOn == 1) {
         pointLight(light0Vect, normal);
@@ -156,20 +157,20 @@ vec4 flight(in vec3 light0Vect, in vec3 light1Vect, in vec3 light2Vect, in vec3 
         directionalLight(light2Vect, normal);
     }
 
-    color = (Ambient * Material.Ambient + Diffuse * Material.Diffuse);
-    color = clamp(color, 0.0, 1.0);
+    color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
+    color = clamp( color, 0.0, 1.0 );
+    
     return color;
 }
 
 void main (void) 
 {
-    // Compléter afin d'ajouter la contribution de la texture:
+    // Complï¿½ter afin d'ajouter la contribution de la texture:
     vec4 out_color;
-    out_color = flight(fragLight0Vect, fragLight1Vect, fragLight2Vect, fragNormal);;
     
     //Contribution de la texture:
-    vec4 couleurTex = texture(colorMap, fragTexCoord);
-    out_color *= couleurTex;
+    out_color = texture(colorMap, fragTexCoord);
+    out_color *= flight(light0Vect, light1Vect, light2Vect, normal_cameraSpace);
     
     color = clamp(out_color, 0.0, 1.0);
 }

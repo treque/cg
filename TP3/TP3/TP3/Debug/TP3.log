@@ -1,21 +1,3 @@
 ﻿cl : command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
-  Vecteur3.cpp
-  textfile.cpp
-  Var.cpp
-  Triangle.cpp
-  StringUtils.cpp
   Scene.cpp
-  Rayon.cpp
-  Quadrique.cpp
-  Plan.cpp
-  NuanceurProg.cpp
-  Matrice4.cpp
-  main.cpp
-  Lumiere.cpp
-  ISurface.cpp
-  Intersection.cpp
-  Couleur.cpp
-  Generating Code...
-Couleur.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   TP3.vcxproj -> C:\Users\tran9\Downloads\cg\TP3\TP3\TP3\Debug\TP3.exe

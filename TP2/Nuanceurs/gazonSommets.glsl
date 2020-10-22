@@ -22,19 +22,18 @@ uniform mat4 M;
 uniform mat4 V;
 uniform Light Lights[3]; // 0:ponctuelle  1:spot  2:directionnelle
 
+//out vec4 fragColor;
 out vec2 fragTexCoord;
-out vec3 fragNormal;
-out vec3 fragLight0Vect;
-out vec3 fragLight1Vect;
-out vec3 fragLight2Vect;
+
+out vec3 light0Vect;
+out vec3 light1Vect;
+out vec3 light2Vect;
+out vec3 normal_cameraSpace;
+
 
 void main (void)
 {
     vec3 csPosition3;
-    vec3 light0Vect;
-    vec3 light1Vect;
-    vec3 light2Vect;
-    vec3 normal_cameraSpace;
     
     // Transformation de la position
     gl_Position = MVP * vec4(vp,1.0);
@@ -42,15 +41,14 @@ void main (void)
     csPosition3 = (csPosition.xyz);
     
     //Vecteurs de la surface vers la lumière
-    light0Vect = vec3(Lights[0].Position) - csPosition3;
-    light1Vect = vec3(Lights[1].Position) - csPosition3;
-    light2Vect = vec3(Lights[2].Position) - csPosition3;
+    light0Vect = Lights[0].Position.xyz - csPosition3.xyz;
+    light1Vect = Lights[1].Position.xyz - csPosition3.xyz;
+    light2Vect = -Lights[2].Position.xyz;
 
     //Normale en référentiel caméra:
     normal_cameraSpace = normalize(MV_N * vn);
-    
+
     //Coordonée de texture:
-    // ...
     fragTexCoord = vt;
     fragNormal = normal_cameraSpace;
     fragLight0Vect = light0Vect;
@@ -59,5 +57,4 @@ void main (void)
     
     // Transformation de la position
     gl_Position = MVP * vec4(vp,1.0);
-    
 }
