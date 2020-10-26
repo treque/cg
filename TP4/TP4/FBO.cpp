@@ -78,20 +78,40 @@ void CFBO::Init(int w, int h)
     m_TextureH = h;
 
     // TODO: Remplir la fonction d'initialisation d'un FBO:
-
     // Créer et lier un nouveau frame buffer avec l'ID m_fbo:
     // ...
 
+    glGenFramebuffers(1, &m_FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
     // Créer une texture RGB pour les couleurs avec L'ID m_Texture:
     // Pour échantillionner plus tard des valeurs exactes
     // on veut des filtres de mignification et magnification de tpe NEAREST!
     // ...
+    glGenTextures(1, &m_Texture);
+    glBindTexture(GL_TEXTURE_2D, m_Texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_TextureW, m_TextureH, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Créer une texture de profondeurs pour les couleurs avec L'ID m_Profondeur:
     // ...
+    glGenTextures(1, &m_Profondeur); // we are not using renderbuffers because we are sampling them. the depth buffer is not only used for testing, but needs to be read from.
+    glBindTexture(GL_TEXTURE_2D, m_Profondeur);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_TextureW, m_TextureH, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Attacher nos deux textures au frame buffer à des fin d'affichage (DRAW):
     // ...
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Profondeur, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Texture, 0);
 
     // Vérification des erreurs FBO
     // Nous vous fournissons cette vérification d'erreurs
@@ -168,6 +188,12 @@ void CFBO::CommencerCapture()
     // Activer l'utilisation du FBO
     // Attention à la résolution avec laquelle on veut afficher!
     // ...
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glPushAttrib(GL_VIEWPORT_BIT);
+    glViewport(0, 0, m_TextureW, m_TextureH);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -190,4 +216,6 @@ void CFBO::TerminerCapture()
     // TODO:
     // Remettre OpenGL dans l'état par défaut
     // ...
+    glPopAttrib();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

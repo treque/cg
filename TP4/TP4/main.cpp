@@ -70,9 +70,9 @@ static CFBO*            fbo = nullptr;
 static CFBO*            shadowMaps[3];
 static CTextureCubemap* carteDiffuse;
 
-static bool         afficherShadowMap     = false;
+static bool         afficherShadowMap     = true;
 static bool         afficherAutresModeles = false;
-static unsigned int shadowMapAAfficher    = 0;
+static unsigned int shadowMapAAfficher    = 1;
 
 static float horizontalAngle = 0.f; // Angle horizontale de la caméra: vers les Z
 static float verticalAngle   = 0.f; // Angle vertical: vers l'horizon
@@ -347,10 +347,16 @@ void initialisation(void)
     // TODO :
     // Création du frame buffer object pour pré-rendu de la scène:
     // Quelle taille devrait avoir nos textures?
-
+    fbo = new CFBO();
+    fbo->Init(CVar::currentW, CVar::currentH);
     // TODO
     // Création des trois FBOs pour cartes d'ombres:
     // Utilisez CCst::tailleShadowMap
+    for (int i = 0; i < 3; ++i)
+    {
+        shadowMaps[i] = new CFBO();
+        shadowMaps[i]->Init(CCst::tailleShadowMap, CCst::tailleShadowMap);
+    }
 
     construireMatricesProjectivesEclairage();
 
@@ -374,7 +380,7 @@ void initialisation(void)
 ///////////////////////////////////////////////////////////////////////////////
 void construireCartesOmbrage(void)
 {
-    GLint     handle;
+    GLint     handle = glGetUniformLocation(progNuanceurShadowMap.getProg(), "shadowMVP");
     glm::mat4 lightMVP;
 
     // Construire les trois cartes d'ombrage
@@ -383,10 +389,21 @@ void construireCartesOmbrage(void)
     // Il vous faut donc afficher dans le FBO adéquat pour chaque lumière, en utilisant le bon nuanceur.
     // Comme il n'y a que le modèle 3D de la vénus qui peut créer des ombres, vous pouvez dessiner que ce modèle,
     // avec la bonne matrice modèle!
+
+    progNuanceurShadowMap.activer();
+
     for (unsigned int i = 0; i < CVar::lumieres.size(); i++)
     {
         // TODO :
         // ...
+        shadowMaps[i]->CommencerCapture();
+        // se mettre du point de vue de la lumiere
+        lightMVP = lightVP[i] * venusModelMatrix;
+        // envoyer MVP au nuanceur
+        glUniformMatrix4fv(handle, 1, GL_FALSE, &lightMVP[0][0]);
+        modele3Dvenus->dessiner();
+
+        shadowMaps[i]->TerminerCapture();
     }
 }
 
@@ -414,28 +431,60 @@ void construireMatricesProjectivesEclairage(void)
 
     // Variables temporaires:
     float       fov;
+    float       aspectRatio = CVar::currentW / CVar::currentH;
     float const K           = 100.0f;
     float const ortho_width = 20.f;
     GLfloat     pos[4];
     GLfloat     dir[3];
-    glm::vec3   point_vise;
     glm::mat4   lumVueMat;
     glm::mat4   lumProjMat;
+    glm::vec3   point_vise;
+
+    glm::vec3   up = glm::vec3(0, 1, 0);
+
+    // lisibilite
+    glm::vec3   posLum;
+    glm::vec3   dirLum;
 
     /// LUM0 : PONCTUELLE : sauvegarder dans lightVP[0]
     // position = position lumière
     // point visé : centre de l'objet (on triche avec la lumière ponctuelle)
     // fov = Assez pour voir completement le moèdle (~90 est OK).
+    CVar::lumieres[ENUM_LUM::LumPonctuelle]->obtenirPos(pos);
+    posLum = glm::vec3(pos[0], pos[1], pos[2]);
+
+    point_vise = modele3Dvenus->obtenirCentroid();
+    lumVueMat = glm::lookAt(posLum, point_vise, up);
+    fov = 90.f;
+    lumProjMat = glm::perspective(fov, aspectRatio, 0.f, K);
+    lightVP[0] = lumProjMat * lumVueMat; //VP --> PV ave glm
 
     /// LUM1 : SPOT : sauvegarder dans lightVP[1]
     //	position = position lumière
     //	direction = spot_dir (attention != point visé)
     //  fov = angle du spot
+    CVar::lumieres[ENUM_LUM::LumSpot]->obtenirPos(pos);
+    CVar::lumieres[ENUM_LUM::LumSpot]->obtenirSpotDir(dir);
+    posLum = glm::vec3(pos[0], pos[1], pos[2]);
+    dirLum = glm::vec3(dir[0], dir[1], dir[2]);
+
+    lumVueMat = glm::lookAt(posLum, posLum + dirLum, up);
+    fov = Deg2Rad(CVar::lumieres[ENUM_LUM::LumSpot]->obtenirSpotCutOff());
+    lumProjMat = glm::perspective(fov, aspectRatio, 0.f, K);
+    lightVP[1] = lumProjMat * lumVueMat; 
+
 
     // LUM2 : DIRECTIONNELLE : sauvegarder dans lightVP[2]
     //	position = -pos * K | K=constante assez grande pour ne pas être dans le modèle
     //	point visé = 0,0,0
     //  projection orthogonale, assez large pour voir le modèle (ortho_width)
+    CVar::lumieres[ENUM_LUM::LumDirectionnelle]->obtenirPos(pos);
+    posLum = glm::vec3(pos[0], pos[1], pos[2]);
+    dirLum = glm::vec3(0, 0, 0);
+
+    lumVueMat = glm::lookAt(posLum, dirLum, up);
+    lumProjMat = glm::ortho(-ortho_width, ortho_width, -ortho_width, ortho_width, 0.f, K);
+    lightVP[2] = lumProjMat * lumVueMat;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -852,15 +901,16 @@ void dessinerScene()
 
     // TODO Décommenter les conditions:
 
-    // if (CVar::FBOon) {
+    if (CVar::FBOon) {
     // TODO :
     // Activer le FBO pour l'affichage
-    //}
-    // else {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, CVar::currentW, CVar::currentH);
-    //}
+        fbo->CommencerCapture();
+    }
+    else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, CVar::currentW, CVar::currentH);
+    }
 
     //////////////////     Afficher les objets:  ///////////////////////////
     glDisable(GL_DEPTH_TEST);
@@ -880,11 +930,12 @@ void dessinerScene()
     }
 
     // TODO Décommenter les conditions:
-    // if (CVar::FBOon){
+    if (CVar::FBOon){
     // TODO :
     // Si on utilisait le FBO, le désactiver et dessiner le quad d'écran:
-
-    //}
+        fbo->TerminerCapture();
+        dessinerQuad();
+    }
 
     // Fonction d'aide pour mieux visualiser le contenu des shadowMaps
     // afficherShadowMap et shadowMapAAfficher sont déclarés globaux au fichier main.
