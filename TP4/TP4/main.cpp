@@ -72,7 +72,7 @@ static CTextureCubemap* carteDiffuse;
 
 static bool         afficherShadowMap     = true;
 static bool         afficherAutresModeles = false;
-static unsigned int shadowMapAAfficher    = 1;
+static unsigned int shadowMapAAfficher    = 2;
 
 static float horizontalAngle = 0.f; // Angle horizontale de la caméra: vers les Z
 static float verticalAngle   = 0.f; // Angle vertical: vers l'horizon
@@ -431,8 +431,8 @@ void construireMatricesProjectivesEclairage(void)
 
     // Variables temporaires:
     float       fov;
-    float       aspectRatio = CVar::currentW / CVar::currentH;
-    float const K           = 100.0f;
+    float       aspectRatio = 1.F;
+    float const K = 3000.0f;
     float const ortho_width = 20.f;
     GLfloat     pos[4];
     GLfloat     dir[3];
@@ -455,9 +455,9 @@ void construireMatricesProjectivesEclairage(void)
 
     point_vise = modele3Dvenus->obtenirCentroid();
     lumVueMat = glm::lookAt(posLum, point_vise, up);
-    fov = 90.f;
-    lumProjMat = glm::perspective(fov, aspectRatio, 0.f, K);
-    lightVP[0] = lumProjMat * lumVueMat; //VP --> PV ave glm
+    fov = glm::radians(90.f);
+    lumProjMat = glm::perspective(fov, aspectRatio, 0.1f, K); // assume model is farther than 0.01 from light (near plane param)
+    lightVP[0] = lumProjMat * lumVueMat; //VP --> PV avec glm
 
     /// LUM1 : SPOT : sauvegarder dans lightVP[1]
     //	position = position lumière
@@ -468,10 +468,12 @@ void construireMatricesProjectivesEclairage(void)
     posLum = glm::vec3(pos[0], pos[1], pos[2]);
     dirLum = glm::vec3(dir[0], dir[1], dir[2]);
 
+    
     lumVueMat = glm::lookAt(posLum, posLum + dirLum, up);
-    fov = Deg2Rad(CVar::lumieres[ENUM_LUM::LumSpot]->obtenirSpotCutOff());
-    lumProjMat = glm::perspective(fov, aspectRatio, 0.f, K);
-    lightVP[1] = lumProjMat * lumVueMat; 
+    fov = glm::radians(CVar::lumieres[ENUM_LUM::LumSpot]->obtenirSpotCutOff());
+    lumProjMat = glm::perspective(fov, aspectRatio, 0.1f, K);
+    lightVP[1] = lumProjMat * lumVueMat;
+
 
 
     // LUM2 : DIRECTIONNELLE : sauvegarder dans lightVP[2]
@@ -479,11 +481,11 @@ void construireMatricesProjectivesEclairage(void)
     //	point visé = 0,0,0
     //  projection orthogonale, assez large pour voir le modèle (ortho_width)
     CVar::lumieres[ENUM_LUM::LumDirectionnelle]->obtenirPos(pos);
-    posLum = glm::vec3(pos[0], pos[1], pos[2]);
+    posLum = glm::vec3(pos[0], pos[1] , pos[2]); // mulitplier car K ne marche pas..
     dirLum = glm::vec3(0, 0, 0);
 
-    lumVueMat = glm::lookAt(posLum, dirLum, up);
-    lumProjMat = glm::ortho(-ortho_width, ortho_width, -ortho_width, ortho_width, 0.f, K);
+    lumVueMat = glm::lookAt(-posLum, dirLum, up);
+    lumProjMat = glm::ortho(-ortho_width, ortho_width, -ortho_width, ortho_width, 0.1f, K);
     lightVP[2] = lumProjMat * lumVueMat;
 }
 
