@@ -85,23 +85,22 @@ void main (void)
    
 		// Quantifier la différence de profondeur entre le point visé et le fragment courant:
 		// Utilisez LineariserProfondeur() sur les profondeurs échantillonnées
-		// depth = ... 
-		// center_depth =  ... 
+		depth = LineariserProfondeur(texture(depthMap, fragTexCoord.xy).x);
+		center_depth = LineariserProfondeur(texture(depthMap, vec2(0.5, 0.5)).x);
 
 		// Le poids est simplement la différence absolue entre ces deux valeurs:
-		// w= ...
+		w = abs(depth - center_depth);
 
 		// Appliquer un filtre gaussien (étendue de 1) :
-		// blurred_col = ...
+		blurred_col = FiltreGaussien(fragTexCoord.x, fragTexCoord.y, 1);
 		// Appliquer un filtre gaussien avec une plus grande étendue (ex.: 5) :
-		// blurred_col += ...
+		blurred_col += FiltreGaussien(fragTexCoord.x, fragTexCoord.y, 5);
 		// Moyenne des deux filtres :
-		// blurred_col = ...
+		blurred_col = blurred_col * 0.5;
 
 		// À modifier :
 		// Ajuster la couleur selon la différence de profondeur entre le point visé et le fragment courant:
-		color = clear_color;
-		
+		color = ((1 - w) * clear_color) + (w * blurred_col);;
 
 		// Afin de déboguer, on peut affichier simplement les valeurs de profondeurs:
 		// color = vec4(depth, depth, depth, 1.0);

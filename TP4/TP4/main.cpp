@@ -317,7 +317,7 @@ void initialisation(void)
 
     char* modele3DTexture = nullptr; // on ne désire pas de texture pour l'instant
 
-    modele3Dvenus = new CModele3DOBJ("Modeles/venus-low.obj", modele3DTexture, 1.0);
+    modele3Dvenus = new CModele3DOBJ("Modeles/venus.obj", modele3DTexture, 1.0);
     modele3Dvenus->attribuerNuanceur(progNuanceurModele3D);
     venusModelMatrix = getModelMatrixVenus();
 
