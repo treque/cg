@@ -347,10 +347,19 @@ void initialisation(void)
     // TODO :
     // Création du frame buffer object pour pré-rendu de la scène:
     // Quelle taille devrait avoir nos textures?
-
+    fbo = new CFBO();
+    fbo->Init( CVar::currentW , CVar::currentH);
+    
     // TODO
     // Création des trois FBOs pour cartes d'ombres:
     // Utilisez CCst::tailleShadowMap
+    shadowMaps[0] = new CFBO();
+    shadowMaps[1] = new CFBO();
+    shadowMaps[2] = new CFBO();
+    shadowMaps[0]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
+    shadowMaps[1]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
+    shadowMaps[2]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
+
 
     construireMatricesProjectivesEclairage();
 
@@ -852,15 +861,16 @@ void dessinerScene()
 
     // TODO Décommenter les conditions:
 
-    // if (CVar::FBOon) {
+    if (CVar::FBOon) {
     // TODO :
     // Activer le FBO pour l'affichage
-    //}
-    // else {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glViewport(0, 0, CVar::currentW, CVar::currentH);
-    //}
+        fbo->CommencerCapture();
+    }
+    else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glViewport(0, 0, CVar::currentW, CVar::currentH);
+    }
 
     //////////////////     Afficher les objets:  ///////////////////////////
     glDisable(GL_DEPTH_TEST);
@@ -880,11 +890,12 @@ void dessinerScene()
     }
 
     // TODO Décommenter les conditions:
-    // if (CVar::FBOon){
+    if (CVar::FBOon){
     // TODO :
     // Si on utilisait le FBO, le désactiver et dessiner le quad d'écran:
-
-    //}
+        fbo->TerminerCapture();
+        dessinerQuad();
+    }
 
     // Fonction d'aide pour mieux visualiser le contenu des shadowMaps
     // afficherShadowMap et shadowMapAAfficher sont déclarés globaux au fichier main.

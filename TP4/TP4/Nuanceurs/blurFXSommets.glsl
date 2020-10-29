@@ -12,5 +12,5 @@ void main (void)
    // Passer les bonnes coordonées de textures.
    // Attention les sommets sont dans le domaine [-1, 1]
    // et des coordonées de textures devrait être en [0, 1]
-   // fragTexCoord = ...
+   fragTexCoord = (gl_Position.xy + vec2(1.0, 1.0)) * 0.5;
 }
