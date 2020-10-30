@@ -214,21 +214,21 @@ vec4 lightingIBL()
     // utilise habituellement) il faut trouver la normal Matrix en coord universelles
     // C'est facile, la normalMatrix est toujours uniquement la sous-matrice 3X3
     // de la matrice utilisée pour placer les modèles tant que l'on scale uniformément...
-    // normalMatrix_worldSpace = ...
+    normalMatrix_worldSpace = mat3(modelMatrix);
 
     // Calcul de la normale en coordonnées universelles (world coord)
-    // normal_worldSpace = ...
+    normal_worldSpace = normalMatrix_worldSpace * Normal_objectSpace;
 
     // Lire la contribution diffuse du fragment dans la carte spéculaire.
-    // Diffuse += ...
+    Diffuse += texture(diffMap, normal_worldSpace);
 
     // Pour le calcul spéculaire, on veut échantillonner la texture spéculaire 
 	// là ou la reflexion du vecteur wcEyedir est reflétée.
 
-    // vertexPos_worldSpace = ...
-    // eyeDir_worldSpace = ...
-    // reflectDir_worldSpace = ...
-    // Specular += ...
+    vertexPos_worldSpace =  (modelMatrix * vec4(Position_objectSpace, 1.0)).xyz;
+    eyeDir_worldSpace = EyePos_worldSpace - vertexPos_worldSpace;
+    reflectDir_worldSpace = reflect(-eyeDir_worldSpace, normal_worldSpace);
+    Specular += texture(specMap, reflectDir_worldSpace);
 
     // Ajout des contributions lumineuses calculées
     resColor += Diffuse * matDiffuse;
