@@ -217,7 +217,7 @@ vec4 lightingIBL()
     normalMatrix_worldSpace = mat3(modelMatrix);
 
     // Calcul de la normale en coordonnées universelles (world coord)
-    normal_worldSpace = normalMatrix_worldSpace * Normal_objectSpace;
+    normal_worldSpace = normalize(normalMatrix_worldSpace * Normal_objectSpace);
 
     // Lire la contribution diffuse du fragment dans la carte spéculaire.
     Diffuse += texture(diffMap, normal_worldSpace);
@@ -227,7 +227,8 @@ vec4 lightingIBL()
 
     vertexPos_worldSpace =  (modelMatrix * vec4(Position_objectSpace, 1.0)).xyz;
     eyeDir_worldSpace = EyePos_worldSpace - vertexPos_worldSpace;
-    reflectDir_worldSpace = reflect(-eyeDir_worldSpace, normal_worldSpace);
+    reflectDir_worldSpace = normalize(reflect(-eyeDir_worldSpace, normal_worldSpace));
+
     Specular += texture(specMap, reflectDir_worldSpace);
 
     // Ajout des contributions lumineuses calculées
