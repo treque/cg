@@ -70,9 +70,9 @@ static CFBO*            fbo = nullptr;
 static CFBO*            shadowMaps[3];
 static CTextureCubemap* carteDiffuse;
 
-static bool         afficherShadowMap     = false;
+static bool         afficherShadowMap     = true;
 static bool         afficherAutresModeles = false;
-static unsigned int shadowMapAAfficher    = 0;
+static unsigned int shadowMapAAfficher    = 2;
 
 static float horizontalAngle = 0.f; // Angle horizontale de la caméra: vers les Z
 static float verticalAngle   = 0.f; // Angle vertical: vers l'horizon
@@ -396,6 +396,19 @@ void construireCartesOmbrage(void)
     {
         // TODO :
         // ...
+        shadowMaps[ i ]->CommencerCapture();
+        
+        progNuanceurShadowMap.activer();
+
+        glm::mat4 mvp = lightVP[ i ] * venusModelMatrix;
+
+        handle = glGetUniformLocation( progNuanceurShadowMap.getProg(), "shadowMVP" );
+        glUniformMatrix4fv( handle, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
+
+        //dessinerModele3D( modele3Dvenus, lightVP[i], mat_pierre_model );
+        modele3Dvenus->dessiner();
+
+        shadowMaps[ i ]->TerminerCapture();
     }
 }
 
@@ -420,10 +433,12 @@ void construireMatricesProjectivesEclairage(void)
     // peuvent fonctionner. Pour des shadow maps identiques aux images dans l'énoncé,
     // prendre les valeurs indiquées ici.
     // Les foncitons glm::lookAt(), glm::perspective() et glm::ortho() vous seront utiles...
+    glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f );
+    
 
     // Variables temporaires:
     float       fov;
-    float const K           = 100.0f;
+    float const K           = 1000.0f;
     float const ortho_width = 20.f;
     GLfloat     pos[4];
     GLfloat     dir[3];
@@ -432,19 +447,64 @@ void construireMatricesProjectivesEclairage(void)
     glm::mat4   lumProjMat;
 
     /// LUM0 : PONCTUELLE : sauvegarder dans lightVP[0]
-    // position = position lumière
+    
+    CVar::lumieres[ 0 ]->obtenirPos( pos );
+
+    point_vise = glm::vec3( modele3Dvenus->obtenirCentroid() );
+    glm::vec3 tPos = glm::vec3( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+
+    glm::vec3 direction = point_vise - tPos;
+    glm::vec3 lightRight = glm::normalize( glm::cross( up, direction ) );
+    glm::vec3 lightUp = glm::cross( direction, lightRight );
+
+    fov = glm::radians( 90.0f );
+    //float ratio = float( CVar::currentW ) / CVar::currentH;
+    float ratio = 1.0f; // why?
+
+    // TODO : doubt
+    lightVP[ 0 ] = 
+        glm::perspective( fov, ratio, 0.1f, K)
+        * glm::lookAt( tPos, point_vise, lightUp );
+
     // point visé : centre de l'objet (on triche avec la lumière ponctuelle)
     // fov = Assez pour voir completement le moèdle (~90 est OK).
+    
 
     /// LUM1 : SPOT : sauvegarder dans lightVP[1]
     //	position = position lumière
     //	direction = spot_dir (attention != point visé)
     //  fov = angle du spot
+    CVar::lumieres[ 1 ]->obtenirPos( pos );
+    tPos = glm::vec3( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+
+    CVar::lumieres[1]->obtenirSpotDir( dir );
+    direction = glm::vec3( dir[ 0 ], dir[ 1 ], dir[ 2 ] );
+
+    fov = glm::radians( CVar::lumieres[1]->obtenirSpotCutOff());
+
+    lightRight = glm::normalize( glm::cross( up, direction ) );
+    lightUp = glm::cross( direction, lightRight );
+
+    lightVP[ 1 ] =
+        glm::perspective( fov, ratio, 0.1f, K )
+        * glm::lookAt( tPos, tPos + direction, lightUp );
 
     // LUM2 : DIRECTIONNELLE : sauvegarder dans lightVP[2]
     //	position = -pos * K | K=constante assez grande pour ne pas être dans le modèle
     //	point visé = 0,0,0
     //  projection orthogonale, assez large pour voir le modèle (ortho_width)
+    CVar::lumieres[ 2 ]->obtenirPos( pos );
+
+    tPos = -glm::vec3( pos[ 0 ], pos[ 1 ], pos[ 2 ] );
+    point_vise = glm::vec3( 0.0f, 0.0f, 0.0f );
+    direction = point_vise - tPos;
+
+    lightRight = glm::normalize( glm::cross( up, direction ) );
+    lightUp = glm::cross( direction, lightRight );
+
+    lightVP[ 2 ] =
+        glm::mat4(glm::ortho(-ortho_width, ortho_width, -ortho_width, ortho_width, 0.1f, K ))
+        * glm::lookAt( tPos, point_vise, lightUp );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
