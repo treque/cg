@@ -70,8 +70,8 @@ static CFBO*            fbo = nullptr;
 static CFBO*            shadowMaps[3];
 static CTextureCubemap* carteDiffuse;
 
-static bool         afficherShadowMap     = true;
-static bool         afficherAutresModeles = false;
+static bool         afficherShadowMap     = false;
+static bool         afficherAutresModeles = true;
 static unsigned int shadowMapAAfficher    = 2;
 
 static float horizontalAngle = 0.f; // Angle horizontale de la caméra: vers les Z
