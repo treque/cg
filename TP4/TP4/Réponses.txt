@@ -1,0 +1,54 @@
+1. On vous a fourni la fonction lineariserProfondeur(). Expliquez ce qu’accompli cette
+fonction.
+
+(100% une hypothèse de ma part)
+Cette fonction utilise une fonction rationnelle centrée autour d'une valeur de d = 1.
+Le but est que les valeurs de profondeur aient un plus grand écart avec les valeurs avoisinantes.
+De cette façon la comparaison de deux profondeurs sortante de cette fonction donne un écart plus significatif.
+L'écart entre deux valeurs dans les environs de la valeur maximale de 1 est encore plus perceptible.
+Cela permet d'avoir une transition drastique entre la zone flouée ayant une différence de profondeur et la zone visée.
+
+2. On vous a aussi fourni la fonction FiltreGaussien(). Expliquez les détails de son
+fonctionnement.
+
+Cette fonction applique un filtre gaussien.
+Le résultat est une convolution des signaux entrants, 
+dans notre cas ces signaux sont les couleurs entourant le point fourni comme paramètre.
+
+Plus précisément, cette fonction échantillonne différentes couleurs avoisinant le point fourni comme paramètre.
+L'écart de distance entre les points dépend du paramètre nommé etendue.
+Les couleurs sont prises à partir de la texture de couleur et différents poids leur sont accordés 
+selon leur position par rapport au centre. 
+La valeur de retour est une couleur résultante de la somme de ces pondérations.
+
+
+3. Cette implémentation naïve du champ de profondeur effectue combien d’échantillonnage
+(sampling) de textures par fragment du quad plein écran ? Donner les détails sur une autre
+technique utilisée réduisant le nombre d’échantillonnage pour une même portée.
+
+La fonction FiltreGaussien() échantillonne 25 fois la texture de couleur.
+Celle-ci est appelée deux fois par fragment avec deux étendues différentes, 50 échantillons sont donc réalisés au total par fragment.
+
+Une technique alternative est d'utilisé les compute shaders ainsi qu'une mémoire partagée.
+Le principe est que les résultats peuvent être réutilisés entre les fragments.
+Les compute shaders applique ainsi le filtre de gauss pour l'ensemble possible et sauvegarde le résultat dans la mémoire partagée.
+Le fragment shader lit ainsi à partir de la mémoire partagée les valeurs précalculées par les threads et utilise ces valeurs.
+
+
+4. Avec notre implémentation présente du IBL, le gazon n’est pas visible dans les réflexions de
+l’environnement. Comment pourriez-vous régler ce problème en utilisant des FBOs ?
+Considérez ici un seul modèle 3D présent sur le gazon.
+
+Le principe de la solution s'apparente à celui utilisé pour l'ombre de la statue sur le gazon.
+L'on veut réalisé une texture de profondeur et de couleurs selon une vue prise du modèle.
+
+- Il faut calculé la matrice MVP selon le centre de du modèle.
+- Réaliser une capture dans un FBO en dessinant le gazon selon cette matrice MVP.
+- Le résultat de cette capture est deux textures de couleurs et une de profondeur selon le point de vue du modèle.
+- Les deux textures de couleurs sont pour la composante diffuse et la composante spéculaire.
+- Lors de l'appel à la fonction lightingIBL de modele3DFragment, 
+  il faut vérifier que la profondeur de la texture de profondeur générée pour le gazon est moindre que la valeur maximale,
+  si c'est le cas l'on prend la couleur réfléchit à partir des textures de couleurs générées pour le gazon,
+  sinon l'on prend la couleur réfléchit à partir des textures de couleurs pour la skybox.
+
+
