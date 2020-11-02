@@ -1,0 +1,36 @@
+1. On vous a fourni la fonction lineariserProfondeur(). Expliquez ce qu’accompli cette
+fonction.
+La profondeur est exprimée entre 0.0 et 1.0. C'est ce que contient le tampon de profondeur. La fonction sert à map cette valeur
+à la valeur dans les coordonnées de la caméra (viewspace). En effet, l'équation linéaire pour cette transformation dépend des
+valeurs du near plane et du far plane, soit les mêmes que celles fournies à la matrice de projection pour définir le frustum visible.
+Voir équation (1):
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+Depth Value Precision
+2. On vous a aussi fourni la fonction FiltreGaussien(). Expliquez les détails de son
+fonctionnement.
+Le filtre gaussien effectue une convolution sur le fragment avec un masque 5x5 d'écart-type 2.5 fourni.
+Étant donné un fragment, la fonction retourne la valeur convoluée de sa couleur originale. Elle multiple
+la valeur originale (échantillonage dans le colormap) des 5x5 pixels autour du fragment par leur valeur respective dans le masque
+et on fait la somme de ces résultats issus de pondérations. L'étendue sert à échantilloner des valeurs plus loin si l'étendue est plus grande, ce qui a
+pour effet de flouter encore plus (car plus les valeurs échantillonnées sont loins du fragment évalué, moins elles se "ressemblent"
+et donnent un plus grand effet de flou).
+
+3. Cette implémentation naïve du champ de profondeur effectue combien d’échantillonnage
+(sampling) de textures par fragment du quad plein écran ? Donner les détails sur une autre
+technique utilisée réduisant le nombre d’échantillonnage pour une même portée.
+Beaucoup. Pour un masque 5x5, il y a 25 échantillons à faire pour chaque pixel de l'écran.
+De plus, puisqu'elle est appelée deux fois dans notre cas, il y a 50 échantillons à faire pour
+chaque pixel de l'écran.
+Une autre technique serait d'utiliser des nuanceurs de calculs (compute shaders) avec une mémoire partagée, qui appliquera
+le filtre gaussien sur tout.
+Ces résultats, en mémoire, peuvent donc être réutilisés par les nuanceurs de fragment.
+
+
+4. Avec notre implémentation présente du IBL, le gazon n’est pas visible dans les réflexions de
+l’environnement. Comment pourriez-vous régler ce problème en utilisant des FBOs ?
+Considérez ici un seul modèle 3D présent sur le gazon.
+- Capture dans un FBO du gazon selon ce le point de vue du modèle (et conserver le MVP pour ce modèle)
+- Dans lighting IBL, vérifier que la profondeur dans la texture est moins grand que la
+valeur max (skybox) et si c'est le cas, on prend la couleur réfléchie à partir des textures de couleur
+générées pour la gazon (avec MVP de tantôt). Sinon, on prend la couleur réfléchie à partir des textures de couleur
+pour la skybox. On considère la même texture pour la diffuse et spéculaire.
