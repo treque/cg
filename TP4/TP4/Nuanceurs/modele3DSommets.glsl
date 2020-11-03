@@ -24,7 +24,6 @@ void main () {
 	// Normale dans le référenciel de caméra
 	Normal_cameraSpace = MV_N * vn; 
 
-	// TODO:
 	// Passer les variables en coordonnées d'objet pour l'IBL :
 	Position_objectSpace = vp;
 	Normal_objectSpace = vn;
