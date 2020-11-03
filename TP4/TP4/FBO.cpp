@@ -77,8 +77,6 @@ void CFBO::Init(int w, int h)
     m_TextureW = w;
     m_TextureH = h;
 
-    // TODO: Remplir la fonction d'initialisation d'un FBO:
-
     // Créer et lier un nouveau frame buffer avec l'ID m_fbo:
     // ...
     glGenFramebuffers( 1, &m_FBO );
@@ -92,23 +90,17 @@ void CFBO::Init(int w, int h)
     glBindTexture( GL_TEXTURE_2D, m_Texture );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
 
-    // TODO : Doubt
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glBindTexture( GL_TEXTURE_2D, 0 );
 
     // Créer une texture de profondeurs pour les couleurs avec L'ID m_Profondeur:
     // ...
-    //glGenRenderbuffers( 1, &m_Profondeur );
-    //glBindRenderbuffer( GL_RENDERBUFFER, m_Profondeur );
-    //glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w, h );
-    //glBindRenderbuffer( GL_RENDERBUFFER, 0 );
 
     glGenTextures( 1, &m_Profondeur );
     glBindTexture( GL_TEXTURE_2D, m_Profondeur );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, w, h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL );
 
-    // TODO : Doubt
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
@@ -119,13 +111,10 @@ void CFBO::Init(int w, int h)
     // Attacher nos deux textures au frame buffer à des fin d'affichage (DRAW):
     // ...
     glFramebufferTexture2D( GL_FRAMEBUFFER,
-                               GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Texture, 0 );
+                            GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Texture, 0 );
     
     glFramebufferTexture2D( GL_FRAMEBUFFER,
                             GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Profondeur, 0 );
-
-    //glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-    //                           GL_RENDERBUFFER, m_Profondeur );
 
     // Vérification des erreurs FBO
     // Nous vous fournissons cette vérification d'erreurs
@@ -198,7 +187,6 @@ void CFBO::Liberer()
 ///////////////////////////////////////////////////////////////////////////////
 void CFBO::CommencerCapture()
 {
-    // TODO:
     // Activer l'utilisation du FBO
     // Attention à la résolution avec laquelle on veut afficher!
     // ...
@@ -225,7 +213,6 @@ void CFBO::CommencerCapture()
 ///////////////////////////////////////////////////////////////////////////////
 void CFBO::TerminerCapture()
 {
-    // TODO:
     // Remettre OpenGL dans l'état par défaut
     // ...
     glPopAttrib();

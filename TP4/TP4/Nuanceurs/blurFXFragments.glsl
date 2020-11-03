@@ -79,14 +79,17 @@ void main (void)
 	}
 	else
 	{
-		//TODO : Ajouter le flou gaussien:
 		//Couleur du FBO:
 		clear_color = vec4(texture(colorMap, fragTexCoord.xy).rgb, 1.0);
    
 		// Quantifier la différence de profondeur entre le point visé et le fragment courant:
 		// Utilisez LineariserProfondeur() sur les profondeurs échantillonnées
-		depth = LineariserProfondeur(texture(depthMap, fragTexCoord.xy).x * 2.0 - 1.0);
-		center_depth = LineariserProfondeur(texture(depthMap, vec2(0.5, 0.5)).x * 2.0 - 1.0);
+		// As seen from: https://learnopengl.com/Advanced-OpenGL/Depth-testing
+		float normalizedTextureDepth = texture(depthMap, fragTexCoord.xy).x * 2.0 - 1.0;
+		depth = LineariserProfondeur(normalizedTextureDepth);
+
+		float normalizedTextureCenterDepth = texture(depthMap, vec2(0.5, 0.5)).x * 2.0 - 1.0;
+		center_depth = LineariserProfondeur(normalizedTextureCenterDepth);
 
 		// Le poids est simplement la différence absolue entre ces deux valeurs:
 		w = abs(depth - center_depth);
@@ -98,9 +101,8 @@ void main (void)
 		// Moyenne des deux filtres :
 		blurred_col = blurred_col * 0.5;
 
-		// À modifier :
 		// Ajuster la couleur selon la différence de profondeur entre le point visé et le fragment courant:
-		color = ((1 - w) * clear_color) + (w * blurred_col);;
+		color = ((1 - w) * clear_color) + (w * blurred_col);
 
 		// Afin de déboguer, on peut affichier simplement les valeurs de profondeurs:
 		// color = vec4(depth, depth, depth, 1.0);

@@ -344,13 +344,11 @@ void initialisation(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    // TODO :
     // Création du frame buffer object pour pré-rendu de la scène:
     // Quelle taille devrait avoir nos textures?
     fbo = new CFBO();
     fbo->Init( CVar::currentW , CVar::currentH);
     
-    // TODO
     // Création des trois FBOs pour cartes d'ombres:
     // Utilisez CCst::tailleShadowMap
     shadowMaps[0] = new CFBO();
@@ -359,7 +357,6 @@ void initialisation(void)
     shadowMaps[0]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
     shadowMaps[1]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
     shadowMaps[2]->Init( CCst::tailleShadowMap, CCst::tailleShadowMap );
-
 
     construireMatricesProjectivesEclairage();
 
@@ -405,7 +402,6 @@ void construireCartesOmbrage(void)
         handle = glGetUniformLocation( progNuanceurShadowMap.getProg(), "shadowMVP" );
         glUniformMatrix4fv( handle, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
 
-        //dessinerModele3D( modele3Dvenus, lightVP[i], mat_pierre_model );
         modele3Dvenus->dessiner();
 
         shadowMaps[ i ]->TerminerCapture();
@@ -922,7 +918,6 @@ void dessinerScene()
     // TODO Décommenter les conditions:
 
     if (CVar::FBOon) {
-    // TODO :
     // Activer le FBO pour l'affichage
         fbo->CommencerCapture();
     }
@@ -949,10 +944,8 @@ void dessinerScene()
         dessinerModele3D(modele3Dbuddha, buddhaModelMatrix, mat_cuivre_model);
     }
 
-    // TODO Décommenter les conditions:
-    if (CVar::FBOon){
-    // TODO :
-    // Si on utilisait le FBO, le désactiver et dessiner le quad d'écran:
+    if (CVar::FBOon) {
+        // Si on utilisait le FBO, le désactiver et dessiner le quad d'écran:
         fbo->TerminerCapture();
         dessinerQuad();
     }
