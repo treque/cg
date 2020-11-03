@@ -1,12 +1,29 @@
 1. On vous a fourni la fonction lineariserProfondeur(). Expliquez ce qu’accompli cette
 fonction.
 
-(100% une hypothèse de ma part)
-Cette fonction utilise une fonction rationnelle centrée autour d'une valeur de d = 1.
-Le but est que les valeurs de profondeur aient un plus grand écart avec les valeurs avoisinantes.
-De cette façon la comparaison de deux profondeurs sortante de cette fonction donne un écart plus significatif.
-L'écart entre deux valeurs dans les environs de la valeur maximale de 1 est encore plus perceptible.
-Cela permet d'avoir une transition drastique entre la zone flouée ayant une différence de profondeur et la zone visée.
+La profondeur récupéré de la texture sont en clip-space. 
+Dans cette situation la valeur de la profondeur suit la fonction présenté dans l'équation 2 trouvé sur cette page:
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+
+L'on peut remarqué que cette équation n'est pas linéaire ce qui fait que les comparaison 
+sont plus ou moins précise selon la position dans la courbe. 
+La précision est moindre pour les distance élevé et la précision est élevé pour les courtes distances.
+Nous voulons éviter les transitions abruptes du floutage qui sont générés par l'imprécision des valeurs elevés.
+
+Le but de la fonction est donc rendre linéaire la relation entre profondeur de la texture et la distance réele de l'objet.
+L'on cherche à revenir à une relation tel que l'équation 1 trouvé sur cette page:
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+
+
+
+
+
+ est exprimée entre 0.0 et 1.0. C'est ce que contient le tampon de profondeur. La fonction sert à map cette valeur
+à la valeur dans les coordonnées de la caméra (viewspace). En effet, l'équation linéaire pour cette transformation dépend des
+valeurs du near plane et du far plane, soit les mêmes que celles fournies à la matrice de projection pour définir le frustum visible.
+Voir équation (1):
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+Depth Value Precision
 
 2. On vous a aussi fourni la fonction FiltreGaussien(). Expliquez les détails de son
 fonctionnement. 

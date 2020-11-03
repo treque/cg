@@ -85,8 +85,8 @@ void main (void)
    
 		// Quantifier la différence de profondeur entre le point visé et le fragment courant:
 		// Utilisez LineariserProfondeur() sur les profondeurs échantillonnées
-		depth = LineariserProfondeur(texture(depthMap, fragTexCoord.xy).x);
-		center_depth = LineariserProfondeur(texture(depthMap, vec2(0.5, 0.5)).x);
+		depth = LineariserProfondeur(texture(depthMap, fragTexCoord.xy).x * 2.0 - 1.0);
+		center_depth = LineariserProfondeur(texture(depthMap, vec2(0.5, 0.5)).x * 2.0 - 1.0);
 
 		// Le poids est simplement la différence absolue entre ces deux valeurs:
 		w = abs(depth - center_depth);
