@@ -422,7 +422,7 @@ void construireCartesOmbrage(void)
 ///////////////////////////////////////////////////////////////////////////////
 void construireMatricesProjectivesEclairage(void)
 {
-    // TODO:
+
     // Compléter la fonction "construireMatricesProjectivesEclairage"
     // On doit ici construire les matrice vue-projection (VP dans MVP) pour chaque lumière.
     // On donne des indices sur quelles valeurs utiliser, mais dans certains cas, d'autres valeurs
@@ -431,10 +431,9 @@ void construireMatricesProjectivesEclairage(void)
     // Les foncitons glm::lookAt(), glm::perspective() et glm::ortho() vous seront utiles...
     glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f );
     
-
     // Variables temporaires:
     float       fov;
-    float const K           = 1000.0f;
+    float const K           = 2000.0f;
     float const ortho_width = 20.f;
     GLfloat     pos[4];
     GLfloat     dir[3];
@@ -443,7 +442,8 @@ void construireMatricesProjectivesEclairage(void)
     glm::mat4   lumProjMat;
 
     /// LUM0 : PONCTUELLE : sauvegarder dans lightVP[0]
-    
+    // point visé : centre de l'objet (on triche avec la lumière ponctuelle)
+    // fov = Assez pour voir completement le moèdle (~90 est OK).
     CVar::lumieres[ 0 ]->obtenirPos( pos );
 
     point_vise = glm::vec3( modele3Dvenus->obtenirCentroid() );
@@ -454,18 +454,12 @@ void construireMatricesProjectivesEclairage(void)
     glm::vec3 lightUp = glm::cross( direction, lightRight );
 
     fov = glm::radians( 90.0f );
-    //float ratio = float( CVar::currentW ) / CVar::currentH;
-    float ratio = 1.0f; // why?
+    float ratio = 1.0f;
 
-    // TODO : doubt
     lightVP[ 0 ] = 
         glm::perspective( fov, ratio, 0.1f, K)
         * glm::lookAt( tPos, point_vise, lightUp );
-
-    // point visé : centre de l'objet (on triche avec la lumière ponctuelle)
-    // fov = Assez pour voir completement le moèdle (~90 est OK).
     
-
     /// LUM1 : SPOT : sauvegarder dans lightVP[1]
     //	position = position lumière
     //	direction = spot_dir (attention != point visé)

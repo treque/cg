@@ -53,8 +53,6 @@ vec4 Diffuse;
 // Sinon, retourner 1.0
 float Ombrage(in vec4 fragLightCoord, in sampler2D shadowMap)
 {
-	// TODO Compléter la fonction Ombrage:
-
 	// Variables utiles:
 	vec3 projCoords;
 	float closestDepth;
@@ -67,7 +65,6 @@ float Ombrage(in vec4 fragLightCoord, in sampler2D shadowMap)
 	// pas converties en coordonées normalisées d'écran.
 	// Il faut donc le faire explicitement ici :
 	// (https://en.wikipedia.org/wiki/Transformation_matrix#Perspective_projection)
-    //projCoords = ... ??? Juste normalisé ???
     projCoords = fragLightCoord.xyz / fragLightCoord.w;
    
     // On transforme ces coordonées situées en [-1,1] vers [0,1]:
@@ -80,8 +77,6 @@ float Ombrage(in vec4 fragLightCoord, in sampler2D shadowMap)
     currentDepth = projCoords.z;
 
     // On compare les pronfondeurs et modifie shadow en conséquence:
-	// ...
-
     return  (closestDepth < currentDepth) ? 0.5 : 1.0; ;
 }  
 

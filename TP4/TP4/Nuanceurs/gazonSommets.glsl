@@ -79,13 +79,11 @@ void main (void)
     ftexgen(); 
     gl_Position = MVP * vec4(vp,1.0);
 
-	// TODO :
 	// Envoyer au nuanceur de fragment les coordonées en espace clip/écran
 	// du point de vue de chaque lumière:
+    vec4 fpos = M * vec4(vp,1.0);
 
-    vec4 clippedV = M * vec4(vp,1.0);
-
-	fragLightCoord0 = Light0VP * clippedV;
-	fragLightCoord1 = Light1VP * clippedV;
-	fragLightCoord2 = Light2VP * clippedV;
+	fragLightCoord0 = Light0VP * fpos;
+	fragLightCoord1 = Light1VP * fpos;
+	fragLightCoord2 = Light2VP * fpos;
 }
