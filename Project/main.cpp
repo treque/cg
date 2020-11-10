@@ -48,6 +48,7 @@ static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceur
 
 // Graphic Objects
 static CSea* gazon;
+static bool isSeaGrid = false;
 static CSkybox*         skybox;
 //static CFBO*            fbo = nullptr;
 
@@ -444,7 +445,18 @@ void drawSea()
     // ...
 
     glBindVertexArray( gazon_vao );
-    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+
+    if( isSeaGrid )
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+    else
+    {
+        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+    }
+
     glBindVertexArray( NULL );
     glUseProgram( NULL );
 }
@@ -584,6 +596,15 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
                 CVar::IBLon = false;
             else
                 CVar::IBLon = true;
+        }
+        break;
+    }
+
+    case GLFW_KEY_G:
+    {
+        if (action == GLFW_PRESS)
+        {
+            isSeaGrid = !isSeaGrid;
         }
         break;
     }
