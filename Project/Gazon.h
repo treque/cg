@@ -12,13 +12,13 @@
 #include "Modele3dAbstrait.h"
 #include "SurfaceBSplinaire.h"
 
-class CGazon : public CModele3DAbstrait, CSurfaceBSplinaire
+class CSea: CModele3DAbstrait
 {
 public:
     /// constructeur créant une patch bsplinaire (gazon) avec texture spécifiée unique (obligatoire)
-    CGazon(const char* nomFichierTexture, const float largeurGazon = 1.0, const float longueurGazon = 1.0);
+    CSea(const char* nomFichierTexture, const float largeurGazon = 1.0, const float longueurGazon = 1.0);
     /// destructeur par défaut
-    ~CGazon(void) override;
+    ~CSea(void) override;
 
     /// fonction à implémenter pour définir la géométrie openGL du gazon (est statique, car est référée par un pointeur
     /// de fonction)
@@ -27,4 +27,9 @@ public:
     void appliquerTextures() override;
 
 private:
+    void   setupVAO();
+    GLuint m_vao;
+    GLuint m_vbo;
+    GLuint m_ibo;
+    GLint  m_taille;
 };

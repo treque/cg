@@ -47,7 +47,7 @@ static CNuanceurProg progNuanceurSkybox( "Nuanceurs/skyBoxSommets.glsl", "Nuance
 static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceurs/gazonFragments.glsl", false );
 
 // Graphic Objects
-static CGazon* gazon;
+static CSea* gazon;
 static CSkybox*         skybox;
 //static CFBO*            fbo = nullptr;
 
@@ -58,13 +58,19 @@ static float vitesseCamera = 50.0f; // unités / seconde
 static float vitesseSouris = 0.075f;
 
 // Camera position
-static glm::vec3 cam_position = glm::vec3(0, 0, -25);
-static glm::vec3 direction    = glm::vec3(0.f, 0.f, -1.f);
+static glm::vec3 cam_position = glm::vec3(0, 0, 0);
+static glm::vec3 direction    = glm::vec3(0.f, 0.f, -1.0f);
 static glm::vec3 cam_right    = glm::vec3(1.f, 0.f, 0.f);
 static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 
 // Models matrix
 static glm::mat4 gazonModelMatrix;
+// Infos Gazon
+GLuint  gazon_vbo_pos = 0;
+GLuint  gazon_vbo_col = 0;
+GLuint  gazon_ibo = 0;
+GLuint  gazon_vao = 0;
+GLint   tailleGazon = 0;
 
 //{ 0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.5f, 0.0f, 0.0f,  0.0f, 0.0f, 0.5f, 0.0f,  0.5f, 0.5f, 0.5f, 1.0f };
 //static glm::mat4 scaleAndBiasMatrix = glm::mat4(glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
@@ -240,6 +246,59 @@ int main(int /*argc*/, char* /*argv*/[])
     return EXIT_SUCCESS;
 }
 
+
+void initialiserCube( void )
+{
+    // Sommets du cube:
+    float positions[] = {
+        1.0f, 1.0f, 0.0f,//0
+        1.0f, 0.0f, 0.0f,//1
+        0.0f, 0.0f, 0.0f,//2
+
+        0.0f, 1.0f, 0.0f,//3
+    };
+
+    // Indique les indexes des sommets composant les faces du cube (groupés en triangles)
+    unsigned int indices_sommets[] = {
+        // front
+        0, 1, 2,
+        2, 3, 0};
+
+    // Générer les buffers:
+    // ...
+    glGenVertexArrays( 1, &gazon_vao );
+    glBindVertexArray( gazon_vao );
+
+    glGenBuffers( 1, &gazon_vbo_pos );
+    glGenBuffers( 1, &gazon_vbo_col );
+    glGenBuffers( 1, &gazon_ibo );
+
+    // Lier (dans le bon ordre) et remplir nos buffers dans le bon ordre:
+    // ...
+    // Positions
+    glBindBuffer( GL_ARRAY_BUFFER, gazon_vbo_pos );
+    //glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, 24 * 3 * sizeof( float ), positions, GL_STATIC_DRAW );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( 0 );
+
+    // Indices
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gazon_ibo );
+    //glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices_sommets ), indices_sommets, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof( unsigned int ), &indices_sommets[ 0 ], GL_STATIC_DRAW );
+    //glVertexAttribPointer( 2, 3, GL_UNSIGNED_INT, GL_FALSE, 0, 0 );
+    //glEnableVertexAttribArray( 2 );
+
+    // Créer les pointeurs d'attributs, activer les bons attributs par rapport au nuanceur
+    // Ici, les déclarations du nuanceur cubeSommets.glsl devraient vous être utile.
+    // ...
+    //glBindAttribLocation( progNuanceurCube.getProg(), 0, "vp" );
+    //glBindAttribLocation( progNuanceurCube.getProg(), 1, "vc" );
+
+    glBindVertexArray( 0 );
+
+}
+
 // initialisation d'openGL
 void initialisation(void)
 {
@@ -265,11 +324,13 @@ void initialisation(void)
     // construire le skybox avec les textures
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
 
-    gazon            = new CGazon("Textures/gazon.bmp", 1.0f, 1.0f);
+    //gazon            = new CSea("Textures/gazon.bmp", 1.0f, 1.0f);
+    initialiserCube();
+    
     gazonModelMatrix = getModelMatrixSea();
 
     // fixer la couleur de fond
-    glClearColor(0.0, 0.0, 0.5, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
 
     // activer les etats openGL
     glEnable(GL_NORMALIZE);
@@ -297,10 +358,10 @@ void initialisation(void)
 glm::mat4 getModelMatrixSea(void)
 {
     // Création d'une matrice-modèle.
-    glm::vec3 t1(-3.5f, -1.5f, 0.f);
+    glm::vec3 t1(0.0f, 0.0f, 0.0f);
     glm::mat4 translationMatrix1 = glm::translate(t1);
 
-    glm::vec3 s(CCst::largeurGazon, CCst::longueurGazon, CCst::hauteurGazon);
+    glm::vec3 s(100.0f, 100.0f, 100.0f);
     glm::mat4 scalingMatrix = glm::scale(s);
 
     glm::mat4 rotationMatrix;
@@ -308,6 +369,7 @@ glm::mat4 getModelMatrixSea(void)
     glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
     float     a    = glm::radians(-90.0f);
     rotationMatrix = glm::rotate(a, rotationAxis);
+
 
     glm::vec3 t2(0.f, -20.f, 0.f);
     glm::mat4 translationMatrix2 = glm::translate(t2);
@@ -329,50 +391,62 @@ glm::mat4 getModelMatrixSea(void)
 ///////////////////////////////////////////////////////////////////////////////
 void drawSea()
 {
-    progNuanceurGazon.activer();
+    // Création d'une matrice-modèle - bouge et déforme l'objet dans le référenciel du monde
+    // Utilisez ici les fonctionnalités de GLM
 
-    // Matrice Model-Vue-Projection:
+    // Matrice effectuant une translation de (0,0,0):
+    // ...
+    //glm::mat4 translationMatrix = glm::mat4(1.0); 
+    glm::mat4 translationMatrix = glm::translate( glm::vec3( 0, 0, 0 ) );
+    // Matrice effectuant une mise à l'échelle de (1.0, 1.0, 1.0)
+    // ...
+    glm::mat4 scaleMatrix = glm::mat4( 1.0 );;
+
+    // Matrice effectuant une rotation égale à 0.75*(le temps écoulé) autour de l'axe Y (up) en radians
+    glm::mat4 rotationMatrix;
+
+    // Caluler la matrice modèle (attention à l'ordre de multiplcations.:
+    // ...
+    glm::mat4 model = translationMatrix * scaleMatrix * rotationMatrix;
+
+    // Activer le nuanceur approprié
+    // ...
+    glUseProgram( progNuanceurGazon.getProg() );
+
+    // Fournir les trois matrices Modele / Vue / Projection au nuanceur, comme en type "uniforms"
+    // ...
+    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrModel" ), 1, GL_FALSE, &model[ 0 ][ 0 ] );
+    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrVisu" ), 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
+    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrProj" ), 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
+
+        // Matrice Model-Vue-Projection:
     glm::mat4 mvp = CVar::projection * CVar::vue * gazonModelMatrix;
 
     glm::mat4 mv = CVar::vue * gazonModelMatrix;
 
     // Matrice pour normales (world matrix):
-    glm::mat3 mv_n = glm::inverseTranspose(glm::mat3(CVar::vue * gazonModelMatrix));
+    glm::mat3 mv_n = glm::inverseTranspose( glm::mat3( CVar::vue * gazonModelMatrix ) );
 
     GLint handle;
-    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "M");
-    glUniformMatrix4fv(handle, 1, GL_FALSE, &gazonModelMatrix[0][0]);
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &gazonModelMatrix[ 0 ][ 0 ] );
 
-    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "MV");
-    glUniformMatrix4fv(handle, 1, GL_FALSE, &mv[0][0]);
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV" );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &mv[ 0 ][ 0 ] );
 
-    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "MVP");
-    glUniformMatrix4fv(handle, 1, GL_FALSE, &mvp[0][0]);
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MVP" );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
 
-    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "MV_N");
-    glUniformMatrix3fv(handle, 1, GL_FALSE, &mv_n[0][0]);
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV_N" );
+    glUniformMatrix3fv( handle, 1, GL_FALSE, &mv_n[ 0 ][ 0 ] );
 
-    ///////////////////////////////////////////////////////////////////////////////////
+    // Utiliser le VAO pour dessiner les triangles du cube:
+    // ...
 
-    setLightsAttributes(progNuanceurGazon.getProg());
-
-    // ajouts d'autres uniforms
-    if (CVar::lumieres[ENUM_LUM::LumPonctuelle]->estAllumee())
-        progNuanceurGazon.uniform1("pointLightOn", 1);
-    else
-        progNuanceurGazon.uniform1("pointLightOn", 0);
-
-    if (CVar::lumieres[ENUM_LUM::LumDirectionnelle]->estAllumee())
-        progNuanceurGazon.uniform1("dirLightOn", 1);
-    else
-        progNuanceurGazon.uniform1("dirLightOn", 0);
-
-    if (CVar::lumieres[ENUM_LUM::LumSpot]->estAllumee())
-        progNuanceurGazon.uniform1("spotLightOn", 1);
-    else
-        progNuanceurGazon.uniform1("spotLightOn", 0);
-
-    gazon->dessiner();
+    glBindVertexArray( gazon_vao );
+    glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+    glBindVertexArray( NULL );
+    glUseProgram( NULL );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -810,8 +884,8 @@ void compileShaders()
     progNuanceurSkybox.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
 
     progNuanceurGazon.compilerEtLier();
-    progNuanceurGazon.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
-    progNuanceurGazon.enregistrerUniformInteger("shadowMap0", CCst::texUnit_1);
-    progNuanceurGazon.enregistrerUniformInteger("shadowMap1", CCst::texUnit_2);
-    progNuanceurGazon.enregistrerUniformInteger("shadowMap2", CCst::texUnit_3);
+    //progNuanceurGazon.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
+    //progNuanceurGazon.enregistrerUniformInteger("shadowMap0", CCst::texUnit_1);
+    //progNuanceurGazon.enregistrerUniformInteger("shadowMap1", CCst::texUnit_2);
+    //progNuanceurGazon.enregistrerUniformInteger("shadowMap2", CCst::texUnit_3);
 }
