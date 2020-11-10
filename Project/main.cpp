@@ -47,7 +47,6 @@ static CNuanceurProg progNuanceurSkybox( "Nuanceurs/skyBoxSommets.glsl", "Nuance
 static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceurs/gazonFragments.glsl", false );
 
 // Graphic Objects
-static CSea* gazon;
 static bool isSeaGrid = false;
 static CSkybox*         skybox;
 //static CFBO*            fbo = nullptr;
@@ -55,8 +54,8 @@ static CSkybox*         skybox;
 // Camera Attributes
 static float horizontalAngle = 0.f;
 static float verticalAngle   = 0.f;
-static float vitesseCamera = 50.0f; // unités / seconde
-static float vitesseSouris = 0.075f;
+static float cameraSpeed = 50.0f; // unités / seconde
+static float mouseSpeed = 0.075f;
 
 // Camera position
 static glm::vec3 cam_position = glm::vec3(0, 0, 0);
@@ -65,30 +64,14 @@ static glm::vec3 cam_right    = glm::vec3(1.f, 0.f, 0.f);
 static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 
 // Models matrix
-static glm::mat4 gazonModelMatrix;
-// Infos Gazon
-GLuint  gazon_vbo_pos = 0;
-GLuint  gazon_vbo_col = 0;
-GLuint  gazon_ibo = 0;
-GLuint  gazon_vao = 0;
-GLint   tailleGazon = 0;
+static glm::mat4 seaModelMatrix;
 
-//{ 0.5f, 0.0f, 0.0f, 0.0f,  0.0f, 0.5f, 0.0f, 0.0f,  0.0f, 0.0f, 0.5f, 0.0f,  0.5f, 0.5f, 0.5f, 1.0f };
-//static glm::mat4 scaleAndBiasMatrix = glm::mat4(glm::vec4(0.5f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-                                                //glm::vec4(0.0f, 0.0f, 0.5f, 0.0f), glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-// Lights
-//static glm::mat4 lightVP[3];
-
-//static GLuint quad_vbo;
-//static GLuint quad_ibo;
-//static GLuint quad_vao;
-//
-//static GLuint debug_quad_vbo;
-//static GLuint debug_quad_ibo;
-//static GLuint debug_quad_vao;
-//
-//static GLuint quad_size;
+// Sea Info
+GLuint  sea_vbo_pos = 0;
+GLuint  sea_vbo_col = 0;
+GLuint  sea_ibo = 0;
+GLuint  sea_vao = 0;
+GLint   seaSize = 0;
 
 ///////////////////////////////////////////////
 // PROTOTYPES DES FONCTIONS DU MAIN          //
@@ -234,7 +217,6 @@ int main(int /*argc*/, char* /*argv*/[])
     glfwTerminate();
 
     // on doit faire le ménage... !
-    delete gazon;
     delete CVar::lumieres[ENUM_LUM::LumPonctuelle];
     delete CVar::lumieres[ENUM_LUM::LumDirectionnelle];
     delete CVar::lumieres[ENUM_LUM::LumSpot];
@@ -248,9 +230,8 @@ int main(int /*argc*/, char* /*argv*/[])
 }
 
 
-void initialiserCube( void )
+void initializeSea( void )
 {
-    // Sommets du cube:
     float positions[] = {
         1.0f, 1.0f, 0.0f,//0
         1.0f, 0.75f, 0.0f,//1
@@ -284,9 +265,7 @@ void initialiserCube( void )
 
     };
 
-    // Indique les indexes des sommets composant les faces du cube (groupés en triangles)
-    unsigned int indices_sommets[] = {
-        // front
+    unsigned int positions_indexes[] = {
         0, 1, 6, 5,
         1, 2, 7, 6,
         2, 3, 8, 7,
@@ -308,44 +287,31 @@ void initialiserCube( void )
         18, 19, 24, 23,
     };
 
-    tailleGazon = sizeof( indices_sommets );
+    seaSize = sizeof( positions_indexes );
 
-    // Générer les buffers:
-    // ...
-    glGenVertexArrays( 1, &gazon_vao );
-    glBindVertexArray( gazon_vao );
+    // Generate buffers
+    glGenVertexArrays( 1, &sea_vao );
+    glBindVertexArray( sea_vao );
 
-    glGenBuffers( 1, &gazon_vbo_pos );
-    glGenBuffers( 1, &gazon_vbo_col );
-    glGenBuffers( 1, &gazon_ibo );
+    glGenBuffers( 1, &sea_vbo_pos );
+    glGenBuffers( 1, &sea_vbo_col );
+    glGenBuffers( 1, &sea_ibo );
 
-    // Lier (dans le bon ordre) et remplir nos buffers dans le bon ordre:
-    // ...
+    // Link buffers and data:
     // Positions
-    glBindBuffer( GL_ARRAY_BUFFER, gazon_vbo_pos );
+    glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
     glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-    //glBufferData( GL_ARRAY_BUFFER, 24 * 4 * sizeof( float ), positions, GL_STATIC_DRAW );
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     glEnableVertexAttribArray( 0 );
 
-    // Indices
-    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gazon_ibo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices_sommets ), indices_sommets, GL_STATIC_DRAW );
-    //glBufferData( GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof( unsigned int ), &indices_sommets[ 0 ], GL_STATIC_DRAW );
-    //glVertexAttribPointer( 2, 3, GL_UNSIGNED_INT, GL_FALSE, 0, 0 );
-    //glEnableVertexAttribArray( 2 );
-
-    // Créer les pointeurs d'attributs, activer les bons attributs par rapport au nuanceur
-    // Ici, les déclarations du nuanceur cubeSommets.glsl devraient vous être utile.
-    // ...
-    //glBindAttribLocation( progNuanceurCube.getProg(), 0, "vp" );
-    //glBindAttribLocation( progNuanceurCube.getProg(), 1, "vc" );
+    // Indexes
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
 
     glBindVertexArray( 0 );
 
 }
 
-// initialisation d'openGL
 void initialisation(void)
 {
     ////////////////////////////////////////////////////
@@ -371,9 +337,9 @@ void initialisation(void)
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
 
     //gazon            = new CSea("Textures/gazon.bmp", 1.0f, 1.0f);
-    initialiserCube();
+    initializeSea();
     
-    gazonModelMatrix = getModelMatrixSea();
+    seaModelMatrix = getModelMatrixSea();
 
     // fixer la couleur de fond
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -383,10 +349,6 @@ void initialisation(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
-    // Création du frame buffer object pour pré-rendu de la scène:
-    // Quelle taille devrait avoir nos textures?
-    //fbo = new CFBO();
-    //fbo->Init( CVar::currentW , CVar::currentH);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -459,23 +421,17 @@ void drawSea()
     // ...
     glUseProgram( progNuanceurGazon.getProg() );
 
-    // Fournir les trois matrices Modele / Vue / Projection au nuanceur, comme en type "uniforms"
-    // ...
-    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrModel" ), 1, GL_FALSE, &model[ 0 ][ 0 ] );
-    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrVisu" ), 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
-    //glUniformMatrix4fv( glGetUniformLocation( progNuanceurGazon.getProg(), "matrProj" ), 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
+    // Matrice Model-Vue-Projection:
+    glm::mat4 mvp = CVar::projection * CVar::vue * seaModelMatrix;
 
-        // Matrice Model-Vue-Projection:
-    glm::mat4 mvp = CVar::projection * CVar::vue * gazonModelMatrix;
-
-    glm::mat4 mv = CVar::vue * gazonModelMatrix;
+    glm::mat4 mv = CVar::vue * seaModelMatrix;
 
     // Matrice pour normales (world matrix):
-    glm::mat3 mv_n = glm::inverseTranspose( glm::mat3( CVar::vue * gazonModelMatrix ) );
+    glm::mat3 mv_n = glm::inverseTranspose( glm::mat3( CVar::vue * seaModelMatrix ) );
 
     GLint handle;
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
-    glUniformMatrix4fv( handle, 1, GL_FALSE, &gazonModelMatrix[ 0 ][ 0 ] );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &seaModelMatrix[ 0 ][ 0 ] );
 
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &mv[ 0 ][ 0 ] );
@@ -489,17 +445,17 @@ void drawSea()
     // Utiliser le VAO pour dessiner les triangles du cube:
     // ...
 
-    glBindVertexArray( gazon_vao );
+    glBindVertexArray( sea_vao );
 
     if( isSeaGrid )
     {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glDrawElements( GL_QUADS, tailleGazon, GL_UNSIGNED_INT, NULL );
+        glDrawElements( GL_QUADS, seaSize, GL_UNSIGNED_INT, NULL );
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
     else
     {
-        glDrawElements( GL_QUADS, tailleGazon, GL_UNSIGNED_INT, NULL );
+        glDrawElements( GL_QUADS, seaSize, GL_UNSIGNED_INT, NULL );
     }
 
     glBindVertexArray( NULL );
@@ -867,8 +823,8 @@ void mouseMovement(GLFWwindow* window, double deltaT, glm::vec3& direction, glm:
         glfwSetCursorPos(window, mid_width, mid_height);
 
         // Nouvelle orientation
-        horizontalAngle += vitesseSouris * float(deltaT * (mid_width - xpos));
-        verticalAngle += vitesseSouris * float(deltaT * (mid_height - ypos));
+        horizontalAngle += mouseSpeed * float(deltaT * (mid_width - xpos));
+        verticalAngle += mouseSpeed * float(deltaT * (mid_height - ypos));
     }
     // Direction : Spherical coordinates to Cartesian coordinates conversion
     direction = glm::vec3(std::cos(verticalAngle) * std::sin(horizontalAngle), std::sin(verticalAngle),
@@ -901,22 +857,22 @@ void refreshCamera(GLFWwindow* fenetre, double deltaT)
     // Move forward
     if (glfwGetKey(fenetre, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cam_position += direction * (float)deltaT * vitesseCamera;
+        cam_position += direction * (float)deltaT * cameraSpeed;
     }
     // Move backward
     if (glfwGetKey(fenetre, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cam_position -= direction * (float)deltaT * vitesseCamera;
+        cam_position -= direction * (float)deltaT * cameraSpeed;
     }
     // Strafe right
     if (glfwGetKey(fenetre, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cam_position += cam_right * (float)deltaT * vitesseCamera;
+        cam_position += cam_right * (float)deltaT * cameraSpeed;
     }
     // Strafe left
     if (glfwGetKey(fenetre, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cam_position -= cam_right * (float)deltaT * vitesseCamera;
+        cam_position -= cam_right * (float)deltaT * cameraSpeed;
     }
 
     // Matrice de projection:
