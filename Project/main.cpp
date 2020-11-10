@@ -253,17 +253,62 @@ void initialiserCube( void )
     // Sommets du cube:
     float positions[] = {
         1.0f, 1.0f, 0.0f,//0
-        1.0f, 0.0f, 0.0f,//1
-        0.0f, 0.0f, 0.0f,//2
+        1.0f, 0.75f, 0.0f,//1
+        1.0f, 0.50f, 0.0f,//2
+        1.0f, 0.25f, 0.0f,//3
+        1.0f, 0.0f, 0.0f,//4
 
-        0.0f, 1.0f, 0.0f,//3
+        0.75f, 1.0f, 0.0f,//5
+        0.75f, 0.75f, 0.0f,//6
+        0.75f, 0.50f, 0.0f,//7
+        0.75f, 0.25f, 0.0f,//8
+        0.75f, 0.0f, 0.0f,//9
+
+        0.5f, 1.0f, 0.0f,//10
+        0.5f, 0.75f, 0.0f,//11
+        0.5f, 0.50f, 0.0f,//12
+        0.5f, 0.25f, 0.0f,//13
+        0.5f, 0.0f, 0.0f,//14
+
+        0.25f, 1.0f, 0.0f,//15
+        0.25f, 0.75f, 0.0f,//16
+        0.25f, 0.50f, 0.0f,//17
+        0.25f, 0.25f, 0.0f,//18
+        0.25f, 0.0f, 0.0f,//19
+
+        0.0f, 1.0f, 0.0f,//20
+        0.0f, 0.75f, 0.0f,//21
+        0.0f, 0.50f, 0.0f,//22
+        0.0f, 0.25f, 0.0f,//23
+        0.0f, 0.0f, 0.0f,//24
+
     };
 
     // Indique les indexes des sommets composant les faces du cube (groupés en triangles)
     unsigned int indices_sommets[] = {
         // front
-        0, 1, 2,
-        2, 3, 0};
+        0, 1, 6, 5,
+        1, 2, 7, 6,
+        2, 3, 8, 7,
+        3, 4, 9, 8,
+
+        5, 6, 11, 10,
+        6, 7, 12, 11,
+        7, 8, 13, 12,
+        8, 9, 14, 13,
+
+        10, 11, 16, 15,
+        11, 12, 17, 16,
+        12, 13, 18, 17,
+        13, 14, 19, 18,
+
+        15, 16, 21, 20,
+        16, 17, 22, 21,
+        17, 18, 23, 22,
+        18, 19, 24, 23,
+    };
+
+    tailleGazon = sizeof( indices_sommets );
 
     // Générer les buffers:
     // ...
@@ -278,15 +323,15 @@ void initialiserCube( void )
     // ...
     // Positions
     glBindBuffer( GL_ARRAY_BUFFER, gazon_vbo_pos );
-    //glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-    glBufferData( GL_ARRAY_BUFFER, 24 * 3 * sizeof( float ), positions, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+    //glBufferData( GL_ARRAY_BUFFER, 24 * 4 * sizeof( float ), positions, GL_STATIC_DRAW );
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     glEnableVertexAttribArray( 0 );
 
     // Indices
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gazon_ibo );
-    //glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices_sommets ), indices_sommets, GL_STATIC_DRAW );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof( unsigned int ), &indices_sommets[ 0 ], GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices_sommets ), indices_sommets, GL_STATIC_DRAW );
+    //glBufferData( GL_ELEMENT_ARRAY_BUFFER, 12 * 3 * sizeof( unsigned int ), &indices_sommets[ 0 ], GL_STATIC_DRAW );
     //glVertexAttribPointer( 2, 3, GL_UNSIGNED_INT, GL_FALSE, 0, 0 );
     //glEnableVertexAttribArray( 2 );
 
@@ -449,12 +494,12 @@ void drawSea()
     if( isSeaGrid )
     {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+        glDrawElements( GL_QUADS, tailleGazon, GL_UNSIGNED_INT, NULL );
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
     else
     {
-        glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL );
+        glDrawElements( GL_QUADS, tailleGazon, GL_UNSIGNED_INT, NULL );
     }
 
     glBindVertexArray( NULL );
