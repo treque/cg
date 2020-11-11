@@ -460,10 +460,13 @@ void drawSea()
     GLint handle;
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &seaModelMatrix[ 0 ][ 0 ] );
-    //handle = glGetUniformLocation( progNuanceurGazon.getProg(), "V" );
-    //glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
-    //handle = glGetUniformLocation( progNuanceurGazon.getProg(), "P" );
-    //glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "eyePos" );
+    glUniform3fv( handle, 1, &cam_position[ 0 ] );
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "V" );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "P" );
+    glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
 
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &mv[ 0 ][ 0 ] );

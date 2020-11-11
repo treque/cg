@@ -14,6 +14,7 @@ uniform mat4 M;
 // ...
 out vec4 color;
 out vec3 vPosition;
+out vec3 wordPos;
 
 
 void main () {
@@ -28,4 +29,5 @@ void main () {
     //gl_Position = (MVP * vec4(vp,1.0));
     gl_Position = (vec4(vp,1.0));
     vPosition = vp;
+    wordPos = (MVP * vec4(vp,1.0)).xyz;
 }
