@@ -109,7 +109,9 @@ void CNuanceurProg::compilerEtLier()
 {
     // vérifie si le programme en cours est un programme de nuanceurs
     assert(!estVide_);
+
     compilerEtLierNuanceurs(nuanceurSommetsStr_, nuanceurFragmentsStr_, nuanceurTessCtrlStr_, nuanceurTessEvalStr_);
+
 }
 
 void CNuanceurProg::enregistrerUniformFloat(const char* nom, const float& val)
@@ -267,6 +269,7 @@ void CNuanceurProg::compilerEtLierNuanceurs(const std::string& nsStr, const std:
     GLuint nuanceurTessEval = 0;
     GLuint nuanceurFragments = 0;
 
+
     if (!nsStr.empty())
     {
         // indiquer la progression...
@@ -309,6 +312,7 @@ void CNuanceurProg::compilerEtLierNuanceurs(const std::string& nsStr, const std:
         glCompileShader( nuanceurTessCtrl );
         afficherShaderInfoLog( nuanceurTessCtrl, "ERREURS DE COMPILATION DU NUANCEUR DE TESSELATIO CTRL : " );
     }
+
 
     if( !nteStr.empty() )
     {
@@ -356,8 +360,15 @@ void CNuanceurProg::compilerEtLierNuanceurs(const std::string& nsStr, const std:
     // créer le programme des nuanceurs et lier
     prog_ = glCreateProgram();
     glAttachShader(prog_, nuanceurSommets);
-    glAttachShader(prog_, nuanceurTessCtrl );
-    glAttachShader(prog_, nuanceurTessEval );
+    if( !ntcStr.empty() )
+    {
+        glAttachShader( prog_, nuanceurTessCtrl );
+    }
+
+    if( !nteStr.empty() )
+    {
+        glAttachShader( prog_, nuanceurTessEval );
+    }
     glAttachShader(prog_, nuanceurFragments);
     glLinkProgram(prog_);
 

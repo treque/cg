@@ -176,11 +176,17 @@ int main(int /*argc*/, char* /*argv*/[])
     mid_height /= 2;
     glfwSetCursorPos(fenetre, mid_width, mid_height);
 
+    GLenum err;
+    while( ( err = glGetError() ) != GL_NO_ERROR )
+    {
+        printf( "Error drawing\n" );
+    }
     // compiler et lier les nuanceurs
     compileShaders();
 
     // initialisation de variables d'état openGL et création des listes
     initialisation();
+
 
     double dernierTemps = glfwGetTime();
     int    nbFrames     = 0;
@@ -357,6 +363,7 @@ void initialisation(void)
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
 
     //gazon            = new CSea("Textures/gazon.bmp", 1.0f, 1.0f);
+
     initializeSea();
     
     seaModelMatrix = getModelMatrixSea();
@@ -441,6 +448,7 @@ void drawSea()
     // ...
     glUseProgram( progNuanceurGazon.getProg() );
 
+
     // Matrice Model-Vue-Projection:
     glm::mat4 mvp = CVar::projection * CVar::vue * seaModelMatrix;
 
@@ -474,21 +482,13 @@ void drawSea()
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-        GLenum err;
-        while( ( err = glGetError() ) != GL_NO_ERROR )
-        {
-            printf( "Error drawing" );
-        }
+
     }
     else
     {
         glPatchParameteri( GL_PATCH_VERTICES, 3 );
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
-        GLenum err;
-        while( ( err = glGetError() ) != GL_NO_ERROR )
-        {
-            printf( "Error drawing\n" );
-        }
+
     }
 
     glBindVertexArray( NULL );
@@ -939,6 +939,7 @@ void compileShaders()
     progNuanceurSkybox.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
 
     progNuanceurGazon.compilerEtLier();
+
     //progNuanceurGazon.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
     //progNuanceurGazon.enregistrerUniformInteger("shadowMap0", CCst::texUnit_1);
     //progNuanceurGazon.enregistrerUniformInteger("shadowMap1", CCst::texUnit_2);
