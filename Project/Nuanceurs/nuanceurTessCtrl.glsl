@@ -86,8 +86,8 @@ void main()
 
     cPosition[gl_InvocationID] = vPosition[gl_InvocationID];
 
-    //if ( gl_InvocationID == 0 )
-    //{
+    if ( gl_InvocationID == 0 )
+    {
         vec3 eyeWorldPos = eyePos;
 
         //vec3 wordPos = (MV * vec4(cPosition[gl_InvocationID], 1)).xyz;
@@ -103,5 +103,5 @@ void main()
         gl_TessLevelOuter[0] = outterLevel;
         gl_TessLevelOuter[1] = outterLevel;
         gl_TessLevelOuter[2] = outterLevel;
-    //}
+    }
 }
