@@ -29,5 +29,5 @@ void main () {
     //gl_Position = (MVP * vec4(vp,1.0));
     gl_Position = (vec4(vp,1.0));
     vPosition = vp;
-    wordPos = (MVP * vec4(vp,1.0)).xyz;
+    wordPos = (M * vec4(vp,1.0)).xyz;
 }

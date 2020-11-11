@@ -13,6 +13,8 @@ uniform mat4 M;
 //uniform mat4 P;
 
 in vec3 cPosition[];
+in vec3 color[];
+out vec3 colorOut;
 
 float interpole( float v0, float v1, float v2, float v3 )
 {
@@ -54,6 +56,7 @@ void main()
     vec3 p1 = gl_TessCoord.y * cPosition[1];
     vec3 p2 = gl_TessCoord.z * cPosition[2];
     gl_Position = MVP * vec4(p0 + p1 + p2, 1);
+    colorOut = color[0];
 
 
 }
