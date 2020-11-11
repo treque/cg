@@ -52,6 +52,27 @@ CNuanceurProg::CNuanceurProg(void)
 ///
 ///////////////////////////////////////////////////////////////////////////////
 CNuanceurProg::CNuanceurProg(const std::string& nuanceurSommetsStr, const std::string& nuanceurFragmentsStr,
+                              const std::string& nuanceurTessCtrlStr, const std::string& nuanceurTessEvalStr, const bool compilerMaintenant)
+    : nuanceurSommetsStr_(nuanceurSommetsStr)
+    , nuanceurFragmentsStr_(nuanceurFragmentsStr)
+    , nuanceurTessCtrlStr_( nuanceurTessCtrlStr)
+    , nuanceurTessEvalStr_( nuanceurTessEvalStr)
+    , estCompileEtLie_(false)
+
+{
+    // s'assurer qu'au moins UN des deux nuanceurs est défini
+    assert(!(nuanceurSommetsStr_.empty() && nuanceurFragmentsStr_.empty()));
+
+    // indiquer que le programme de nuanceurs n'est pas vide
+    estVide_ = false;
+
+    if (compilerMaintenant)
+    {
+        compilerEtLierNuanceurs(nuanceurSommetsStr, nuanceurFragmentsStr, nuanceurTessCtrlStr, nuanceurTessEvalStr);
+    }
+}
+
+CNuanceurProg::CNuanceurProg(const std::string& nuanceurSommetsStr, const std::string& nuanceurFragmentsStr,
                              const bool compilerMaintenant)
     : nuanceurSommetsStr_(nuanceurSommetsStr)
     , nuanceurFragmentsStr_(nuanceurFragmentsStr)
@@ -88,7 +109,7 @@ void CNuanceurProg::compilerEtLier()
 {
     // vérifie si le programme en cours est un programme de nuanceurs
     assert(!estVide_);
-    compilerEtLierNuanceurs(nuanceurSommetsStr_, nuanceurFragmentsStr_);
+    compilerEtLierNuanceurs(nuanceurSommetsStr_, nuanceurFragmentsStr_, nuanceurTessCtrlStr_, nuanceurTessEvalStr_);
 }
 
 void CNuanceurProg::enregistrerUniformFloat(const char* nom, const float& val)
@@ -239,6 +260,114 @@ void CNuanceurProg::afficherProgramInfoLog(const GLuint obj, const std::string& 
 ///  @date   2007-12-12
 ///
 ///////////////////////////////////////////////////////////////////////////////
+void CNuanceurProg::compilerEtLierNuanceurs(const std::string& nsStr, const std::string& nfStr, const std::string& ntcStr, const std::string& nteStr)
+{
+    GLuint nuanceurSommets   = 0;
+    GLuint nuanceurTessCtrl = 0;
+    GLuint nuanceurTessEval = 0;
+    GLuint nuanceurFragments = 0;
+
+    if (!nsStr.empty())
+    {
+        // indiquer la progression...
+        printf("Compilation du nuanceur de sommets   : %s \n", nsStr.c_str());
+
+        // créer le nuanceur en GLSL
+        nuanceurSommets = glCreateShader(GL_VERTEX_SHADER);
+
+        // lecture du code du nuanceur
+        const auto ns = textFileRead(nsStr);
+
+        // créer un pointeur sur le texte du code du nuanceur
+        const char* ns_ptr = ns.c_str();
+
+        // sourcer le nuanceur
+        glShaderSource(nuanceurSommets, 1, &ns_ptr, nullptr);
+
+        glCompileShader(nuanceurSommets);
+        afficherShaderInfoLog(nuanceurSommets, "ERREURS DE COMPILATION DU NUANCEUR DE SOMMETS : ");
+    }
+
+
+    if( !ntcStr.empty() )
+    {
+        // indiquer la progression...
+        printf( "Compilation du nuanceur de tesselation   : %s \n", ntcStr.c_str() );
+
+        // créer le nuanceur en GLSL
+        nuanceurTessCtrl = glCreateShader( GL_TESS_CONTROL_SHADER );
+
+        // lecture du code du nuanceur
+        const auto ntc = textFileRead( ntcStr );
+
+        // créer un pointeur sur le texte du code du nuanceur
+        const char* ntc_ptr = ntc.c_str();
+
+        // sourcer le nuanceur
+        glShaderSource( nuanceurTessCtrl, 1, &ntc_ptr, nullptr );
+
+        glCompileShader( nuanceurTessCtrl );
+        afficherShaderInfoLog( nuanceurTessCtrl, "ERREURS DE COMPILATION DU NUANCEUR DE TESSELATIO CTRL : " );
+    }
+
+    if( !nteStr.empty() )
+    {
+        // indiquer la progression...
+        printf( "Compilation du nuanceur de tesselation   : %s \n", nteStr.c_str() );
+
+        // créer le nuanceur en GLSL
+        nuanceurTessEval = glCreateShader( GL_TESS_EVALUATION_SHADER );
+
+        // lecture du code du nuanceur
+        const auto nte = textFileRead( nteStr );
+
+        // créer un pointeur sur le texte du code du nuanceur
+        const char* nte_ptr = nte.c_str();
+
+        // sourcer le nuanceur
+        glShaderSource( nuanceurTessEval, 1, &nte_ptr, nullptr );
+
+        glCompileShader( nuanceurTessEval );
+        afficherShaderInfoLog( nuanceurTessEval, "ERREURS DE COMPILATION DU NUANCEUR DE TESSELATIO EVAL : " );
+    }
+
+    // création du NUANCEUR DE FRAGMENTS (si spécifié)
+    if (!nfStr.empty())
+    {
+        // indiquer la progression...
+        printf("Compilation du nuanceur de fragments : %s \n", nfStr.c_str());
+
+        // créer le nuanceur en GLSL
+        nuanceurFragments = glCreateShader(GL_FRAGMENT_SHADER);
+
+        // lecture du code du nuanceur
+        const auto nf = textFileRead(nfStr);
+
+        // créer un pointeur sur le texte du code du nuanceur
+        const char* nf_ptr = nf.c_str();
+
+        // sourcer le nuanceur
+        glShaderSource(nuanceurFragments, 1, &nf_ptr, nullptr);
+
+        glCompileShader(nuanceurFragments);
+        afficherShaderInfoLog(nuanceurFragments, "ERREURS DE COMPILATION DU NUANCEUR DE FRAGMENTS : ");
+    }
+
+    // créer le programme des nuanceurs et lier
+    prog_ = glCreateProgram();
+    glAttachShader(prog_, nuanceurSommets);
+    glAttachShader(prog_, nuanceurTessCtrl );
+    glAttachShader(prog_, nuanceurTessEval );
+    glAttachShader(prog_, nuanceurFragments);
+    glLinkProgram(prog_);
+
+    // afficher les erreurs de compilation et de linkage
+    afficherProgramInfoLog(prog_, "ERREURS DE L'EDITION DES LIENS : ");
+
+    // marquer les nuanceurs compilés
+    estCompileEtLie_ = true;
+}
+
 void CNuanceurProg::compilerEtLierNuanceurs(const std::string& nsStr, const std::string& nfStr)
 {
     GLuint nuanceurSommets   = 0;

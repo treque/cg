@@ -152,6 +152,8 @@
     <None Include="Nuanceurs\gazonSommets.glsl" />
     <None Include="Nuanceurs\modele3DFragments.glsl" />
     <None Include="Nuanceurs\modele3DSommets.glsl" />
+    <None Include="Nuanceurs\nuanceurTessCtrl.glsl" />
+    <None Include="Nuanceurs\nuanceurTessEval.glsl" />
     <None Include="Nuanceurs\shadowFragments.glsl" />
     <None Include="Nuanceurs\shadowSommets.glsl" />
     <None Include="Nuanceurs\skyBoxFragments.glsl" />

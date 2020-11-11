@@ -36,6 +36,8 @@
 #include "Var.h"
 #include "textfile.h"
 
+#include <string>
+
 using namespace Math3D;
 
 ///////////////////////////////////////////////
@@ -44,7 +46,8 @@ using namespace Math3D;
 
 // Shaders
 static CNuanceurProg progNuanceurSkybox( "Nuanceurs/skyBoxSommets.glsl", "Nuanceurs/skyBoxFragments.glsl", false );
-static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceurs/gazonFragments.glsl", false );
+static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceurs/gazonFragments.glsl", 
+                                        "Nuanceurs/nuanceurTessCtrl.glsl", "Nuanceurs/nuanceurTessEval.glsl", false );
 
 // Graphic Objects
 static bool isSeaGrid = false;
@@ -266,25 +269,41 @@ void initializeSea( void )
     };
 
     unsigned int positions_indexes[] = {
-        0, 1, 6, 5,
-        1, 2, 7, 6,
-        2, 3, 8, 7,
-        3, 4, 9, 8,
+        0, 1, 6,
+        0, 6, 5,
+        1, 2, 7,
+        1, 7, 6,
+        2, 3, 8,
+        2, 8, 7,
+        3, 4, 9,
+        3, 9, 8,
 
-        5, 6, 11, 10,
-        6, 7, 12, 11,
-        7, 8, 13, 12,
-        8, 9, 14, 13,
+        5, 6, 11,
+        5, 11, 10,
+        6, 7, 12,
+        6, 12, 11,
+        7, 8, 13,
+        7, 13, 12,
+        8, 9, 14,
+        8, 14, 13,
 
-        10, 11, 16, 15,
-        11, 12, 17, 16,
-        12, 13, 18, 17,
-        13, 14, 19, 18,
+        10, 11, 16,
+        10, 16, 15,
+        11, 12, 17,
+        11, 17, 16,
+        12, 13, 18,
+        12, 18, 17,
+        13, 14, 19,
+        13, 19, 18,
 
-        15, 16, 21, 20,
-        16, 17, 22, 21,
-        17, 18, 23, 22,
-        18, 19, 24, 23,
+        15, 16, 21,
+        15, 21, 20,
+        16, 17, 22,
+        16, 22, 21,
+        17, 18, 23,
+        17, 23, 22,
+        18, 19, 24,
+        18, 24, 23,
     };
 
     seaSize = sizeof( positions_indexes );
@@ -314,6 +333,7 @@ void initializeSea( void )
 
 void initialisation(void)
 {
+
     ////////////////////////////////////////////////////
     // CONSTRUCTION DES LUMIÈRES
     ////////////////////////////////////////////////////
@@ -450,12 +470,25 @@ void drawSea()
     if( isSeaGrid )
     {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-        glDrawElements( GL_QUADS, seaSize, GL_UNSIGNED_INT, NULL );
+        glPatchParameteri( GL_PATCH_VERTICES, 3 );
+        glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+        GLenum err;
+        while( ( err = glGetError() ) != GL_NO_ERROR )
+        {
+            printf( "Error drawing" );
+        }
     }
     else
     {
-        glDrawElements( GL_QUADS, seaSize, GL_UNSIGNED_INT, NULL );
+        glPatchParameteri( GL_PATCH_VERTICES, 3 );
+        glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
+        GLenum err;
+        while( ( err = glGetError() ) != GL_NO_ERROR )
+        {
+            printf( "Error drawing\n" );
+        }
     }
 
     glBindVertexArray( NULL );

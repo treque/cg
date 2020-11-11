@@ -77,6 +77,7 @@ class CNuanceurProg
 public:
     /// constructeur par défaut : utilisé pour créer un PROGRAMME VKDE de nuanceur (0)
     CNuanceurProg(void);
+    CNuanceurProg( const std::string& nuanceurSommetsStr, const std::string& nuanceurFragmentsStr, const std::string& nuanceurTessCtrlStr, const std::string& nuanceurTessEvalStr, const bool compilerMaintenant );
     /// constructeur spécifique : utilisé pour créer un PROGRAMME DE NUANCEURS.
     CNuanceurProg(const std::string& nuanceurSommetsStr, const std::string& nuanceurFragmentsStr,
                   const bool compilerImmediatement);
@@ -112,11 +113,17 @@ private:
     /// Affiche les informations de compilation et d'édition de liens (link) du programme de nuanceurs
     void afficherProgramInfoLog(const GLuint obj, const std::string& message);
 
+    void compilerEtLierNuanceurs( const std::string& nsStr, const std::string& nfStr, const std::string& ntcStr, const std::string& nteStr );
+
     /// la chaîne de caractères du nom de fichier du nuanceur de sommets
     std::string nuanceurSommetsStr_;
 
     /// la chaîne de caractères du nom de fichier du nuanceur de fragments
     std::string nuanceurFragmentsStr_;
+
+    /// la chaîne de caractères du nom des fichier du nuanceur de tess
+    std::string nuanceurTessCtrlStr_;
+    std::string nuanceurTessEvalStr_;
 
     /// la liste des uniforms float requis par les nuanceurs
     std::vector<floatUniform> floatUniforms_;
