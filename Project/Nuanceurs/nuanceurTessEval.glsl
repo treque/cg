@@ -1,10 +1,18 @@
 #version 410
 
-layout(triangles, equal_spacing, ccw) in;
+layout(triangles, equal_spacing, cw) in;
 
 uniform float TessLevelInner;
 uniform float TessLevelOuter;
 
+uniform mat4 MVP;
+uniform mat4 MV;
+uniform mat3 MV_N;
+uniform mat4 M;
+//uniform mat4 V;
+//uniform mat4 P;
+
+in vec3 cPosition[];
 
 float interpole( float v0, float v1, float v2, float v3 )
 {
@@ -42,9 +50,10 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 
 void main()
 {
- gl_Position = vec4(interpolate3D(
-  gl_in[0].gl_Position.xyz, 
-  gl_in[1].gl_Position.xyz, 
-  gl_in[2].gl_Position.xyz), 1.0f);
+    vec3 p0 = gl_TessCoord.x * cPosition[0];
+    vec3 p1 = gl_TessCoord.y * cPosition[1];
+    vec3 p2 = gl_TessCoord.z * cPosition[2];
+    gl_Position = MVP * vec4(p0 + p1 + p2, 1);
+
 
 }

@@ -460,6 +460,10 @@ void drawSea()
     GLint handle;
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &seaModelMatrix[ 0 ][ 0 ] );
+    //handle = glGetUniformLocation( progNuanceurGazon.getProg(), "V" );
+    //glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
+    //handle = glGetUniformLocation( progNuanceurGazon.getProg(), "P" );
+    //glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
 
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &mv[ 0 ][ 0 ] );
@@ -483,11 +487,25 @@ void drawSea()
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 
+        GLenum err;
+        while( ( err = glGetError() ) != GL_NO_ERROR )
+        {
+            printf( "Error drawing\n" );
+        }
+
+
     }
     else
     {
         glPatchParameteri( GL_PATCH_VERTICES, 3 );
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
+
+
+        GLenum err;
+        while( ( err = glGetError() ) != GL_NO_ERROR )
+        {
+            printf( "Error drawing\n" );
+        }
 
     }
 

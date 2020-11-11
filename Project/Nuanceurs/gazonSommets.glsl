@@ -13,6 +13,8 @@ uniform mat4 M;
 // Déclaration des variables de sorties:
 // ...
 out vec4 color;
+out vec3 vPosition;
+
 
 void main () {
     //// Eye-coordinate position of vertex, needed in various calculations
@@ -23,5 +25,7 @@ void main () {
     //ecPosition3 = (vec3 (ecPosition)) / ecPosition.w;
     //fragNormal = fnormal();
     //ftexgen(); 
-    gl_Position = (MVP * vec4(vp,1.0));
+    //gl_Position = (MVP * vec4(vp,1.0));
+    gl_Position = (vec4(vp,1.0));
+    vPosition = vp;
 }
