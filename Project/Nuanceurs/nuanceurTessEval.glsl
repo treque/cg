@@ -133,15 +133,13 @@ void main()
     vec3 p1 = gl_TessCoord.y * cPosition[1];
     vec3 p2 = gl_TessCoord.z * cPosition[2];
     vec4 pos = vec4(p0 + p1 + p2, 1);
-	gl_Position = MVP * pos;
+    vec2 p = (M * pos).xz / 500.f;
+    vec3 p3 = vec3(p, Time * 0.025);
 
-	vec2 p = gl_Position.xy/1000.f;
-	vec3 p3 = vec3(p, Time * 0.025);
+    float noiseVal;
+    noiseVal = simplex3d_fractal(p3 * 3.0 + 3.0);
+    noiseVal = 0.5 + 0.5 * noiseVal;
 
-	float noiseVal;
-	noiseVal = simplex3d_fractal(p3 * 3.0 + 3.0);
-	noiseVal = 0.5 + 0.5 * noiseVal;
-
-	gl_Position = MVP * (pos + vec4(0 , 0, noiseVal, 0));
-	colorOut = color[0];
+    gl_Position = MVP * pos + vec4(0 , noiseVal * 100 , 0 , 0);
+    colorOut = color[0];
 }
