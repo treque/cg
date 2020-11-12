@@ -567,7 +567,7 @@ void drawSkybox()
     handle = glGetUniformLocation(progNuanceurSkybox.getProg(), "MVP");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &mvp[0][0]);
 
-    //skybox->dessiner();
+    skybox->dessiner();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
