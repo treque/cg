@@ -76,6 +76,14 @@ GLuint  sea_ibo = 0;
 GLuint  sea_vao = 0;
 GLint   seaSize = 0;
 
+
+// Patch info
+GLuint  patch_vbo_pos = 0;
+GLuint  patch_vbo_col = 0;
+GLuint  patch_ibo = 0;
+GLuint  patch_vao = 0;
+GLint   patchSize = 0;
+
 // Debug tessellation levels
 static GLfloat TessLevelInner = 1;
 static GLfloat TessLevelOuter = 1;
@@ -276,7 +284,6 @@ void initializeSea( void )
         0.0f, 0.50f, 0.0f,//22
         0.0f, 0.25f, 0.0f,//23
         0.0f, 0.0f, 0.0f,//24
-
     };
 
     unsigned int positions_indexes[] = {
@@ -342,6 +349,44 @@ void initializeSea( void )
 
 }
 
+void initializePatch(void)
+{
+    std::vector<float> vertices_pos = {
+        0.5f, 0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
+
+    std::vector<unsigned int> indices = {
+        0, 1, 2, 2, 3, 0
+    };
+
+    patchSize = indices.size();
+
+    // vao for each leaf
+    glGenVertexArrays(1, &patch_vao);
+    glBindVertexArray(patch_vao);
+
+    glGenBuffers(1, &patch_vbo_pos);
+    glGenBuffers(1, &patch_vbo_col);
+    glGenBuffers(1, &patch_ibo);
+
+    // Link buffers and data:
+    // Positions
+    glBindBuffer(GL_ARRAY_BUFFER, patch_vbo_pos);
+    glBufferData(GL_ARRAY_BUFFER, vertices_pos.size(), vertices_pos.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    // Indexes
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, patch_ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+
+}
+
 void initialisation(void)
 {
 
@@ -372,6 +417,8 @@ void initialisation(void)
     initializeSea();
     
     seaModelMatrix = getModelMatrixSea();
+
+    initializePatch();
 
     // fixer la couleur de fond
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -431,17 +478,10 @@ glm::mat4 getModelMatrixSea(void)
 ///////////////////////////////////////////////////////////////////////////////
 void drawSea()
 {
-    glm::mat4 translationMatrix = glm::translate( glm::vec3( 0, 0, 0 ) );
-    glm::mat4 scaleMatrix = glm::mat4( 2.0 );;
-    glm::mat4 rotationMatrix;
-
-
-    glm::mat4 model = translationMatrix * scaleMatrix * rotationMatrix;
 
     // Activer le nuanceur approprié
     // ...
     glUseProgram( progNuanceurGazon.getProg() );
-
 
     // Matrice Model-Vue-Projection:
     glm::mat4 mvp = CVar::projection * CVar::vue * seaModelMatrix;
@@ -482,9 +522,6 @@ void drawSea()
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV_N" );
     glUniformMatrix3fv( handle, 1, GL_FALSE, &mv_n[ 0 ][ 0 ] );
 
-    // Utiliser le VAO pour dessiner les triangles du cube:
-    // ...
-
     glBindVertexArray( sea_vao );
 
     if( isSeaGrid )
@@ -499,6 +536,19 @@ void drawSea()
         glPatchParameteri( GL_PATCH_VERTICES, 3 );
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
     }
+    /*
+    glBindVertexArray(patch_vao);
+    if (isSeaGrid)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawElements(GL_PATCHES, patchSize, GL_UNSIGNED_INT, NULL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    else
+    {
+        glDrawElements(GL_PATCHES, patchSize, GL_UNSIGNED_INT, NULL);
+    } */
+
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR)
     {
