@@ -1,4 +1,0 @@
-C:\Users\tran9\Desktop\cg\TP3\TP3\TP3\Debug\TP3.exe
-C:\Users\tran9\Desktop\cg\TP3\TP3\TP3\Debug\TP3.pdb
-C:\Users\tran9\Downloads\cg\TP3\TP3\TP3\Debug\TP3.exe
-C:\Users\tran9\Downloads\cg\TP3\TP3\TP3\Debug\TP3.pdb
