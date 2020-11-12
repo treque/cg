@@ -5,6 +5,8 @@ layout(triangles, equal_spacing, cw) in;
 uniform float TessLevelInner;
 uniform float TessLevelOuter;
 
+uniform float Time;
+
 uniform mat4 MVP;
 uniform mat4 MV;
 uniform mat3 MV_N;

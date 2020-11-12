@@ -4,6 +4,7 @@ layout(vertices = 3) out;
 
 uniform float TessLevelInner;
 uniform float TessLevelOuter;
+uniform bool debugCustomTessellationLevels;
 
 uniform vec3 eyePos;
 uniform mat4 MVP;
@@ -99,9 +100,9 @@ void main()
         //float EyeToVertexDistance1 = distance(eyeWorldPos, cPosition[1]);
         //float EyeToVertexDistance2 = distance(eyeWorldPos, cPosition[2]);
 
-        gl_TessLevelInner[0] = 2;
-        gl_TessLevelOuter[0] = outterLevel;
-        gl_TessLevelOuter[1] = outterLevel;
-        gl_TessLevelOuter[2] = outterLevel;
+        gl_TessLevelInner[0] = debugCustomTessellationLevels ? TessLevelInner : 2 ;
+        gl_TessLevelOuter[0] =
+        gl_TessLevelOuter[1] =
+        gl_TessLevelOuter[2] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel;
     }
 }

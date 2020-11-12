@@ -76,6 +76,11 @@ GLuint  sea_ibo = 0;
 GLuint  sea_vao = 0;
 GLint   seaSize = 0;
 
+// Debug tessellation levels
+static GLfloat TessLevelInner = 1;
+static GLfloat TessLevelOuter = 1;
+static GLboolean debugCustomTessellationLevels = false;
+
 ///////////////////////////////////////////////
 // PROTOTYPES DES FONCTIONS DU MAIN          //
 ///////////////////////////////////////////////
@@ -458,6 +463,17 @@ void drawSea()
     glm::mat3 mv_n = glm::inverseTranspose( glm::mat3( CVar::vue * seaModelMatrix ) );
 
     GLint handle;
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "TessLevelInner");
+    glUniform1f(handle, TessLevelInner);
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "TessLevelOuter");
+    glUniform1f(handle, TessLevelOuter);
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "debugCustomTessellationLevels");
+    glUniform1f(handle, debugCustomTessellationLevels);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Time");
+    glUniform1f(handle, CVar::temps);
+
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
     glUniformMatrix4fv( handle, 1, GL_FALSE, &seaModelMatrix[ 0 ][ 0 ] );
 
@@ -754,6 +770,52 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
         }
         break;
     }
+
+    case GLFW_KEY_Y:
+    {
+        if (action == GLFW_PRESS)
+        {
+            TessLevelInner++;
+        }
+        break;
+    }
+
+    case GLFW_KEY_H:
+    {
+        if (action == GLFW_PRESS)
+        {
+            if (--TessLevelInner < 1) TessLevelInner = 1;
+        }
+        break;
+    }
+
+    case GLFW_KEY_U:
+    {
+        if (action == GLFW_PRESS)
+        {
+            TessLevelOuter++;
+        }
+        break;
+    }
+
+    case GLFW_KEY_J:
+    {
+        if (action == GLFW_PRESS)
+        {
+            if (--TessLevelOuter < 1) TessLevelOuter = 1;
+        }
+        break;
+    }
+
+    case GLFW_KEY_T:
+    {
+        if (action == GLFW_PRESS)
+        {
+            debugCustomTessellationLevels = !debugCustomTessellationLevels;
+        }
+        break;
+    }
+
     }
 }
 
