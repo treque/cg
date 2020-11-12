@@ -431,22 +431,11 @@ glm::mat4 getModelMatrixSea(void)
 ///////////////////////////////////////////////////////////////////////////////
 void drawSea()
 {
-    // Création d'une matrice-modèle - bouge et déforme l'objet dans le référenciel du monde
-    // Utilisez ici les fonctionnalités de GLM
-
-    // Matrice effectuant une translation de (0,0,0):
-    // ...
-    //glm::mat4 translationMatrix = glm::mat4(1.0); 
     glm::mat4 translationMatrix = glm::translate( glm::vec3( 0, 0, 0 ) );
-    // Matrice effectuant une mise à l'échelle de (1.0, 1.0, 1.0)
-    // ...
-    glm::mat4 scaleMatrix = glm::mat4( 1.0 );;
-
-    // Matrice effectuant une rotation égale à 0.75*(le temps écoulé) autour de l'axe Y (up) en radians
+    glm::mat4 scaleMatrix = glm::mat4( 2.0 );;
     glm::mat4 rotationMatrix;
 
-    // Caluler la matrice modèle (attention à l'ordre de multiplcations.:
-    // ...
+
     glm::mat4 model = translationMatrix * scaleMatrix * rotationMatrix;
 
     // Activer le nuanceur approprié
@@ -503,29 +492,17 @@ void drawSea()
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glPatchParameteri( GL_PATCH_VERTICES, 3 );
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
-
-        GLenum err;
-        while( ( err = glGetError() ) != GL_NO_ERROR )
-        {
-            printf( "Error drawing\n" );
-        }
-
-
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     else
     {
         glPatchParameteri( GL_PATCH_VERTICES, 3 );
         glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
-
-
-        GLenum err;
-        while( ( err = glGetError() ) != GL_NO_ERROR )
-        {
-            printf( "Error drawing\n" );
-        }
-
+    }
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR)
+    {
+        printf("Error drawing\n");
     }
 
     glBindVertexArray( NULL );
