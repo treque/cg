@@ -53,35 +53,30 @@ vec4 Diffuse;
 // Sinon, retourner 1.0
 float Ombrage(in vec4 fragLightCoord, in sampler2D shadowMap)
 {
-
-    if (fragLightCoord.w <= 0) return 1.0;
-
-	// TODO Compléter la fonction Ombrage:
 	// Variables utiles:
 	vec3 projCoords;
 	float closestDepth;
 	float currentDepth;
 
+    if (fragLightCoord.w <= 0) return 1.0;
+
 	// Comme nous ne passons pas par gl_Position ici, nos coordonées passées en "clip-space" ne sont pas
 	// pas converties en coordonées normalisées d'écran.
 	// Il faut donc le faire explicitement ici :
 	// (https://en.wikipedia.org/wiki/Transformation_matrix#Perspective_projection)
-
-    // https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
-    projCoords = fragLightCoord.xyz/fragLightCoord.w;
+    projCoords = fragLightCoord.xyz / fragLightCoord.w;
    
     // On transforme ces coordonées situées en [-1,1] vers [0,1]:
-    projCoords = projCoords * 0.5 + 0.5;
+    projCoords = (projCoords + 1) * 0.5f;
 
     // On échantillone dans le shadowmap:
-    closestDepth = texture(shadowMap, projCoords.xy).x;
+    closestDepth = texture(shadowMap, projCoords.xy).r;
 
     // On récupère la profondeur du fragment courant:
     currentDepth = projCoords.z;
 
     // On compare les pronfondeurs et modifie shadow en conséquence:
-
-    return closestDepth < currentDepth ? 0.5 : 1.0;
+    return  (closestDepth < currentDepth) ? 0.5 : 1.0; ;
 }  
 
 

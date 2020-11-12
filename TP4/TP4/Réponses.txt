@@ -1,0 +1,71 @@
+1. On vous a fourni la fonction lineariserProfondeur(). Expliquez ce qu’accompli cette
+fonction.
+
+La profondeur récupéré de la texture sont en clip-space. 
+Dans cette situation la valeur de la profondeur suit la fonction présenté dans l'équation 2 trouvé sur cette page:
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+
+L'on peut remarqué que cette équation n'est pas linéaire ce qui fait que les comparaison 
+sont plus ou moins précise selon la position dans la courbe. 
+La précision est moindre pour les distance élevé et la précision est élevé pour les courtes distances.
+Nous voulons éviter les transitions abruptes du floutage qui sont générés par l'imprécision des valeurs elevés.
+
+Le but de la fonction est donc rendre linéaire la relation entre profondeur de la texture et la distance réele de l'objet.
+L'on cherche à revenir à une relation tel que l'équation 1 trouvé sur cette page:
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+
+
+
+
+
+ est exprimée entre 0.0 et 1.0. C'est ce que contient le tampon de profondeur. La fonction sert à map cette valeur
+à la valeur dans les coordonnées de la caméra (viewspace). En effet, l'équation linéaire pour cette transformation dépend des
+valeurs du near plane et du far plane, soit les mêmes que celles fournies à la matrice de projection pour définir le frustum visible.
+Voir équation (1):
+https://learnopengl.com/Advanced-OpenGL/Depth-testing
+Depth Value Precision
+
+2. On vous a aussi fourni la fonction FiltreGaussien(). Expliquez les détails de son
+fonctionnement. 
+
+Le filtre gaussien effectue une convolution sur le fragment avec un masque 5x5 d'écart-type 2.5 fourni.
+Étant donné un fragment, la fonction retourne la valeur convoluée de sa couleur originale.
+
+Plus précisement, elle multiplie la valeur originale (échantillonage dans le colormap)
+des 5x5 pixels autour du fragment par leur valeur respective dans le masque et fait la somme de des résultats. 
+L'étendue sert à échantilloner des valeurs plus loin. 
+Si l'étendue est plus grande, cela aura pour effet de flouter encore plus le résultat final 
+car plus les valeurs échantillonnées sont loins du fragment évalué, moins elles "ressemblent" à leur valeur original.
+
+
+3. Cette implémentation naïve du champ de profondeur effectue combien d’échantillonnage
+(sampling) de textures par fragment du quad plein écran ? Donner les détails sur une autre
+technique utilisée réduisant le nombre d’échantillonnage pour une même portée.
+
+La fonction applique un masque 5x5. 
+Pour un masque 5x5, il y a 25 échantillons à faire pour chaque pixel de l'écran.
+De plus, puisque la fonction est appelée deux fois, il y a 50 échantillons à faire pour chaque fragment de l'écran.
+
+Une technique alternative est d'utilisé les compute shaders ainsi qu'une mémoire partagée.
+Le principe est que les résultats peuvent être réutilisés entre les fragments.
+Les compute shaders applique ainsi le filtre de gauss pour l'ensemble possible et sauvegarde le résultat dans la mémoire partagée.
+Le fragment shader lit ainsi à partir de la mémoire partagée les valeurs précalculées par les threads et utilise ces valeurs.
+
+
+4. Avec notre implémentation présente du IBL, le gazon n’est pas visible dans les réflexions de
+l’environnement. Comment pourriez-vous régler ce problème en utilisant des FBOs ?
+Considérez ici un seul modèle 3D présent sur le gazon.
+
+Le principe de la solution s'apparente à celui utilisé pour l'ombre de la statue sur le gazon.
+L'on veut réalisé une texture de profondeur et deux textures de couleurs selon une vue prise du modèle.
+Il y a une texture de couleur pour la composante spéculaire et une pour la composante diffuse.
+
+- Il faut calculé la matrice MVP selon le centre du modèle.
+- Réaliser une capture dans un FBO en dessinant le gazon selon cette matrice MVP.
+- Le résultat de cette capture est les deux textures de couleurs et celle de profondeur selon le point de vue du modèle.
+- Lors de l'appel à la fonction lightingIBL de modele3DFragment, 
+  il faut vérifier que la profondeur de la texture de profondeur générée pour le gazon est moindre que la valeur maximale,
+  si c'est le cas l'on prend la couleur réfléchit à partir des textures de couleurs générées pour le gazon,
+  sinon l'on prend la couleur réfléchit à partir des textures de couleurs pour la skybox.
+
+
