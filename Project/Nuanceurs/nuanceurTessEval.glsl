@@ -1,6 +1,6 @@
 #version 410
 
-layout(triangles, equal_spacing, cw) in;
+layout(quads, equal_spacing, cw) in;
 
 uniform float TessLevelInner;
 uniform float TessLevelOuter;
@@ -129,15 +129,17 @@ vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
 
 void main()
 {
-    vec3 p0 = gl_TessCoord.x * cPosition[0];
-    vec3 p1 = gl_TessCoord.y * cPosition[1];
-    vec3 p2 = gl_TessCoord.z * cPosition[2];
-    vec4 pos = vec4(p0 + p1 + p2, 1);
+    vec3 p0 = cPosition[0];
+    vec3 p1 = cPosition[1];
+    vec3 p2 = cPosition[2];
+    vec3 p3 = cPosition[3];
+    vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
+
     vec2 p = (M * pos).xz / 500.f;
-    vec3 p3 = vec3(p, Time * 0.004);
+    vec3 p4 = vec3(p, Time * 0.004);
 
     float noiseVal;
-    noiseVal = simplex3d_fractal(p3 * 20 + 20);
+    noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
 
     gl_Position = MVP * pos + vec4(0 , noiseVal * 10 , 0 , 0);

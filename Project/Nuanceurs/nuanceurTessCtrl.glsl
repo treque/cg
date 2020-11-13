@@ -1,6 +1,6 @@
 #version 410
 
-layout(vertices = 3) out;
+layout(vertices = 4) out;
 
 uniform float TessLevelInner;
 uniform float TessLevelOuter;
@@ -21,28 +21,28 @@ float GetTessLevel(float Distance0)
 {
 
     if (Distance0 <= 25.0) {
-        return 32.0;
+        return 9.0;
     }
     else if (Distance0 <= 50.0) {
-        return 16.0;
-    }
-    else if (Distance0 <= 75.0) {
-        return 10.0;
-    }
-    else if (Distance0 <= 100.0) {
         return 8.0;
     }
-    else if (Distance0 <= 125.0) {
+    else if (Distance0 <= 75.0) {
+        return 7.0;
+    }
+    else if (Distance0 <= 100.0) {
         return 6.0;
     }
+    else if (Distance0 <= 125.0) {
+        return 5.0;
+    }
     else if (Distance0 <= 150.0) {
-        return 3.0;
+        return 4.0;
     }
     else if (Distance0 <= 175.0) {
-        return 2.0;
+        return 3.0;
     }
     else if (Distance0 <= 200.0) {
-        return 1.0;
+        return 2.0;
     }
     else {
         return 1.0;
@@ -100,9 +100,11 @@ void main()
         //float EyeToVertexDistance1 = distance(eyeWorldPos, cPosition[1]);
         //float EyeToVertexDistance2 = distance(eyeWorldPos, cPosition[2]);
 
-        gl_TessLevelInner[0] = debugCustomTessellationLevels ? TessLevelInner : outterLevel ;
+        gl_TessLevelInner[0] =
+        gl_TessLevelInner[1] = debugCustomTessellationLevels ? TessLevelInner : outterLevel ;
         gl_TessLevelOuter[0] =
         gl_TessLevelOuter[1] =
-        gl_TessLevelOuter[2] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel;
+        gl_TessLevelOuter[2] =
+        gl_TessLevelOuter[3] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel;
     }
 }
