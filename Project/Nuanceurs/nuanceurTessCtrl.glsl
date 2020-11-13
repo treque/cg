@@ -107,11 +107,13 @@ void main()
         //float EyeToVertexDistance1 = distance(eyeWorldPos, cPosition[1]);
         //float EyeToVertexDistance2 = distance(eyeWorldPos, cPosition[2]);
 
-        gl_TessLevelInner[0] =
-        gl_TessLevelInner[1] = 1 ;
+
         gl_TessLevelOuter[0] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel0;
         gl_TessLevelOuter[1] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel1;
         gl_TessLevelOuter[2] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel2;
         gl_TessLevelOuter[3] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel3;
+
+        gl_TessLevelInner[0] = (outterLevel0 + outterLevel2) / 2;
+        gl_TessLevelInner[1] = (outterLevel1 + outterLevel3) / 2;
     }
 }
