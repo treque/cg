@@ -92,19 +92,26 @@ void main()
         vec3 eyeWorldPos = eyePos;
 
         //vec3 wordPos = (MV * vec4(cPosition[gl_InvocationID], 1)).xyz;
-        float EyeToVertexDistance0 = distance(eyeWorldPos, wordPos[0] );
+        float EyeToVertexDistance0 = distance(eyeWorldPos, (wordPos[3] + wordPos[0])/2  );
+        float EyeToVertexDistance1 = distance(eyeWorldPos, (wordPos[0] + wordPos[1])/2  );
+        float EyeToVertexDistance2 = distance(eyeWorldPos, (wordPos[1] + wordPos[2])/2  );
+        float EyeToVertexDistance3 = distance(eyeWorldPos, (wordPos[2] + wordPos[3])/2  );
         
         //float EyeToVertexDistance0 = distance(eyeWorldPos, cPosition[0] );
-        float outterLevel = GetTessLevel(EyeToVertexDistance0);
-        color[gl_InvocationID] = GetTessLevelColor(EyeToVertexDistance0);
+        float outterLevel0 = GetTessLevel(EyeToVertexDistance0);
+        float outterLevel1 = GetTessLevel(EyeToVertexDistance1);
+        float outterLevel2 = GetTessLevel(EyeToVertexDistance2);
+        float outterLevel3 = GetTessLevel(EyeToVertexDistance3);
+        //color[gl_InvocationID] = GetTessLevelColor(EyeToVertexDistance0);
+        color[gl_InvocationID] = vec3(0,0,1);
         //float EyeToVertexDistance1 = distance(eyeWorldPos, cPosition[1]);
         //float EyeToVertexDistance2 = distance(eyeWorldPos, cPosition[2]);
 
         gl_TessLevelInner[0] =
-        gl_TessLevelInner[1] = debugCustomTessellationLevels ? TessLevelInner : outterLevel ;
-        gl_TessLevelOuter[0] =
-        gl_TessLevelOuter[1] =
-        gl_TessLevelOuter[2] =
-        gl_TessLevelOuter[3] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel;
+        gl_TessLevelInner[1] = 1 ;
+        gl_TessLevelOuter[0] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel0;
+        gl_TessLevelOuter[1] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel1;
+        gl_TessLevelOuter[2] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel2;
+        gl_TessLevelOuter[3] = debugCustomTessellationLevels ? TessLevelOuter : outterLevel3;
     }
 }
