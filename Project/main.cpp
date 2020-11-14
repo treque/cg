@@ -254,74 +254,19 @@ int main(int /*argc*/, char* /*argv*/[])
 
 void initializeSea( void )
 {
-    float positions[] = {
-        1.0f, 1.0f, 0.0f,//0
-        1.0f, 0.75f, 0.0f,//1
-        1.0f, 0.50f, 0.0f,//2
-        1.0f, 0.25f, 0.0f,//3
-        1.0f, 0.0f, 0.0f,//4
+    float  positions[] = {
 
-        0.75f, 1.0f, 0.0f,//5
-        0.75f, 0.75f, 0.0f,//6
-        0.75f, 0.50f, 0.0f,//7
-        0.75f, 0.25f, 0.0f,//8
-        0.75f, 0.0f, 0.0f,//9
-
-        0.5f, 1.0f, 0.0f,//10
-        0.5f, 0.75f, 0.0f,//11
-        0.5f, 0.50f, 0.0f,//12
-        0.5f, 0.25f, 0.0f,//13
-        0.5f, 0.0f, 0.0f,//14
-
-        0.25f, 1.0f, 0.0f,//15
-        0.25f, 0.75f, 0.0f,//16
-        0.25f, 0.50f, 0.0f,//17
-        0.25f, 0.25f, 0.0f,//18
-        0.25f, 0.0f, 0.0f,//19
-
-        0.0f, 1.0f, 0.0f,//20
-        0.0f, 0.75f, 0.0f,//21
-        0.0f, 0.50f, 0.0f,//22
-        0.0f, 0.25f, 0.0f,//23
-        0.0f, 0.0f, 0.0f,//24
+        -0.5, 0.5,0,
+        -0.5,-0.5,0,
+        0.5, -0.5, 0,
+        0.5, 0.5, 0 
     };
 
-    unsigned int positions_indexes[] = {
-        0, 1, 6,
-        0, 6, 5,
-        1, 2, 7,
-        1, 7, 6,
-        2, 3, 8,
-        2, 8, 7,
-        3, 4, 9,
-        3, 9, 8,
-
-        5, 6, 11,
-        5, 11, 10,
-        6, 7, 12,
-        6, 12, 11,
-        7, 8, 13,
-        7, 13, 12,
-        8, 9, 14,
-        8, 14, 13,
-
-        10, 11, 16,
-        10, 16, 15,
-        11, 12, 17,
-        11, 17, 16,
-        12, 13, 18,
-        12, 18, 17,
-        13, 14, 19,
-        13, 19, 18,
-
-        15, 16, 21,
-        15, 21, 20,
-        16, 17, 22,
-        16, 22, 21,
-        17, 18, 23,
-        17, 23, 22,
-        18, 19, 24,
-        18, 24, 23,
+    unsigned int  positions_indexes[] = {
+        // Left bottom triangle
+        0, 1, 2,
+        // Right top triangle
+        2, 3, 0
     };
 
     seaSize = sizeof( positions_indexes );
@@ -337,54 +282,128 @@ void initializeSea( void )
     // Link buffers and data:
     // Positions
     glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
-    glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( positions), positions, GL_STATIC_DRAW );
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
     glEnableVertexAttribArray( 0 );
 
     // Indexes
     glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
-    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes), positions_indexes, GL_STATIC_DRAW );
 
     glBindVertexArray( 0 );
 
 }
 
+void createVertices(std::vector<float>& verticesPos, unsigned int remainingSubdivs)
+{
+    return;
+}
+
 void initializePatch(void)
 {
-    std::vector<float> vertices_pos = {
-        0.5f, 0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
+    std::vector<float> v_pos = {
+                -0.5f, 0.5f, 0.0f,    // Left top         ID: 0
+        -0.5f, -0.5f, 0.0f,   // Left bottom      ID: 1
+        0.5f, -0.5f, 0.0f,    // Right bottom     ID: 2
+        0.5f, 0.5f, 0.0f  // Right left       ID: 3
     };
+
+    unsigned int maxSubdiv = 3;
+
+
+
+    /*
+    
+     _________2__________
+     |                  |
+     |                  |
+     |                  |
+     0         1        4
+     |                  |
+     |                  |
+     |                  |
+     |_________3________|
+    
+
+     00________________33
+     |                  |
+     |                  |
+     |                  |
+     |                  |
+     |                  |
+     |                  |
+     |                  |
+     11________________22
+    
+    */
+    
+    for (int i = 1; i <= maxSubdiv; ++i)
+    {
+        float subdivSideSize = 1 / (2*i);
+
+        //0
+        v_pos.push_back(-0.5f); //x
+        // s11.y + ((s00.y + s11.y)/2) s11.y sera toujours = -0.5
+        v_pos.push_back(-0.5f + subdivSideSize);
+        v_pos.push_back(0.0f); //z
+
+        //1
+        v_pos.push_back(-0.5f + subdivSideSize); //x
+        v_pos.push_back(-0.5f + subdivSideSize); //y same as 0.y
+        v_pos.push_back(0.0f); //z
+
+        //2
+        v_pos.push_back(-0.5f + subdivSideSize); //x
+        v_pos.push_back(-0.5f + subdivSideSize + subdivSideSize); //y
+        v_pos.push_back(0.0f); //z
+
+        //3
+        v_pos.push_back(-0.5f + subdivSideSize); //x
+        v_pos.push_back(-0.5f + subdivSideSize - subdivSideSize); //y
+        v_pos.push_back(0.0f); //z
+
+        //4
+        v_pos.push_back(-0.5f + subdivSideSize + subdivSideSize); //x
+        v_pos.push_back(-0.5f + subdivSideSize); //y
+        v_pos.push_back(0.0f); //z
+
+    } 
 
     std::vector<unsigned int> indices = {
-        0, 1, 2, 2, 3, 0
+0, 4, 5, 5, 6, 0,
+        /*6, 5, 8, 8, 3, 6,
+        5, 7, 2, 2, 8, 5,
+        4, 9, 10, 10, 11, 4,
+        11, 10, 13, 13, 5, 11,
+        10, 12, 7, 7, 13, 10,
+        9, 14, 15, 15, 16, 9,
+        14, 1, 17, 17, 15, 14,
+        15, 17, 12, 12, 18, 15,
+        16, 15, 18, 18, 10, 16 */
     };
 
-    patchSize = indices.size();
+    patchSize = sizeof(v_pos.data());
 
-    // vao for each leaf
-    glGenVertexArrays(1, &patch_vao);
-    glBindVertexArray(patch_vao);
+    // Generate buffers
+    glGenVertexArrays(1, &sea_vao);
+    glBindVertexArray(sea_vao);
 
-    glGenBuffers(1, &patch_vbo_pos);
-    glGenBuffers(1, &patch_vbo_col);
-    glGenBuffers(1, &patch_ibo);
+    glGenBuffers(1, &sea_vbo_pos);
+    glGenBuffers(1, &sea_vbo_col);
+    glGenBuffers(1, &sea_ibo);
 
     // Link buffers and data:
     // Positions
-    glBindBuffer(GL_ARRAY_BUFFER, patch_vbo_pos);
-    glBufferData(GL_ARRAY_BUFFER, vertices_pos.size(), vertices_pos.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, sea_vbo_pos);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(v_pos.data()), v_pos.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
     // Indexes
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, patch_ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size(), indices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sea_ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices.data()), indices.data(), GL_STATIC_DRAW);
 
     glBindVertexArray(0);
-
 }
 
 void initialisation(void)
@@ -416,9 +435,9 @@ void initialisation(void)
 
     initializeSea();
     
-    seaModelMatrix = getModelMatrixSea();
 
-    initializePatch();
+    //initializePatch();
+    seaModelMatrix = getModelMatrixSea();
 
     // fixer la couleur de fond
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -522,7 +541,7 @@ void drawSea()
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV_N" );
     glUniformMatrix3fv( handle, 1, GL_FALSE, &mv_n[ 0 ][ 0 ] );
 
-    glBindVertexArray( sea_vao );
+    glBindVertexArray(sea_vao);
 
     if( isSeaGrid )
     {
