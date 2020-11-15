@@ -110,6 +110,7 @@
     <ClCompile Include="ObjParser\Vecteur3.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SurfaceBSplinaire.cpp" />
+    <ClCompile Include="SurfaceNode.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="TextureAbstraite.cpp" />
     <ClCompile Include="TextureCubemap.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="ObjParser\Vecteur3.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SurfaceBSplinaire.h" />
+    <ClInclude Include="SurfaceNode.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TextureAbstraite.h" />
     <ClInclude Include="TextureCubemap.h" />

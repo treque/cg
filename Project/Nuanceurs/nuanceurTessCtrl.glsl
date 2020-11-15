@@ -1,4 +1,4 @@
-#version 410
+/*#version 410
 
 layout(vertices = 4) out;
 
@@ -16,6 +16,11 @@ in vec3 vPosition[];
 out vec3 cPosition[];
 out vec3 color[];
 in vec3 wordPos[];
+
+uniform float tscale_negx;
+uniform float tscale_negz;
+uniform float tscale_posx;
+uniform float tscale_posz;
 
 float GetTessLevel(float Distance0)
 {
@@ -115,5 +120,57 @@ void main()
 
         gl_TessLevelInner[0] = (outterLevel0 + outterLevel2) / 2;
         gl_TessLevelInner[1] = (outterLevel1 + outterLevel3) / 2;
+    }
+}*/
+
+#version 420
+
+//
+// Uniforms
+//
+uniform	mat4 M;
+uniform	mat4 P;
+uniform	mat4 MV;
+uniform	mat4 MVP;
+uniform	mat3 N;
+uniform vec3 eyePos;
+
+uniform float tscale_negx;
+uniform float tscale_negz;
+uniform float tscale_posx;
+uniform float tscale_posz;
+
+in vec3 vPosition[];
+out vec3 cPosition[];
+out vec3 color[];
+in vec3 wordPos[];
+
+//
+// Outputs
+//
+layout(vertices = 4) out;
+
+
+void main(void)
+{
+    gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+    cPosition[gl_InvocationID] = vPosition[gl_InvocationID];
+
+    if ( gl_InvocationID == 0 )
+    {
+        vec3 eyeWorldPos = eyePos;
+
+
+        color[gl_InvocationID] = vec3(0,0,1);
+
+
+        gl_TessLevelOuter[0] = 
+        gl_TessLevelOuter[1] = 
+        gl_TessLevelOuter[2] = 
+        gl_TessLevelOuter[3] = 1;
+
+        gl_TessLevelInner[0] = 
+        gl_TessLevelInner[1] = 1;
     }
 }

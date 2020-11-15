@@ -7,7 +7,7 @@ layout(location = 0) in vec3 vp;
 // ...
 uniform mat4 MVP;
 uniform mat4 MV;
-uniform mat3 MV_N;
+uniform mat3 N;
 uniform mat4 M;
 
 // Déclaration des variables de sorties:

@@ -35,6 +35,7 @@
 #include "Texture2D.h"
 #include "Var.h"
 #include "textfile.h"
+#include "SurfaceNode.h"
 
 #include <string>
 
@@ -52,6 +53,7 @@ static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceur
 // Graphic Objects
 static bool isSeaGrid = false;
 static CSkybox*         skybox;
+static CSea*         gazon;
 //static CFBO*            fbo = nullptr;
 
 // Camera Attributes
@@ -68,6 +70,36 @@ static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 
 // Models matrix
 static glm::mat4 seaModelMatrix;
+GLuint quadIndicies[] = { 0, 3, 2, 0, 2, 1 };
+GLuint quadPatchInd[] = { 0, 1, 2, 3 };
+GLuint g_vbo_quad; // Vertex buffer object
+GLuint g_vao_quad; // Vertex attribute object
+GLuint g_ibo_quad; // Index buffer object
+float quadData[] = {
+    // Vert 1
+    -1.0f, 0.0f, -1.0f, 1.0,	// Position
+    0.18f, 0.91f, 0.46f, 1.0,	// Color
+    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
+    0.0f, 2.0f,					// Tex coord (u,v)
+
+    // Vert 2
+    1.0f, 0.0f, -1.0f, 1.0,		// Position
+    0.18f, 0.91f, 0.46f, 1.0,	// Color
+    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
+    2.0f, 2.0f,					// Tex coord (u,v)
+
+    // Vert 3
+    1.0f, 0.0f, 1.0f, 1.0,		// Position
+    0.18f, 0.91f, 0.46f, 1.0,	// Color
+    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
+    2.0f, 0.0f,					// Tex coord (u,v)
+
+    // Vert 4
+    -1.0f, 0.0f, 1.0f, 1.0,		// Position
+    0.18f, 0.91f, 0.46f, 1.0,	// Color
+    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
+    0.0f, 0.0f,					// Tex coord (u,v)
+};
 
 // Sea Info
 GLuint  sea_vbo_pos = 0;
@@ -235,6 +267,7 @@ int main(int /*argc*/, char* /*argv*/[])
     delete CVar::lumieres[ENUM_LUM::LumDirectionnelle];
     delete CVar::lumieres[ENUM_LUM::LumSpot];
     delete skybox;
+    surfaceShutdown();
 
     //if (fbo)
     //    delete fbo;
@@ -354,6 +387,7 @@ void initializeSea( void )
 
 }
 
+
 void initialisation(void)
 {
 
@@ -378,12 +412,26 @@ void initialisation(void)
 
     // construire le skybox avec les textures
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
-
-    //gazon            = new CSea("Textures/gazon.bmp", 1.0f, 1.0f);
+    
 
     initializeSea();
     
     seaModelMatrix = getModelMatrixSea();
+
+    surfaceInit();
+    glGenBuffers(1, &g_vbo_quad);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
+    glBufferData(GL_ARRAY_BUFFER, 14 * 4 * sizeof(float), quadData, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenBuffers(1, &g_ibo_quad);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(float), quadPatchInd, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &g_vao_quad);
+    glBindVertexArray(g_vao_quad);
+    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
 
     // fixer la couleur de fond
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -583,11 +631,19 @@ void drawScene()
     
 
     //////////////////     Afficher les objets:  ///////////////////////////
+
+    //glUseProgram(progNuanceurGazon.getProg());
+    //glBindVertexArray(g_vao_quad);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
+
+    //createTree(0, 0, 0, 100, 100, cam_position);
+    //renderSea(progNuanceurGazon, cam_position);
     glDisable(GL_DEPTH_TEST);
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
 
     drawSea();
+
 
     // Flush les derniers vertex du pipeline graphique
     glFlush();
