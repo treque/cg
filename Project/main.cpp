@@ -641,8 +641,8 @@ void drawScene()
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
-    glBindVertexArray(g_vao_quad);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
+    //glBindVertexArray(g_vao_quad);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
     createTree(0, 0, 0, 100, 100, cam_position);
     renderSea(progNuanceurGazon, cam_position);

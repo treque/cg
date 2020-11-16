@@ -17,6 +17,8 @@ struct SurfaceNode
 	float width;
 	float height;
 
+	unsigned int vboId;
+
 	int type;  // child #, 0 = root
 
 	//tessellation scale
@@ -38,10 +40,7 @@ struct SurfaceNode
 };
 
 // Sea Info
-GLuint  sea_vbo_pos = 0;
-GLuint  sea_vbo_col = 0;
 GLuint  sea_ibo = 0;
-GLuint  sea_vao = 0;
 GLint   seaSize = 0;
 
 // size of the patch in meters where you stop subdiv a once its w is > cutoff
@@ -50,7 +49,6 @@ GLint   seaSize = 0;
 SurfaceNode* surfaceTree;
 SurfaceNode* surfaceTreeTail;
 int numSurfaceNodes = 0;
-
 
 ///ds le main
 glm::mat4 sea_M;	    // Model matrix
@@ -62,9 +60,19 @@ glm::mat3 sea_N;       // Normal matrix
 ///
 
 #define MAX_SURFACE_NODES 500
+GLuint vaos[ MAX_SURFACE_NODES ];
+GLuint vbos[ MAX_SURFACE_NODES ];
+GLsizei nBuffers;
+
+
 void clearTree()
 {
 	surfaceTreeTail = surfaceTree;
+
+	glDeleteVertexArrays( nBuffers + 1, vaos );
+	glDeleteBuffers( nBuffers + 1, vbos );
+	nBuffers = 0;
+
 	memset(surfaceTree, 0, MAX_SURFACE_NODES * sizeof(SurfaceNode));
 	numSurfaceNodes = 0;
 }
@@ -72,6 +80,15 @@ void clearTree()
 void surfaceInit()
 {
     surfaceTree = (SurfaceNode*)malloc(MAX_SURFACE_NODES * sizeof(SurfaceNode));
+
+	glGenBuffers( 1, &sea_ibo );
+	unsigned int positions_indexes[] = { 0, 1, 2, 3 };
+	seaSize = sizeof( positions_indexes );
+
+	// Indexes
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
     clearTree();
 }
 
@@ -104,6 +121,35 @@ SurfaceNode* createNode(SurfaceNode* parent, int type, float x, float y, float z
 	surfaceTreeTail->east = NULL;
 	surfaceTreeTail->west = NULL;
 
+	//9x * 9y * 3vertex
+	float positions[] =
+	{ x + w / 2, y, z + h / 2,
+	  x + w / 2, y, z - h / 2,
+	  x - w / 2, y, z - h / 2,
+	  x - w / 2, y, z + h / 2,
+	};
+	
+	// Generate buffers
+	glGenVertexArrays( 1, &vaos[ nBuffers ] );
+	glBindVertexArray( vaos[ nBuffers ] );
+
+	glGenBuffers( 1, &vbos[ nBuffers ] );
+
+	// Link buffers and data:
+	// Positions
+	glBindBuffer( GL_ARRAY_BUFFER, vbos[ nBuffers ] );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+	// Indexes
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+
+	glEnableVertexAttribArray( 0 );
+
+	glBindVertexArray( 0 );
+	//
+	surfaceTreeTail->vboId = nBuffers;
+	nBuffers++;
 	return surfaceTreeTail;
 }
 
@@ -202,6 +248,36 @@ void createTree(float x, float y, float z, float width, float height, glm::vec3 
 	surfaceTree->east = NULL;
 	surfaceTree->west = NULL;
 
+	// Generate buffers
+	glGenVertexArrays( 1, &vaos[nBuffers] );
+	glBindVertexArray( vaos[ nBuffers ] );
+
+	//9x * 9y * 3vertex
+	float positions[] =
+	{ x + width / 2, y, z + height / 2,
+	  x + width / 2, y, z - height / 2,
+	  x - width / 2, y, z - height / 2,
+	  x - width / 2, y, z + height / 2,
+	};
+
+	glGenBuffers( 1, &vbos[ nBuffers ] );
+
+	// Link buffers and data:
+	// Positions
+	glBindBuffer( GL_ARRAY_BUFFER, vbos[ nBuffers ] );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+	glEnableVertexAttribArray( 0 );
+
+	// Indexes
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+
+	glBindVertexArray( 0 );
+	//
+	surfaceTreeTail->vboId = nBuffers;
+	nBuffers++;
+
 	// Recursively subdivide the terrain
 	divideNode(surfaceTree, cam_position);
 }
@@ -260,49 +336,6 @@ void calcTessScale(SurfaceNode *node)
 void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 cam_position)
 {
 
-	// Test
-	float xO = 0.0f;
-	float yO = 0.0f;
-	float zO = 0.0f;
-
-	float xOffset = 25.0f;
-	float zOffset = 25.0f;
-
-	//9x * 9y * 3vertex
-	float positions[] =
-	{ node->origin[0] + node->width / 2, yO, node->origin[ 2 ] + node->height / 2,
-	node->origin[ 0 ] + node->width / 2, yO, node->origin[ 2 ] - node->height / 2,
-	node->origin[ 0 ] - node->width / 2, yO, node->origin[ 2 ] - node->height / 2,
-	node->origin[ 0 ] - node->width / 2, yO, node->origin[ 2 ] + node->height / 2,
-	};
-
-	unsigned int positions_indexes[] = { 0, 1, 2, 3 };
-
-	seaSize = sizeof( positions_indexes );
-
-	// Generate buffers
-	glGenVertexArrays( 1, &sea_vao );
-	glBindVertexArray( sea_vao );
-
-	glGenBuffers( 1, &sea_vbo_pos );
-	glGenBuffers( 1, &sea_vbo_col );
-	glGenBuffers( 1, &sea_ibo );
-
-	// Link buffers and data:
-	// Positions
-	glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-	glEnableVertexAttribArray( 0 );
-
-	// Indexes
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
-
-	glBindVertexArray( 0 );
-	//
-
-
 	// Calculate the tess scale factor
 	calcTessScale(node);
 
@@ -359,11 +392,14 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	glUniform3fv(handle, 1, &cam_position[0]);
 
 	// Do it
-	glBindVertexArray( sea_vao );
+	glBindVertexArray( vaos[ node->vboId ] );
+
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glPatchParameteri( GL_PATCH_VERTICES, 4 );
 	glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+	glBindBuffer( GL_ARRAY_BUFFER, NULL );
 	glBindVertexArray( NULL );
 }
 
