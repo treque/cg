@@ -37,8 +37,15 @@ struct SurfaceNode
 	SurfaceNode* west;
 };
 
+// Sea Info
+GLuint  sea_vbo_pos = 0;
+GLuint  sea_vbo_col = 0;
+GLuint  sea_ibo = 0;
+GLuint  sea_vao = 0;
+GLint   seaSize = 0;
+
 // size of the patch in meters where you stop subdiv a once its w is > cutoff
-#define SURFACE_CUTOFF 100
+#define SURFACE_CUTOFF 25
 
 SurfaceNode* surfaceTree;
 SurfaceNode* surfaceTreeTail;
@@ -252,20 +259,79 @@ void calcTessScale(SurfaceNode *node)
 */
 void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 cam_position)
 {
+
+	// Test
+	float xO = 0.0f;
+	float yO = 0.0f;
+	float zO = 0.0f;
+
+	float xOffset = 25.0f;
+	float zOffset = 25.0f;
+
+	//9x * 9y * 3vertex
+	float positions[] =
+	{ node->origin[0] + node->width / 2, yO, node->origin[ 2 ] + node->height / 2,
+	node->origin[ 0 ] + node->width / 2, yO, node->origin[ 2 ] - node->height / 2,
+	node->origin[ 0 ] - node->width / 2, yO, node->origin[ 2 ] - node->height / 2,
+	node->origin[ 0 ] - node->width / 2, yO, node->origin[ 2 ] + node->height / 2,
+	};
+
+	unsigned int positions_indexes[] = { 0, 1, 2, 3 };
+
+	seaSize = sizeof( positions_indexes );
+
+	// Generate buffers
+	glGenVertexArrays( 1, &sea_vao );
+	glBindVertexArray( sea_vao );
+
+	glGenBuffers( 1, &sea_vbo_pos );
+	glGenBuffers( 1, &sea_vbo_col );
+	glGenBuffers( 1, &sea_ibo );
+
+	// Link buffers and data:
+	// Positions
+	glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+	glEnableVertexAttribArray( 0 );
+
+	// Indexes
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
+
+	glBindVertexArray( 0 );
+	//
+
+
 	// Calculate the tess scale factor
 	calcTessScale(node);
 
+	glm::vec3 t( 0.f, -20.f, 0.f );
     sea_MV = glm::mat4();
-    sea_M = glm::translate(glm::mat4(), glm::vec3(node->origin[0], node->origin[1], node->origin[2]));
+    sea_M = glm::translate( t );
     sea_MV = CVar::vue * sea_M;
+	glm::mat4 mvp = CVar::projection * CVar::vue * sea_M;
 
     GLint handle;
+
+	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "TessLevelInner" );
+	glUniform1f( handle, 2.0f );
+	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "TessLevelOuter" );
+	glUniform1f( handle, 2.0f );
+	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "debugCustomTessellationLevels" );
+	glUniform1f( handle, false );
+
+	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Time" );
+	glUniform1f( handle, CVar::temps );
 
     handle = glGetUniformLocation(progNuanceurGazon.getProg(), "M");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &sea_M[0][0]);
 
     handle = glGetUniformLocation(progNuanceurGazon.getProg(), "MV");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &sea_MV[0][0]);
+
+	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MVP" );
+	glUniformMatrix4fv( handle, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
 
 	// Calc normal matrix
     sea_N = glm::mat3(sea_MV);
@@ -293,7 +359,12 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	glUniform3fv(handle, 1, &cam_position[0]);
 
 	// Do it
+	glBindVertexArray( sea_vao );
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glPatchParameteri( GL_PATCH_VERTICES, 4 );
 	glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	glBindVertexArray( NULL );
 }
 
 int maxRenderDepth = 1;
