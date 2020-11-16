@@ -137,4 +137,5 @@ public:
     static bool spotLightOn;
 
     static bool showDebugInfo;
+    static bool isSeaGrid;
 };

@@ -51,7 +51,6 @@ static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceur
                                         "Nuanceurs/nuanceurTessCtrl.glsl", "Nuanceurs/nuanceurTessEval.glsl", false );
 
 // Graphic Objects
-static bool isSeaGrid = false;
 static CSkybox*         skybox;
 static CSea*         gazon;
 //static CFBO*            fbo = nullptr;
@@ -644,7 +643,7 @@ void drawScene()
     //glBindVertexArray(g_vao_quad);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
-    createTree(0, 0, 0, 100, 100, cam_position);
+    createTree(0, 0, 0, 1000, 1000, cam_position);
     renderSea(progNuanceurGazon, cam_position);
     //drawSea();
 
@@ -724,7 +723,7 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
     {
         if (action == GLFW_PRESS)
         {
-            isSeaGrid = !isSeaGrid;
+            CVar::isSeaGrid = !CVar::isSeaGrid;
         }
         break;
     }

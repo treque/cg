@@ -393,11 +393,18 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 
 	// Do it
 	glBindVertexArray( vaos[ node->vboId ] );
-
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	glPatchParameteri( GL_PATCH_VERTICES, 4 );
-	glDrawElements(GL_PATCHES, 4, GL_UNSIGNED_INT, 0);
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    if( CVar::isSeaGrid )
+    {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+        glPatchParameteri( GL_PATCH_VERTICES, 4 );
+        glDrawElements( GL_PATCHES, 4, GL_UNSIGNED_INT, NULL );
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    else
+    {
+        glPatchParameteri( GL_PATCH_VERTICES, 4 );
+        glDrawElements( GL_PATCHES, 4, GL_UNSIGNED_INT, NULL );
+    }
 
 	glBindBuffer( GL_ARRAY_BUFFER, NULL );
 	glBindVertexArray( NULL );
