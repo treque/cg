@@ -414,7 +414,7 @@ void initialisation(void)
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
     
 
-    initializeSea();
+    //initializeSea();
     
     seaModelMatrix = getModelMatrixSea();
 
@@ -461,20 +461,21 @@ glm::mat4 getModelMatrixSea(void)
     glm::vec3 t1(0.0f, 0.0f, 0.0f);
     glm::mat4 translationMatrix1 = glm::translate(t1);
 
-    glm::vec3 s(100.0f, 100.0f, 100.0f);
-    glm::mat4 scalingMatrix = glm::scale(s);
-
-    glm::mat4 rotationMatrix;
-
-    glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
-    float     a    = glm::radians(-90.0f);
-    rotationMatrix = glm::rotate(a, rotationAxis);
-
-
+    //glm::vec3 s(100.0f, 100.0f, 100.0f);
+    //glm::mat4 scalingMatrix = glm::scale(s);
+    //
+    //glm::mat4 rotationMatrix;
+    //
+    //glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
+    //float     a    = glm::radians(-90.0f);
+    //rotationMatrix = glm::rotate(a, rotationAxis);
+    //
+    //
     glm::vec3 t2(0.f, -20.f, 0.f);
     glm::mat4 translationMatrix2 = glm::translate(t2);
-
-    return translationMatrix2 * rotationMatrix * scalingMatrix * translationMatrix1;
+    //
+    //return translationMatrix2 * rotationMatrix * scalingMatrix * translationMatrix1;
+    return translationMatrix2 * translationMatrix1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -491,6 +492,50 @@ glm::mat4 getModelMatrixSea(void)
 ///////////////////////////////////////////////////////////////////////////////
 void drawSea()
 {
+
+    // Test
+    float xO = 0.0f;
+    float yO = 0.0f;
+    float zO = 0.0f;
+
+    float xOffset = 25.0f;
+    float zOffset = 25.0f;
+
+    //9x * 9y * 3vertex
+    float positions[] = 
+    {xO + xOffset, yO, zO + zOffset,
+    xO + xOffset, yO, zO - zOffset,
+    xO - xOffset, yO, zO - zOffset,
+    xO - xOffset, yO, zO + zOffset,
+    };
+
+    unsigned int positions_indexes[] = {0, 1, 2, 3};
+
+    seaSize = sizeof( positions_indexes );
+
+    // Generate buffers
+    glGenVertexArrays( 1, &sea_vao );
+    glBindVertexArray( sea_vao );
+
+    glGenBuffers( 1, &sea_vbo_pos );
+    glGenBuffers( 1, &sea_vbo_col );
+    glGenBuffers( 1, &sea_ibo );
+
+    // Link buffers and data:
+    // Positions
+    glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
+    glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+    glEnableVertexAttribArray( 0 );
+
+    // Indexes
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
+
+    glBindVertexArray( 0 );
+    //
+
+
     glm::mat4 translationMatrix = glm::translate( glm::vec3( 0, 0, 0 ) );
     glm::mat4 scaleMatrix = glm::mat4( 2.0 );;
     glm::mat4 rotationMatrix;
@@ -640,9 +685,9 @@ void drawScene()
     glBindVertexArray(g_vao_quad);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
-    createTree(0, 0, 0, 100, 100, cam_position);
-    renderSea(progNuanceurGazon, cam_position);
-    //drawSea();
+    //createTree(0, 0, 0, 100, 100, cam_position);
+    //renderSea(progNuanceurGazon, cam_position);
+    drawSea();
 
 
     // Flush les derniers vertex du pipeline graphique
