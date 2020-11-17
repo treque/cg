@@ -133,9 +133,6 @@ public:
     /// Lumiere directionnelle allumée?
     static bool dirLightOn;
 
-    /// Lumière spot allumée?
-    static bool spotLightOn;
-
     static bool showDebugInfo;
     static bool isSeaGrid;
 };

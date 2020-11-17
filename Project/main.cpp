@@ -229,21 +229,11 @@ int main(int /*argc*/, char* /*argv*/[])
 
         nbFrames++;
         // Si ça fait une seconde que l'on a pas affiché les infos
-        if (temps - dernierTemps >= 1.0)
-        {
-            if (CVar::showDebugInfo)
-            {
-                printf("%f ms/frame\n", 1000.0 / double(nbFrames));
-                printf("Position: (%f,%f,%f)\n", cam_position.x, cam_position.y, cam_position.z);
-            }
-            nbFrames = 0;
-            dernierTemps += 1.0;
-        }
 
         // Rafraichir le point de vue selon les input clavier et souris
         refreshCamera(fenetre, deltaT);
 
-        // Afficher nos modèlests
+        // Afficher nos modèles
         drawScene();
 
         // Swap buffers
@@ -256,14 +246,9 @@ int main(int /*argc*/, char* /*argv*/[])
     // on doit faire le ménage... !
     delete CVar::lumieres[ENUM_LUM::LumPonctuelle];
     delete CVar::lumieres[ENUM_LUM::LumDirectionnelle];
-    delete CVar::lumieres[ENUM_LUM::LumSpot];
     delete skybox;
     surfaceShutdown();
 
-    //if (fbo)
-    //    delete fbo;
-
-    // le programme n'arrivera jamais jusqu'ici
     return EXIT_SUCCESS;
 }
 
@@ -281,23 +266,19 @@ void initialisation(void)
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierLinAtt(0.0);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierQuadAtt(0.0);
 
-    // LUMIÈRE SPOT (enum : LumSpot - 1)
-    CVar::lumieres[ENUM_LUM::LumSpot] = new CLumiere(0.2f, 0.2f, 0.2f, 0.9f, 0.8f, 0.4f, 1.0f, 1.0f, 1.0f, 10.0f, 10.0f,
-                                                     -10.0f, 1.0f, true, -0.5f, -1.0f, 1.0f, 5.f, 60.0);
-
     // LUMIÈRE DIRECTIONNELLE (enum : LumDirectionnelle - 2)
     CVar::lumieres[ENUM_LUM::LumDirectionnelle] =
         new CLumiere(0.1f, 0.1f, 0.1f, 0.8f, 0.8f, 0.8f, 0.4f, 0.4f, 0.4f, 5.0f, -10.0f, -5.0f, 0.0f, true);
 
     // construire le skybox avec les textures
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
-    
+    drawSkybox();
 
-    //initializeSea();
-    
     seaModelMatrix = getModelMatrixSea();
 
     surfaceInit();
+
+
     glGenBuffers(1, &g_vbo_quad);
     glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
     glBufferData(GL_ARRAY_BUFFER, 14 * 4 * sizeof(float), quadData, GL_STATIC_DRAW);
@@ -551,17 +532,6 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
         }
         break;
     }
-    case GLFW_KEY_3:
-    {
-        if (action == GLFW_PRESS)
-        {
-            if (CVar::lumieres[ENUM_LUM::LumSpot]->estAllumee())
-                CVar::lumieres[ENUM_LUM::LumSpot]->eteindre();
-            else
-                CVar::lumieres[ENUM_LUM::LumSpot]->allumer();
-        }
-        break;
-    }
 
     // permuter le minFilter
     case GLFW_KEY_N:
@@ -668,8 +638,6 @@ void setLightsAttributes(const GLuint progNuanceur)
     glUniform1i(li_handle, CVar::lumieres[ENUM_LUM::LumDirectionnelle]->estAllumee());
     li_handle = glGetUniformLocation(progNuanceur, "pointLightOn");
     glUniform1i(li_handle, CVar::lumieres[ENUM_LUM::LumPonctuelle]->estAllumee());
-    li_handle = glGetUniformLocation(progNuanceur, "spotLightOn");
-    glUniform1i(li_handle, CVar::lumieres[ENUM_LUM::LumSpot]->estAllumee());
 
     // Fournir les valeurs d'éclairage au nuanceur.
     // Les directions et positions doivent être en référenciel de caméra.

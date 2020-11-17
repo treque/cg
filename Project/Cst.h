@@ -58,7 +58,6 @@ using Point = vect3D;
 enum ENUM_LUM
 {
     LumPonctuelle,
-    LumSpot,
     LumDirectionnelle
 };
 

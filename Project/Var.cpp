@@ -34,7 +34,6 @@ bool CVar::mouseControl  = true;
 std::vector<CLumiere*> CVar::lumieres      = std::vector<CLumiere*>(CCst::nbLumieresOpenGL);
 bool                   CVar::pointLightOn  = true;
 bool                   CVar::dirLightOn    = true;
-bool                   CVar::spotLightOn   = true;
 bool                   CVar::showDebugInfo = false;
 bool CVar::isSeaGrid = false;
 

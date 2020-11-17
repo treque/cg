@@ -21,7 +21,7 @@ const float CCst::freqRotZ = 0.2f;
 
 const float CCst::frameRate = 50.0f;
 
-const int CCst::nbLumieresOpenGL = 3;
+const int CCst::nbLumieresOpenGL = 2;
 
 const float CCst::largeurModele  = 20.0f;
 const float CCst::hauteurModele  = 12.46f;
