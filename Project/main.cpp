@@ -100,13 +100,6 @@ float quadData[] = {
     0.0f, 0.0f,					// Tex coord (u,v)
 };
 
-// Sea Info
-//GLuint  sea_vbo_pos = 0;
-//GLuint  sea_vbo_col = 0;
-//GLuint  sea_ibo = 0;
-//GLuint  sea_vao = 0;
-//GLint   seaSize = 0;
-
 // Debug tessellation levels
 static GLfloat TessLevelInner = 1;
 static GLfloat TessLevelOuter = 1;
@@ -118,7 +111,6 @@ static GLboolean debugCustomTessellationLevels = false;
 void      initialisation(void);
 void      drawSkybox(void);
 void      drawScene(void);
-void      drawSea(void);
 glm::mat4 getModelMatrixSea(void);
 void      setLightsAttributes(const GLuint progNuanceur);
 void      keyboard(GLFWwindow* fenetre, int touche, int scancode, int action, int mods);
@@ -275,118 +267,6 @@ int main(int /*argc*/, char* /*argv*/[])
     return EXIT_SUCCESS;
 }
 
-
-//void initializeSea( void )
-//{
-//    //float positions[] = {
-//    //    1.0f, 1.0f, 0.0f,//0
-//    //    1.0f, 0.75f, 0.0f,//1
-//    //    1.0f, 0.50f, 0.0f,//2
-//    //    1.0f, 0.25f, 0.0f,//3
-//    //    1.0f, 0.0f, 0.0f,//4
-//    //
-//    //    0.75f, 1.0f, 0.0f,//5
-//    //    0.75f, 0.75f, 0.0f,//6
-//    //    0.75f, 0.50f, 0.0f,//7
-//    //    0.75f, 0.25f, 0.0f,//8
-//    //    0.75f, 0.0f, 0.0f,//9
-//    //
-//    //    0.5f, 1.0f, 0.0f,//10
-//    //    0.5f, 0.75f, 0.0f,//11
-//    //    0.5f, 0.50f, 0.0f,//12
-//    //    0.5f, 0.25f, 0.0f,//13
-//    //    0.5f, 0.0f, 0.0f,//14
-//    //
-//    //    0.25f, 1.0f, 0.0f,//15
-//    //    0.25f, 0.75f, 0.0f,//16
-//    //    0.25f, 0.50f, 0.0f,//17
-//    //    0.25f, 0.25f, 0.0f,//18
-//    //    0.25f, 0.0f, 0.0f,//19
-//    //
-//    //    0.0f, 1.0f, 0.0f,//20
-//    //    0.0f, 0.75f, 0.0f,//21
-//    //    0.0f, 0.50f, 0.0f,//22
-//    //    0.0f, 0.25f, 0.0f,//23
-//    //    0.0f, 0.0f, 0.0f,//24
-//    //};
-//
-//    //9x * 9y * 3vertex
-//    float positions[243];
-//
-//
-//    for(int i = 0; i < 9; i++ )
-//    {
-//        for( int j = 0; j < 9; j++ )
-//        {
-//            positions[ ( i * 9 + j)  * 3 + 0  ] = (-1.0f + i * 0.25f);
-//            positions[ ( i * 9 + j ) * 3 + 1 ] = (-1.0f + j * 0.25f);
-//            positions[ ( i * 9 + j ) * 3 + 2 ] = (0.0f);
-//        }
-//    }
-//
-//    //unsigned int positions_indexes[] = {
-//    //    0, 1, 6, 5,
-//    //    1, 2, 7, 6,
-//    //    2, 3, 8, 7,
-//    //    3, 4, 9, 8,
-//    //
-//    //    5, 6, 11, 10,
-//    //    6, 7, 12, 11,
-//    //    7, 8, 13, 12,
-//    //    8, 9, 14, 13,
-//    //
-//    //    10, 11, 16, 15,
-//    //    11, 12, 17, 16,
-//    //    12, 13, 18, 17,
-//    //    13, 14, 19, 18,
-//    //
-//    //    15, 16, 21, 20,
-//    //    16, 17, 22, 21,
-//    //    17, 18, 23, 22,
-//    //    18, 19, 24, 23,
-//    //};
-//
-//    // 8x * 8y
-//    unsigned int positions_indexes[64 * 4];
-//
-//
-//    for( unsigned int i = 0; i < 8; i++ )
-//    {
-//        for( unsigned int j = 0; j < 8; j++ )
-//        {
-//            positions_indexes[ (i * 8 + j) * 4 ] = (i * 9) + j;
-//            positions_indexes[ (i * 8 + j) * 4 + 1 ] = ( i * 9 ) + j + 1;
-//            positions_indexes[ ( i * 8 + j ) * 4 + 2 ] = ( i * 9 ) + j + 9 + 1;
-//            positions_indexes[ ( i * 8 + j ) * 4 + 3 ] = ( i * 9 ) + j + 9;
-//        }
-//    }
-//
-//    seaSize = sizeof( positions_indexes );
-//
-//    // Generate buffers
-//    glGenVertexArrays( 1, &sea_vao );
-//    glBindVertexArray( sea_vao );
-//
-//    glGenBuffers( 1, &sea_vbo_pos );
-//    glGenBuffers( 1, &sea_vbo_col );
-//    glGenBuffers( 1, &sea_ibo );
-//
-//    // Link buffers and data:
-//    // Positions
-//    glBindBuffer( GL_ARRAY_BUFFER, sea_vbo_pos );
-//    glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-//    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-//    glEnableVertexAttribArray( 0 );
-//
-//    // Indexes
-//    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
-//    glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( positions_indexes ), positions_indexes, GL_STATIC_DRAW );
-//
-//    glBindVertexArray( 0 );
-//
-//}
-
-
 void initialisation(void)
 {
 
@@ -460,120 +340,10 @@ void initialisation(void)
 glm::mat4 getModelMatrixSea(void)
 {
     // Création d'une matrice-modèle.
-    glm::vec3 t1(0.0f, 0.0f, 0.0f);
-    glm::mat4 translationMatrix1 = glm::translate(t1);
-
-    //glm::vec3 s(100.0f, 100.0f, 100.0f);
-    //glm::mat4 scalingMatrix = glm::scale(s);
-    //
-    //glm::mat4 rotationMatrix;
-    //
-    //glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
-    //float     a    = glm::radians(-90.0f);
-    //rotationMatrix = glm::rotate(a, rotationAxis);
-    //
-    //
-    glm::vec3 t2(0.f, -20.f, 0.f);
-    glm::mat4 translationMatrix2 = glm::translate(t2);
-    //
-    //return translationMatrix2 * rotationMatrix * scalingMatrix * translationMatrix1;
-    return translationMatrix2 * translationMatrix1;
+    glm::mat4 translationMatrix = glm::translate(glm::vec3(0.f, -20.f, 0.f));
+    return translationMatrix;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///  global public  dessinerGazon \n
-///
-///  fonction de d'affichage pour le modele du Gazon
-///
-///
-///  @return Aucune
-///
-///  @author Félix G. Harvey
-///  @date   2016
-///
-///////////////////////////////////////////////////////////////////////////////
-//void drawSea()
-//{
-//
-//
-//
-//    glm::mat4 translationMatrix = glm::translate( glm::vec3( 0, 0, 0 ) );
-//    glm::mat4 scaleMatrix = glm::mat4( 2.0 );;
-//    glm::mat4 rotationMatrix;
-//
-//
-//    glm::mat4 model = translationMatrix * scaleMatrix * rotationMatrix;
-//
-//    // Activer le nuanceur approprié
-//    // ...
-//    glUseProgram( progNuanceurGazon.getProg() );
-//
-//
-//    // Matrice Model-Vue-Projection:
-//    glm::mat4 mvp = CVar::projection * CVar::vue * seaModelMatrix;
-//
-//    glm::mat4 mv = CVar::vue * seaModelMatrix;
-//
-//    // Matrice pour normales (world matrix):
-//    glm::mat3 mv_n = glm::inverseTranspose( glm::mat3( CVar::vue * seaModelMatrix ) );
-//
-//    GLint handle;
-//
-//    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "TessLevelInner");
-//    glUniform1f(handle, TessLevelInner);
-//    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "TessLevelOuter");
-//    glUniform1f(handle, TessLevelOuter);
-//    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "debugCustomTessellationLevels");
-//    glUniform1f(handle, debugCustomTessellationLevels);
-//
-//    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Time");
-//    glUniform1f(handle, CVar::temps);
-//
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "M" );
-//    glUniformMatrix4fv( handle, 1, GL_FALSE, &seaModelMatrix[ 0 ][ 0 ] );
-//
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "eyePos" );
-//    glUniform3fv( handle, 1, &cam_position[ 0 ] );
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "V" );
-//    glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::vue[ 0 ][ 0 ] );
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "P" );
-//    glUniformMatrix4fv( handle, 1, GL_FALSE, &CVar::projection[ 0 ][ 0 ] );
-//
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV" );
-//    glUniformMatrix4fv( handle, 1, GL_FALSE, &mv[ 0 ][ 0 ] );
-//
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MVP" );
-//    glUniformMatrix4fv( handle, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
-//
-//    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "MV_N" );
-//    glUniformMatrix3fv( handle, 1, GL_FALSE, &mv_n[ 0 ][ 0 ] );
-//
-//    // Utiliser le VAO pour dessiner les triangles du cube:
-//    // ...
-//
-//    glBindVertexArray( sea_vao );
-//
-//    if( isSeaGrid )
-//    {
-//        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-//        glPatchParameteri( GL_PATCH_VERTICES, 4 );
-//        glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//    }
-//    else
-//    {
-//        glPatchParameteri( GL_PATCH_VERTICES, 4 );
-//        glDrawElements( GL_PATCHES, seaSize, GL_UNSIGNED_INT, NULL );
-//    }
-//    GLenum err;
-//    while ((err = glGetError()) != GL_NO_ERROR)
-//    {
-//        printf("Error drawing\n");
-//    }
-//
-//    glBindVertexArray( NULL );
-//    glUseProgram( NULL );
-//}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///  global public  dessinerSkybox \n
@@ -866,7 +636,6 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
         }
         break;
     }
-
     }
 }
 
@@ -1073,9 +842,4 @@ void compileShaders()
     progNuanceurSkybox.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
 
     progNuanceurGazon.compilerEtLier();
-
-    //progNuanceurGazon.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
-    //progNuanceurGazon.enregistrerUniformInteger("shadowMap0", CCst::texUnit_1);
-    //progNuanceurGazon.enregistrerUniformInteger("shadowMap1", CCst::texUnit_2);
-    //progNuanceurGazon.enregistrerUniformInteger("shadowMap2", CCst::texUnit_3);
 }
