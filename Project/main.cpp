@@ -278,7 +278,6 @@ void initialisation(void)
 
     surfaceInit();
 
-
     glGenBuffers(1, &g_vbo_quad);
     glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
     glBufferData(GL_ARRAY_BUFFER, 14 * 4 * sizeof(float), quadData, GL_STATIC_DRAW);
@@ -358,7 +357,7 @@ void drawSkybox()
     handle = glGetUniformLocation(progNuanceurSkybox.getProg(), "MVP");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &mvp[0][0]);
 
-    //skybox->dessiner();
+    skybox->dessiner();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -371,7 +370,7 @@ void drawSkybox()
 ///  @return Aucune
 ///
 ///  @author Félix G. Harvey
-///  @date   2016
+///  @date   2020
 ///
 ///////////////////////////////////////////////////////////////////////////////
 void drawScene()
@@ -383,21 +382,15 @@ void drawScene()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, CVar::currentW, CVar::currentH);
     
-
     //////////////////     Afficher les objets:  ///////////////////////////
-
 
     glDisable(GL_DEPTH_TEST);
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
-    //glBindVertexArray(g_vao_quad);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
     createTree(0, 0, 0, 1000, 1000, cam_position);
     renderSea(progNuanceurGazon, cam_position);
-    //drawSea();
-
 
     // Flush les derniers vertex du pipeline graphique
     glFlush();
