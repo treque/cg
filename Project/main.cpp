@@ -440,6 +440,9 @@ void initialisation(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    // Unlock the fps (To go higher than 60 hz)
+    //glfwSwapInterval( 0 );
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

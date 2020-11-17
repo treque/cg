@@ -99,6 +99,45 @@ void surfaceShutdown()
     surfaceTreeTail = NULL;
 }
 
+void createNodeVao( SurfaceNode* node )
+{
+	float x = node->origin[ 0 ];
+	float y = node->origin[ 1 ];
+	float z = node->origin[ 2 ];
+
+	float w = node->width;
+	float h = node->height;
+
+	float positions[] =
+	{ x + w / 2, y, z + h / 2,
+	  x + w / 2, y, z - h / 2,
+	  x - w / 2, y, z - h / 2,
+	  x - w / 2, y, z + h / 2,
+	};
+
+	// Generate buffers
+	glGenVertexArrays( 1, &vaos[ nBuffers ] );
+	glBindVertexArray( vaos[ nBuffers ] );
+
+	glGenBuffers( 1, &vbos[ nBuffers ] );
+
+	// Link buffers and data:
+	// Positions
+	glBindBuffer( GL_ARRAY_BUFFER, vbos[ nBuffers ] );
+	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
+	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
+
+	// Indexes
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
+
+	glEnableVertexAttribArray( 0 );
+
+	glBindVertexArray( 0 );
+	
+	node->vboId = nBuffers;
+	nBuffers++;
+}
+
 SurfaceNode* createNode(SurfaceNode* parent, int type, float x, float y, float z, float w, float h)
 {
     if (numSurfaceNodes >= MAX_SURFACE_NODES) return NULL;
@@ -121,35 +160,6 @@ SurfaceNode* createNode(SurfaceNode* parent, int type, float x, float y, float z
 	surfaceTreeTail->east = NULL;
 	surfaceTreeTail->west = NULL;
 
-	//9x * 9y * 3vertex
-	float positions[] =
-	{ x + w / 2, y, z + h / 2,
-	  x + w / 2, y, z - h / 2,
-	  x - w / 2, y, z - h / 2,
-	  x - w / 2, y, z + h / 2,
-	};
-	
-	// Generate buffers
-	glGenVertexArrays( 1, &vaos[ nBuffers ] );
-	glBindVertexArray( vaos[ nBuffers ] );
-
-	glGenBuffers( 1, &vbos[ nBuffers ] );
-
-	// Link buffers and data:
-	// Positions
-	glBindBuffer( GL_ARRAY_BUFFER, vbos[ nBuffers ] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-
-	// Indexes
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
-
-	glEnableVertexAttribArray( 0 );
-
-	glBindVertexArray( 0 );
-	//
-	surfaceTreeTail->vboId = nBuffers;
-	nBuffers++;
 	return surfaceTreeTail;
 }
 
@@ -218,14 +228,37 @@ void divideNode(SurfaceNode *node, glm::vec3 cam_position)
 	div3 = needsSubdivision(node->child3, cam_position);
 	div4 = needsSubdivision(node->child4, cam_position);
 
-	if (div1)
-		divideNode(node->child1, cam_position);
-	if (div2)
-		divideNode(node->child2, cam_position);
-	if (div3)
-		divideNode(node->child3, cam_position);
-	if (div4)
-		divideNode(node->child4, cam_position);
+	if( div1 )
+	{
+		divideNode( node->child1, cam_position );
+	} else
+	{
+		createNodeVao( node->child1 );
+	}
+
+	if( div2 )
+	{
+		divideNode( node->child2, cam_position );
+	} else 
+	{
+		createNodeVao( node->child2 );
+	}
+		
+	if( div3 )
+	{
+		divideNode( node->child3, cam_position );
+	} else
+	{
+		createNodeVao( node->child3 );
+	}
+
+	if( div4 )
+	{
+		divideNode( node->child4, cam_position );
+	} else
+	{
+		createNodeVao( node->child4 );
+	}
 }
 
 void createTree(float x, float y, float z, float width, float height, glm::vec3 cam_position)
