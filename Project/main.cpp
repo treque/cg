@@ -63,6 +63,7 @@ static float mouseSpeed = 0.075f;
 
 // Camera position
 static glm::vec3 cam_position = glm::vec3(0, 0, 0);
+static glm::vec3 prev_cam_position = glm::vec3(0, 0, 0);
 static glm::vec3 direction    = glm::vec3(0.f, 0.f, -1.0f);
 static glm::vec3 cam_right    = glm::vec3(1.f, 0.f, 0.f);
 static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
@@ -416,7 +417,9 @@ void drawScene()
     //glBindVertexArray(g_vao_quad);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
-    createTree(0, 0, 0, 1000, 1000, cam_position);
+    if( !glm::all(glm::equal(cam_position, prev_cam_position )));
+        createTree(0, 0, 0, 1000, 1000, cam_position);
+
     renderSea(progNuanceurGazon, cam_position);
     //drawSea();
 
@@ -793,21 +796,25 @@ void refreshCamera(GLFWwindow* fenetre, double deltaT)
     // Move forward
     if (glfwGetKey(fenetre, GLFW_KEY_W) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position += direction * (float)deltaT * cameraSpeed;
     }
     // Move backward
     if (glfwGetKey(fenetre, GLFW_KEY_S) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position -= direction * (float)deltaT * cameraSpeed;
     }
     // Strafe right
     if (glfwGetKey(fenetre, GLFW_KEY_D) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position += cam_right * (float)deltaT * cameraSpeed;
     }
     // Strafe left
     if (glfwGetKey(fenetre, GLFW_KEY_A) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position -= cam_right * (float)deltaT * cameraSpeed;
     }
 
