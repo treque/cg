@@ -268,7 +268,7 @@ void createTree(float x, float y, float z, float width, float height, glm::vec3 
 	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
 
-	glEnableVertexAttribArray( 0 );
+	glEnableVertexAttribArray( 0 ); // layout location 0?
 
 	// Indexes
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
@@ -347,13 +347,6 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 
     GLint handle;
 
-	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "TessLevelInner" );
-	glUniform1f( handle, 2.0f );
-	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "TessLevelOuter" );
-	glUniform1f( handle, 2.0f );
-	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "debugCustomTessellationLevels" );
-	glUniform1f( handle, false );
-
 	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Time" );
 	glUniform1f( handle, CVar::temps );
 
@@ -374,10 +367,6 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "N");
 	glUniformMatrix3fv(handle, 1, GL_FALSE, &sea_N[0][0]);
 
-	// Send the size of the patch to the GPU
-	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "tileScale");
-	glUniform1f(handle, 0.5 * node->width);
-
 	// Send patch neighbor edge tess scale factors
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "tscale_negx");
 	glUniform1f(handle, node->tscale_negx);
@@ -391,7 +380,6 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "eyePos");
 	glUniform3fv(handle, 1, &cam_position[0]);
 
-	// Do it
 	glBindVertexArray( vaos[ node->vboId ] );
     if( CVar::isSeaGrid )
     {
@@ -410,23 +398,16 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	glBindVertexArray( NULL );
 }
 
-int maxRenderDepth = 1;
-int renderDepth = 0;
-
 
 /**
 * Traverses the terrain quadtree to draw nodes with no children.
 */
 void renderRecursive(SurfaceNode *node, CNuanceurProg& progNuanceurGazon, glm::vec3 cam_position)
 {
-	//if (renderDepth >= maxRenderDepth)
-	//	return;
-
 	// If all children are null, render this node
 	if (!node->child1 && !node->child2 && !node->child3 && !node->child4)
 	{
 		renderNode(node, progNuanceurGazon, cam_position);
-		renderDepth++;
 		return;
 	}
 
@@ -449,7 +430,5 @@ void renderRecursive(SurfaceNode *node, CNuanceurProg& progNuanceurGazon, glm::v
 */
 void renderSea(CNuanceurProg& progNuanceurGazon, glm::vec3 cam_position)
 {
-	renderDepth = 0;
-
 	renderRecursive(surfaceTree, progNuanceurGazon, cam_position);
 }

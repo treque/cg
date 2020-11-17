@@ -4,7 +4,7 @@
 in vec3 colorOut;
 
 // Déclaration des variables de sortie
-layout(location = 0) out vec4 fragColor;
+out vec4 fragColor;
 
 void main () {
 

@@ -87,7 +87,9 @@ uniform	mat4 MVP;
 uniform	mat3 N;
 in vec3 cPosition[];
 in vec3 color[];
+in vec3 outNormal[];
 out vec3 colorOut;
+out vec3 normal;
 
 //
 // Inputs
@@ -118,7 +120,16 @@ void main()
     noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
 
+
     gl_Position = MVP * pos + vec4(0 , noiseVal * 10 , 0 , 0);
+	
+	vec4 worldPos = M * (pos + vec4(0 , noiseVal * 10 , 0 , 0));
+	vec4 edge1 = normalize(M * (vec4(cPosition[1], 1) - vec4(cPosition[0], 1)));
+	vec4 edge2 = normalize(M * (vec4(cPosition[2], 1) - vec4(cPosition[1], 1)));
+	vec3 e1 = vec3(edge1.x, edge1.y, edge1.z);
+	vec3 e2 =  vec3(edge2.x, edge2.y, edge2.z);
+	normal = normalize(cross(e1, e2));
+
     colorOut = color[0];
 
 }

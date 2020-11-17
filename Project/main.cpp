@@ -317,7 +317,7 @@ void initialisation(void)
 glm::mat4 getModelMatrixSea(void)
 {
     // Création d'une matrice-modèle.
-    glm::mat4 translationMatrix = glm::translate(glm::vec3(0.f, -20.f, 0.f));
+    glm::mat4 translationMatrix = glm::translate(glm::vec3(0.f, 0.f, 0.f)) * glm::translate(glm::vec3(0.f, -20.f, 0.f));
     return translationMatrix;
 }
 
@@ -385,7 +385,7 @@ void drawScene()
     //////////////////     Afficher les objets:  ///////////////////////////
 
     glDisable(GL_DEPTH_TEST);
-    drawSkybox();
+    //drawSkybox();
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
 
