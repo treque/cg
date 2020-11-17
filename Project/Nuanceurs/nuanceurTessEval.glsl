@@ -1,23 +1,7 @@
 #version 420
-//
-//layout(quads, equal_spacing, cw) in;
-//
-//uniform float TessLevelInner;
-//uniform float TessLevelOuter;
-//
+
 uniform float Time;
-//
-//uniform mat4 MVP;
-//uniform mat4 MV;
-//uniform mat3 MV_N;
-//uniform mat4 M;
-////uniform mat4 V;
-////uniform mat4 P;
-//
-//in vec3 cPosition[];
-//in vec3 color[];
-//out vec3 colorOut;
-//
+
 vec3 random3(vec3 c) {
 	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
 	vec3 r;
@@ -92,61 +76,6 @@ float simplex3d_fractal(vec3 m) {
 			+0.1333333*simplex3d(4.0*m*rot3)
 			+0.0666667*simplex3d(8.0*m);
 }
-//
-//float interpole( float v0, float v1, float v2, float v3 )
-//{
-//    // mix( x, y, f ) = x * (1-f) + y * f.
-//    float v01 = mix( v0, v1, gl_TessCoord.x );
-//    float v32 = mix( v3, v2, gl_TessCoord.x );
-//    return mix( v01, v32, gl_TessCoord.y );
-//}
-//vec2 interpole( vec2 v0, vec2 v1, vec2 v2, vec2 v3 )
-//{
-//    // mix( x, y, f ) = x * (1-f) + y * f.
-//    vec2 v01 = mix( v0, v1, gl_TessCoord.x );
-//    vec2 v32 = mix( v3, v2, gl_TessCoord.x );
-//    return mix( v01, v32, gl_TessCoord.y );
-//}
-//vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
-//{
-//    // mix( x, y, f ) = x * (1-f) + y * f.
-//    vec3 v01 = mix( v0, v1, gl_TessCoord.x );
-//    vec3 v32 = mix( v3, v2, gl_TessCoord.x );
-//    return mix( v01, v32, gl_TessCoord.y );
-//}
-//
-//vec4 interpole( vec4 v0, vec4 v1, vec4 v2)
-//{
-//    // mix( x, y, f ) = x * (1-f) + y * f.
-//    vec4 v01 = mix( v0, v1, gl_TessCoord.x );
-//    return mix( v01, v2, gl_TessCoord.y );
-//}
-//
-//vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)
-//{
-//    return vec3(gl_TessCoord.x) * v0 + vec3(gl_TessCoord.y) * v1 + vec3(gl_TessCoord.z) * v2;
-//}
-//
-//void main()
-//{
-//    vec3 p0 = cPosition[0];
-//    vec3 p1 = cPosition[1];
-//    vec3 p2 = cPosition[2];
-//    vec3 p3 = cPosition[3];
-//    vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
-//
-//    vec2 p = (M * pos).xz / 500.f;
-//    vec3 p4 = vec3(p, Time * 0.004);
-//
-//    float noiseVal;
-//    noiseVal = simplex3d_fractal(p4 * 20 + 20);
-//    noiseVal = 0.5 + 0.5 * noiseVal;
-//
-//    gl_Position = MVP * pos + vec4(0 , noiseVal * 10 , 0 , 0);
-//    colorOut = color[0];
-//}
-
-
 
 //
 // Uniforms
@@ -181,9 +110,6 @@ void main()
     vec3 p2 = cPosition[2];
     vec3 p3 = cPosition[3];
     vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
-
-    //gl_Position = MVP * pos;
-    //colorOut = color[0];
 
     vec2 p = (M * pos).xz / 500.f;
     vec3 p4 = vec3(p, Time * 0.004);
