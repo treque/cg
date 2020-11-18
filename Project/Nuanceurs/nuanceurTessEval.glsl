@@ -81,6 +81,7 @@ float simplex3d_fractal(vec3 m) {
 // Uniforms
 //
 uniform	mat4 M;
+uniform	mat4 V;
 uniform	mat4 P;
 uniform	mat4 MV;
 uniform	mat4 MVP;
@@ -88,6 +89,7 @@ uniform	mat3 N;
 in vec3 cPosition[];
 in vec3 color[];
 out vec3 colorOut;
+out vec3 normal;
 
 //
 // Inputs
@@ -102,6 +104,26 @@ vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
     return mix( v01, v32, gl_TessCoord.y );
 }
 
+vec4 height( vec4 pos )
+{
+	vec2 p = (M * pos).xz / 500.f;
+    vec3 p4 = vec3(p, Time * 0.004);
+
+    float noiseVal;
+    noiseVal = simplex3d_fractal(p4 * 20 + 20);
+    noiseVal = 0.5 + 0.5 * noiseVal;
+	return M * (pos + vec4(0 , noiseVal * 10 , 0 , 0));
+}
+
+vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
+{
+    vec4 edge1 = normalize((vec4(ws_p1, 2) - vec4(ws_p2, 1)));
+    vec4 edge2 = normalize((vec4(ws_p3, 3) - vec4(ws_p2, 2)));
+    vec3 e1 = vec3(edge1.x, edge1.y, edge1.z);
+    vec3 e2 =  vec3(edge2.x, edge2.y, edge2.z);
+
+    return normalize(cross(e1, e2));
+}
 
 void main()
 {
@@ -111,14 +133,13 @@ void main()
     vec3 p3 = cPosition[3];
     vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
 
-    vec2 p = (M * pos).xz / 500.f;
-    vec3 p4 = vec3(p, Time * 0.004);
+	vec4 posInterpol = height(pos);
+	// The 0.1 step need to be reworked, we need to calculate it from the levels
+	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
+	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
 
-    float noiseVal;
-    noiseVal = simplex3d_fractal(p4 * 20 + 20);
-    noiseVal = 0.5 + 0.5 * noiseVal;
-
-    gl_Position = MVP * pos + vec4(0 , noiseVal * 10 , 0 , 0);
+    gl_Position = P * V * posInterpol;
     colorOut = color[0];
 
+	normal = getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz);
 }
