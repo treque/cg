@@ -63,6 +63,7 @@ static float mouseSpeed = 0.075f;
 
 // Camera position
 static glm::vec3 cam_position = glm::vec3(0, 0, 0);
+static glm::vec3 prev_cam_position = glm::vec3(0, 0, 0);
 static glm::vec3 direction    = glm::vec3(0.f, 0.f, -1.0f);
 static glm::vec3 cam_right    = glm::vec3(1.f, 0.f, 0.f);
 static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
@@ -300,6 +301,9 @@ void initialisation(void)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 
+    // Unlock the fps (To go higher than 60 hz)
+    //glfwSwapInterval( 0 );
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -389,7 +393,9 @@ void drawScene()
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
 
-    createTree(0, 0, 0, 1000, 1000, cam_position);
+    if( !glm::all(glm::equal(cam_position, prev_cam_position )));
+        createTree(0, 0, 0, 1000, 1000, cam_position);
+
     renderSea(progNuanceurGazon, cam_position);
 
     // Flush les derniers vertex du pipeline graphique
@@ -751,21 +757,25 @@ void refreshCamera(GLFWwindow* fenetre, double deltaT)
     // Move forward
     if (glfwGetKey(fenetre, GLFW_KEY_W) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position += direction * (float)deltaT * cameraSpeed;
     }
     // Move backward
     if (glfwGetKey(fenetre, GLFW_KEY_S) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position -= direction * (float)deltaT * cameraSpeed;
     }
     // Strafe right
     if (glfwGetKey(fenetre, GLFW_KEY_D) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position += cam_right * (float)deltaT * cameraSpeed;
     }
     // Strafe left
     if (glfwGetKey(fenetre, GLFW_KEY_A) == GLFW_PRESS)
     {
+        prev_cam_position = cam_position;
         cam_position -= cam_right * (float)deltaT * cameraSpeed;
     }
 
