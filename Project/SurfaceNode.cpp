@@ -383,8 +383,14 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Time" );
 	glUniform1f( handle, CVar::temps );
 
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "V");
+    glUniformMatrix4fv(handle, 1, GL_FALSE, &CVar::vue[0][0]);
+
     handle = glGetUniformLocation(progNuanceurGazon.getProg(), "M");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &sea_M[0][0]);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "P");
+    glUniformMatrix4fv(handle, 1, GL_FALSE, &CVar::projection[0][0]);
 
     handle = glGetUniformLocation(progNuanceurGazon.getProg(), "MV");
     glUniformMatrix4fv(handle, 1, GL_FALSE, &sea_MV[0][0]);
