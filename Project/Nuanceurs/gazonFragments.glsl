@@ -96,6 +96,7 @@ void directionalLight(in vec3 lightVect)
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[2].Ambient,1.0);
    Diffuse  += vec4(Lights[2].Diffuse,1.0) * nDotVP;
+   specular +=  lightSpec(2, normal, Light2HV, 100.0);
 }
 
 
@@ -186,7 +187,8 @@ void main () {
     specular = vec4(0.0);
 
     //pointLight(fragLight0Vect);
-    spotLight(fragLight1Vect);
+    //spotLight(fragLight1Vect);
+    directionalLight(fragLight2Vect);
 	fragColor = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
 	fragColor = clamp( fragColor, 0.0, 1.0 );
 }

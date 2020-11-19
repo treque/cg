@@ -188,5 +188,5 @@ void main()
 
 	Light0HV = normalize(fragLight0Vect - ecPosition.xyz);
 	Light1HV = normalize(fragLight1Vect - ecPosition.xyz);
-	Light2HV = normalize(fragLight2Vect - ecPosition.xyz);
+	Light2HV = normalize(-fragLight2Vect);
 }
