@@ -78,9 +78,9 @@ GLuint g_ibo_quad; // Index buffer object
 
 static CMateriau mat_model(0.1f, 0.1f, 0.1f, 1.0f, // ambient
     0.1f, 0.2f, 0.953f, 1.0f, // diffuse
-    0.5f, 0.5f, 0.5f, 1.0f, // spec
+    0.7f, 0.7f, 0.7f, 1.0f, // spec
     0.0f, 0.0f, 0.0f, 1.0f, // exponent
-    400.0f); // shininess
+    800.0f); // shininess
 
 float quadData[] = {
     // Vert 1
@@ -243,7 +243,14 @@ int main(int /*argc*/, char* /*argv*/[])
 
         // Afficher nos modèles
         drawScene();
-
+        if (nbFrames % 200 == 0)
+        {
+            GLfloat ay[4];
+            CVar::lumieres[0]->obtenirPos(ay);
+            printf("Position: (%f,%f,%f)\n", cam_position.x, cam_position.y, cam_position.z);
+            printf("LUM: (%f,%f,%f)\n", ay[0], ay[1], ay[2]);
+        }
+      
         // Swap buffers
         glfwSwapBuffers(fenetre);
         glfwPollEvents();
@@ -272,7 +279,7 @@ void initialisation(void)
         new CLumiere(0.1f, 0.1f, 0.1f, // ambient
             1.0f, 1.0f, 0.9f, // diff
             1.0f, 1.0f, 0.7f, // spec
-            0.0f, 100.0f, -50.0f, // pos
+            0.0f, 100.0f, 0.0f, // pos
             1.0f, true);
     
     
@@ -285,7 +292,7 @@ void initialisation(void)
         new CLumiere(0.1f, 0.1f, 0.1f,
             1.0f, 1.0f, 0.6f,
             1.0f, 1.0f, 0.6f,
-            0.0f, 1000.0f, 0.0f,
+            0.0f, 100.0f, 0.0f,
             0.0f, true);
 
     // construire le skybox avec les textures

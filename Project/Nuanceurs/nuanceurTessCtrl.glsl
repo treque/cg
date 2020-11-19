@@ -16,11 +16,10 @@ uniform float tscale_posz;
 
 in vec3 vPosition[];
 in vec3 normal[];
-in vec3 obs[];
+
 out vec3 cPosition[];
 out vec3 color[];
 out vec3 outNormal[];
-out vec3 outObs[];
 
 float dlodCameraDistance(vec4 p0, vec4 p1)
 {
@@ -66,7 +65,6 @@ void main(void)
 
     cPosition[gl_InvocationID] = vPosition[gl_InvocationID];
     outNormal[gl_InvocationID] = normal[gl_InvocationID];
-	outObs[gl_InvocationID] = obs[gl_InvocationID];
 
     if ( gl_InvocationID == 0 )
     {
