@@ -75,6 +75,13 @@ GLuint quadPatchInd[] = { 0, 1, 2, 3 };
 GLuint g_vbo_quad; // Vertex buffer object
 GLuint g_vao_quad; // Vertex attribute object
 GLuint g_ibo_quad; // Index buffer object
+
+static CMateriau mat_model(0.1f, 0.1f, 0.1f, 1.0f, // ambient
+    0.1f, 0.2f, 0.953f, 1.0f, // diffuse
+    0.5f, 0.5f, 0.5f, 1.0f, // spec
+    0.0f, 0.0f, 0.0f, 1.0f, // exponent
+    400.0f); // shininess
+
 float quadData[] = {
     // Vert 1
     -1.0f, 0.0f, -1.0f, 1.0,	// Position
@@ -260,16 +267,26 @@ void initialisation(void)
     // CONSTRUCTION DES LUMIÈRES
     ////////////////////////////////////////////////////
 
-    // LUMIÈRE PONCTUELLE (enum : LumPonctuelle - 0)
+    // LUMIÈRE PONCTUELLE
     CVar::lumieres[ENUM_LUM::LumPonctuelle] =
-        new CLumiere(0.1f, 0.1f, 0.1f, 0.5f, 0.5f, 1.0f, 0.7f, 0.7f, 0.7f, 0.0f, 20.0f, -20.0f, 1.0f, true);
+        new CLumiere(0.1f, 0.1f, 0.1f, // ambient
+            1.0f, 1.0f, 0.9f, // diff
+            1.0f, 1.0f, 0.7f, // spec
+            0.0f, 100.0f, -50.0f, // pos
+            1.0f, true);
+    
+    
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierConstAtt(1.1f);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierLinAtt(0.0);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierQuadAtt(0.0);
 
-    // LUMIÈRE DIRECTIONNELLE (enum : LumDirectionnelle - 2)
+    // LUMIÈRE DIRECTIONNELLE 
     CVar::lumieres[ENUM_LUM::LumDirectionnelle] =
-        new CLumiere(0.1f, 0.1f, 0.1f, 0.8f, 0.8f, 0.8f, 0.4f, 0.4f, 0.4f, 5.0f, -10.0f, -5.0f, 0.0f, true);
+        new CLumiere(0.1f, 0.1f, 0.1f,
+            1.0f, 1.0f, 0.6f,
+            1.0f, 1.0f, 0.6f,
+            0.0f, 1000.0f, 0.0f,
+            0.0f, true);
 
     // construire le skybox avec les textures
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
@@ -397,6 +414,31 @@ void drawScene()
         createTree(0, 0, 0, 1000, 1000, cam_position);
 
     renderSea(progNuanceurGazon, cam_position);
+
+
+    GLfloat component[4];
+    GLint handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Material.Ambient");
+    mat_model.obtenirKA(component);
+    glUniform4fv(handle, 1, component);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Material.Diffuse");
+    mat_model.obtenirKD(component);
+    glUniform4fv(handle, 1, component);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Material.Specular");
+    mat_model.obtenirKS(component);
+    glUniform4fv(handle, 1, component);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Material.Exponent");
+    mat_model.obtenirKE(component);
+    glUniform4fv(handle, 1, component);
+
+    handle = glGetUniformLocation(progNuanceurGazon.getProg(), "Material.Shininess");
+    glUniform1f(handle, mat_model.obtenirShininess());
+
+
+    setLightsAttributes(progNuanceurGazon.getProg());
+
 
     // Flush les derniers vertex du pipeline graphique
     glFlush();
@@ -632,11 +674,6 @@ void setLightsAttributes(const GLuint progNuanceur)
 {
     // Handle pour attribut de lumiere
     GLint li_handle;
-
-    li_handle = glGetUniformLocation(progNuanceur, "dirLightOn");
-    glUniform1i(li_handle, CVar::lumieres[ENUM_LUM::LumDirectionnelle]->estAllumee());
-    li_handle = glGetUniformLocation(progNuanceur, "pointLightOn");
-    glUniform1i(li_handle, CVar::lumieres[ENUM_LUM::LumPonctuelle]->estAllumee());
 
     // Fournir les valeurs d'éclairage au nuanceur.
     // Les directions et positions doivent être en référenciel de caméra.

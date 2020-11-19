@@ -1,4 +1,15 @@
 #version 420
+struct Light
+{
+        vec3 Ambient; 
+        vec3 Diffuse;
+        vec3 Specular;
+        vec4 Position;  // Si .w = 1.0 -> Direction de lumiere directionelle.
+        vec3 SpotDir;
+        float SpotExp;
+        float SpotCutoff;
+        vec3 Attenuation; //Constante, Lineraire, Quadratique
+};
 
 uniform float Time;
 
@@ -86,11 +97,16 @@ uniform	mat4 P;
 uniform	mat4 MV;
 uniform	mat4 MVP;
 uniform	mat3 N;
+uniform Light Lights[2]; // 0:ponctuelle  1:dir
+
 in vec3 cPosition[];
 in vec3 color[];
 in vec3 outNormal[];
+in vec3 outObs[];
+out vec3 lightDir[2];
 out vec3 colorOut;
 out vec3 normal;
+out vec3 obs;
 
 //
 // Inputs
@@ -108,12 +124,12 @@ vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
 vec4 height( vec4 pos )
 {
 	vec2 p = (M * pos).xz / 500.f;
-    vec3 p4 = vec3(p, Time * 0.004);
+    vec3 p4 = vec3(p, Time * 0.002);
 
     float noiseVal;
     noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
-	return M * (pos + vec4(0 , noiseVal * 10 , 0 , 0));
+	return M * (pos + vec4(0 , noiseVal * 2 , 0 , 0));
 }
 
 vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
@@ -136,11 +152,18 @@ void main()
 
 	vec4 posInterpol = height(pos);
 	// The 0.1 step need to be reworked, we need to calculate it from the levels
-	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
-	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
+	vec4 posInterpolXP = height(pos + vec4(0.01, 0, 0, 0));
+	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.01, 0));
 
     gl_Position = P * V * posInterpol;
     colorOut = color[0];
 
 	normal = getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz);
+	obs = interpole(outObs[0], outObs[1], outObs[2], outObs[3]);
+
+	vec4 posCam = V * pos;
+	for ( int j = 0 ; j < 2 ; ++j )
+    {
+        lightDir[j] = ( V * Lights[j].Position ).xyz - posCam.xyz;
+    } 
 }
