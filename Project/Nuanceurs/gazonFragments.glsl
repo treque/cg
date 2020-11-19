@@ -82,7 +82,7 @@ void pointLight(in vec3 lightVect)
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[0].Ambient, 1.0) * attenuation;
    Diffuse  += vec4(Lights[0].Diffuse, 1.0) * nDotVP * attenuation;
-   specular +=  lightSpec(0, normal, Light0HV, 400.0);
+   specular +=  lightSpec(0, normal, Light0HV, Material.Shininess);
 }
 
 
@@ -96,7 +96,7 @@ void directionalLight(in vec3 lightVect)
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[2].Ambient,1.0);
    Diffuse  += vec4(Lights[2].Diffuse,1.0) * nDotVP;
-   specular +=  lightSpec(2, normal, Light2HV, 100.0);
+   specular +=  lightSpec(2, normal, Light2HV, Material.Shininess);
 }
 
 
@@ -147,7 +147,7 @@ void spotLight(in vec3 lightVect)
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[1].Ambient, 1.0) * attenuation;
    Diffuse  += vec4(Lights[1].Diffuse, 1.0) * nDotVP * attenuation;
-   specular +=  lightSpec(1, normal, Light1HV, 400.0) * attenuation;
+   specular +=  lightSpec(1, normal, Light1HV, Material.Shininess) * attenuation;
 }
 
 
@@ -174,7 +174,7 @@ vec4 flight()
     }
 
     //color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
-    color = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
+    color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse + specular * Material.Specular);
     color = clamp( color, 0.0, 1.0 );
     return color;
 }

@@ -268,6 +268,27 @@ int main(int /*argc*/, char* /*argv*/[])
     return EXIT_SUCCESS;
 }
 
+void attribuerValeursMateriel( const GLuint progNuanceur )
+{
+    GLint handle;
+    GLfloat component[ 4 ] = { 1.0f , 1.0f , 1.0f , 1.0f };
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Ambient" );
+    glUniform4fv( handle, 1, component );
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Diffuse" );
+    glUniform4fv( handle, 1, component );
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Specular" );
+    glUniform4fv( handle, 1, component );
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Exponent" );
+    glUniform4fv( handle, 1, component );
+
+    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Shininess" );
+    glUniform1f( handle, 400.0f );
+}
+
 void attribuerValeursLumieres( const GLuint progNuanceur )
 {
     // Handle pour attribut de lumiere
@@ -489,6 +510,8 @@ void drawScene()
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
     attribuerValeursLumieres( progNuanceurGazon.getProg() );
+    attribuerValeursMateriel( progNuanceurGazon.getProg() );
+
     //glBindVertexArray(g_vao_quad);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
