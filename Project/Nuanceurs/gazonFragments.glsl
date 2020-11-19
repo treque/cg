@@ -31,6 +31,8 @@ uniform int pointLightOn;
 uniform int spotLightOn;
 uniform int dirLightOn;
 
+in vec3 Light0HV;
+
 in vec3 fragLight0Vect;
 in vec3 fragLight1Vect;
 in vec3 fragLight2Vect;
@@ -41,6 +43,16 @@ layout(location = 0) out vec4 fragColor;
 // Accumulateurs pour les facteurs d'éclairage
 vec4 Ambient;
 vec4 Diffuse;
+vec4 specular;
+
+
+// Calcule la spécularité d'une source lumineuse
+vec4 lightSpec(in int i, in vec3 normal, in vec3 halfVector, in float shininess)
+{
+    // À compléter
+    float NdotH = max(0.0, dot(normal, halfVector));
+    return  vec4(Lights[i].Specular * pow(NdotH, shininess), 1.0);
+}
 
 void pointLight(in vec3 lightVect)
 {
@@ -68,6 +80,7 @@ void pointLight(in vec3 lightVect)
    // Calculer les contributions ambiantes et diffuses
    Ambient  += vec4(Lights[0].Ambient, 1.0) * attenuation;
    Diffuse  += vec4(Lights[0].Diffuse, 1.0) * nDotVP * attenuation;
+   specular +=  lightSpec(0, normal, Light0HV, 400.0);
 }
 
 
@@ -167,7 +180,9 @@ void main () {
 	//fragColor = flight(normal);
     Ambient  = vec4 (0.0);
     Diffuse  = vec4 (0.0);
+    specular = vec4(0.0);
+
     pointLight(fragLight0Vect);
-	fragColor = (Ambient * 1.0f + Diffuse  * 1.0f);
+	fragColor = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
 	fragColor = clamp( fragColor, 0.0, 1.0 );
 }

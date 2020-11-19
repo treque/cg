@@ -157,6 +157,8 @@ vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
     return normalize(cross(e1, e2));
 }
 
+out vec3 Light0HV;
+
 void main()
 {
     vec3 p0 = cPosition[0];
@@ -167,8 +169,8 @@ void main()
 
 	vec4 posInterpol = height(pos);
 	// The 0.1 step need to be reworked, we need to calculate it from the levels
-	vec4 posInterpolXP = height(pos + vec4(0.01, 0, 0, 0));
-	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.01, 0));
+	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
+	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
 
     gl_Position = P * V * posInterpol;
     colorOut = color[0];
@@ -181,4 +183,6 @@ void main()
 	fragLight0Vect = vec3 (Lights[0].Position) - ecPosition3;
     fragLight1Vect = vec3 (Lights[1].Position) - ecPosition3;
     fragLight2Vect = vec3 (-Lights[2].Position);
+
+	Light0HV = normalize(fragLight0Vect - ecPosition.xyz);
 }
