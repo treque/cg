@@ -151,7 +151,7 @@ void spotLight(in vec3 lightVect)
 }
 
 
-vec4 flight(in vec3 normalFoIn)
+vec4 flight()
 {
     vec4 color;
     vec3 ecPosition3;
@@ -159,6 +159,7 @@ vec4 flight(in vec3 normalFoIn)
     // Réinitialiser les accumulateurs
     Ambient  = vec4 (0.0);
     Diffuse  = vec4 (0.0);
+    specular = vec4(0.0);
 
     if (pointLightOn == 1) {
         pointLight(fragLight0Vect);
@@ -172,7 +173,8 @@ vec4 flight(in vec3 normalFoIn)
         spotLight(fragLight1Vect);
     }
 
-    color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
+    //color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
+    color = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
     color = clamp( color, 0.0, 1.0 );
     return color;
 }
@@ -182,13 +184,13 @@ void main () {
     // À changer:
 	//fragColor = vec4(normal, 1.0f);
 	//fragColor = flight(normal);
-    Ambient  = vec4 (0.0);
-    Diffuse  = vec4 (0.0);
-    specular = vec4(0.0);
+    //Ambient  = vec4 (0.0);
+    //Diffuse  = vec4 (0.0);
+    //specular = vec4(0.0);
 
     //pointLight(fragLight0Vect);
     //spotLight(fragLight1Vect);
-    directionalLight(fragLight2Vect);
-	fragColor = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
-	fragColor = clamp( fragColor, 0.0, 1.0 );
+    //directionalLight(fragLight2Vect);
+	//fragColor = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
+	fragColor = flight();
 }
