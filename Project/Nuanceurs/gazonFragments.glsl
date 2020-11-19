@@ -67,19 +67,19 @@ vec4 ambient(in int i)
 {
     return Material.Ambient * (Lights[i].Ambient, 1);
 }
-
+in vec3 FragPos;  
 void main () {
     vec3 N = normalize(normal);
     vec3 O = normalize(obs);
-
+    O = -normalize((V * vec4(FragPos,1)).xyz);
     vec4 coul = vec4(0, 0, 0, 1);
 
-    //for ( int j = 0 ; j < 1 ; ++j )
-    //{
-        vec3 L = normalize(lightDir[0]);
-        coul += ambient(0);
-        //coul += diffuse(0, L, N, O);
-        //coul += spec(0, L, N, O);
-    //}
+    for ( int j = 0 ; j < 2 ; ++j )
+    {
+        vec3 L = normalize(lightDir[j]);
+        coul += ambient(j);
+        coul += diffuse(j, L, N, O);
+        coul += spec(j, L, N, O);
+    }
 	fragColor = coul;
 }

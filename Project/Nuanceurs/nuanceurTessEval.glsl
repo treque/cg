@@ -140,7 +140,7 @@ vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
 
     return normalize(cross(e1, e2));
 }
-  
+  out vec3 FragPos; 
 void main()
 {
     vec3 p0 = cPosition[0];
@@ -158,9 +158,9 @@ void main()
 
 	normal = getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz);
 	
-	vec4 cs_pos = M* posInterpol;
+	vec4 cs_pos = MV * posInterpol;
 	obs = normalize(-cs_pos.xyz);
-
+	FragPos = (M * pos).xyz;
 	for ( int j = 0 ; j < 2 ; ++j )
     {
         lightDir[j] = ( V * Lights[j].Position ).xyz - cs_pos.xyz;

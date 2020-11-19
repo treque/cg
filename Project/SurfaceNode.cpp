@@ -372,7 +372,7 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	// Calculate the tess scale factor
 	calcTessScale(node);
 
-	glm::vec3 t( 0.f, -20.f, 0.f );
+	glm::vec3 t( 0.f, 0.f, 0.f );
     sea_MV = glm::mat4();
     sea_M = glm::translate( t );
     sea_MV = CVar::vue * sea_M;
