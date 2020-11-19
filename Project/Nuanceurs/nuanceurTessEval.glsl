@@ -2,6 +2,27 @@
 
 uniform float Time;
 
+struct Light
+{
+        vec3 Ambient; 
+        vec3 Diffuse;
+        vec3 Specular;
+        vec4 Position;  // Si .w = 1.0 -> Direction de lumiere directionelle.
+        vec3 SpotDir;
+        float SpotExp;
+        float SpotCutoff;
+        vec3 Attenuation; //Constante, Lineraire, Quadratique
+};
+
+struct Mat
+{
+        vec4 Ambient; 
+        vec4 Diffuse;
+        vec4 Specular;
+        vec4 Exponent;
+        float Shininess;
+};
+
 vec3 random3(vec3 c) {
 	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
 	vec3 r;
@@ -86,6 +107,17 @@ uniform	mat4 P;
 uniform	mat4 MV;
 uniform	mat4 MVP;
 uniform	mat3 N;
+
+uniform Light Lights[3];
+uniform Mat Material;
+uniform int pointLightOn;
+uniform int spotLightOn;
+uniform int dirLightOn;
+
+out vec3 fragLight0Vect;
+out vec3 fragLight1Vect;
+out vec3 fragLight2Vect;
+
 in vec3 cPosition[];
 in vec3 color[];
 out vec3 colorOut;
@@ -135,11 +167,18 @@ void main()
 
 	vec4 posInterpol = height(pos);
 	// The 0.1 step need to be reworked, we need to calculate it from the levels
-	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
-	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
+	vec4 posInterpolXP = height(pos + vec4(0.01, 0, 0, 0));
+	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.01, 0));
 
     gl_Position = P * V * posInterpol;
     colorOut = color[0];
 
-	normal = getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz);
+	normal = mat3(V) * getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz).xyz;
+
+	vec4 ecPosition = V * posInterpol;
+	vec3 ecPosition3;
+	ecPosition3 = (vec3 (ecPosition)) / ecPosition.w;
+	fragLight0Vect = vec3 (Lights[0].Position) - ecPosition3;
+    fragLight1Vect = vec3 (Lights[1].Position) - ecPosition3;
+    fragLight2Vect = vec3 (-Lights[2].Position);
 }

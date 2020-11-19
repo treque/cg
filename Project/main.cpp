@@ -268,6 +268,80 @@ int main(int /*argc*/, char* /*argv*/[])
     return EXIT_SUCCESS;
 }
 
+void attribuerValeursLumieres( const GLuint progNuanceur )
+{
+    // Handle pour attribut de lumiere
+    GLint li_handle;
+
+    li_handle = glGetUniformLocation( progNuanceur, "dirLightOn" );
+    glUniform1i( li_handle, CVar::lumieres[ ENUM_LUM::LumDirectionnelle ]->estAllumee() );
+    li_handle = glGetUniformLocation( progNuanceur, "pointLightOn" );
+    glUniform1i( li_handle, CVar::lumieres[ ENUM_LUM::LumPonctuelle ]->estAllumee() );
+    li_handle = glGetUniformLocation( progNuanceur, "spotLightOn" );
+    glUniform1i( li_handle, CVar::lumieres[ ENUM_LUM::LumSpot ]->estAllumee() );
+
+    // Fournir les valeurs d'éclairage au nuanceur.
+    // Les directions et positions doivent être en référenciel de caméra.
+    for( size_t i = 0; i < CVar::lumieres.size(); i++ )
+    {
+        // Placeholders pour contenir les valeurs
+        GLfloat   temp3[ 3 ];
+        GLfloat   temp4[ 4 ];
+        glm::vec4 pos;
+
+        // Creer un descripteur basé sur l'index de lumière
+        std::string begin = "Lights[";
+        int         l_idx = (int)i;
+        std::string end = "]";
+        std::string light_desc = begin + std::to_string( l_idx ) + end;
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".Ambient" ).c_str() );
+        CVar::lumieres[ i ]->obtenirKA( temp3 );
+        glUniform3fv( li_handle, 1, &temp3[ 0 ] );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".Diffuse" ).c_str() );
+        CVar::lumieres[ i ]->obtenirKD( temp3 );
+        glUniform3fv( li_handle, 1, &temp3[ 0 ] );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".Specular" ).c_str() );
+        CVar::lumieres[ i ]->obtenirKS( temp3 );
+        glUniform3fv( li_handle, 1, &temp3[ 0 ] );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".Position" ).c_str() );
+        CVar::lumieres[ i ]->obtenirPos( temp4 );
+
+        // Transformer ici la direction/position de la lumière vers un référenciel de caméra
+        pos = glm::vec4( temp4[ 0 ], temp4[ 1 ], temp4[ 2 ], temp4[ 3 ] );
+        pos = CVar::vue * pos;
+
+        temp4[ 0 ] = pos.x;
+        temp4[ 1 ] = pos.y;
+        temp4[ 2 ] = pos.z;
+        temp4[ 3 ] = pos.w;
+        glUniform4fv( li_handle, 1, &temp4[ 0 ] );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".SpotDir" ).c_str() );
+        CVar::lumieres[ i ]->obtenirSpotDir( temp3 );
+        // Transformer ici la direction du spot
+        pos = glm::vec4( temp3[ 0 ], temp3[ 1 ], temp3[ 2 ], 0.0f );
+        pos = CVar::vue * pos;
+        temp3[ 0 ] = pos.x;
+        temp3[ 1 ] = pos.y;
+        temp3[ 2 ] = pos.z;
+        glUniform3fv( li_handle, 1, &temp3[ 0 ] );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".SpotExp" ).c_str() );
+        glUniform1f( li_handle, CVar::lumieres[ i ]->obtenirSpotExp() );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".SpotCutoff" ).c_str() );
+        glUniform1f( li_handle, CVar::lumieres[ i ]->obtenirSpotCutOff() );
+
+        li_handle = glGetUniformLocation( progNuanceur, ( light_desc + ".Attenuation" ).c_str() );
+        glUniform3f( li_handle, CVar::lumieres[ i ]->obtenirConsAtt(), CVar::lumieres[ i ]->obtenirLinAtt(),
+                     CVar::lumieres[ i ]->obtenirQuadAtt() );
+    }
+}
+
 void initialisation(void)
 {
 
@@ -414,6 +488,7 @@ void drawScene()
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
     glUseProgram(progNuanceurGazon.getProg());
+    attribuerValeursLumieres( progNuanceurGazon.getProg() );
     //glBindVertexArray(g_vao_quad);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
 
