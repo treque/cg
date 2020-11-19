@@ -158,6 +158,8 @@ vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
 }
 
 out vec3 Light0HV;
+out vec3 Light1HV;
+out vec3 Light2HV;
 
 void main()
 {
@@ -185,4 +187,6 @@ void main()
     fragLight2Vect = vec3 (-Lights[2].Position);
 
 	Light0HV = normalize(fragLight0Vect - ecPosition.xyz);
+	Light1HV = normalize(fragLight1Vect - ecPosition.xyz);
+	Light2HV = normalize(fragLight2Vect - ecPosition.xyz);
 }
