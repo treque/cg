@@ -525,6 +525,7 @@ void drawScene()
     if( !glm::all(glm::equal(cam_position, prev_cam_position )));
         createTree(0, 0, 0, 1000, 1000, cam_position);
 
+    renderSea(progNuanceurGazon, cam_position);
     // Flush les derniers vertex du pipeline graphique
     glFlush();
 }
