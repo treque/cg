@@ -139,12 +139,12 @@ vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
 vec4 height( vec4 pos )
 {
 	vec2 p = (M * pos).xz / 500.f;
-    vec3 p4 = vec3(p, Time * 0.004);
+    vec3 p4 = vec3(p, Time * 0.003);
 
     float noiseVal;
     noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
-	return M * (pos + vec4(0 , noiseVal * 10 , 0 , 0));
+	return M * (pos + vec4(0 , noiseVal * 2 , 0 , 0));
 }
 
 vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)

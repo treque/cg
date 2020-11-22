@@ -271,7 +271,7 @@ int main(int /*argc*/, char* /*argv*/[])
 void attribuerValeursMateriel( const GLuint progNuanceur )
 {
     GLint handle;
-    GLfloat component[ 4 ] = { 1.0f , 1.0f , 1.0f , 1.0f };
+    GLfloat component[ 4 ] = { 0.1f , 0.26f , 0.55f , 1.0f };
 
     handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Ambient" );
     glUniform4fv( handle, 1, component );
@@ -372,24 +372,34 @@ void initialisation(void)
 
     // LUMIÈRE PONCTUELLE (enum : LumPonctuelle - 0)
     CVar::lumieres[ENUM_LUM::LumPonctuelle] =
-        new CLumiere(0.1f, 0.1f, 0.1f, 0.5f, 0.5f, 1.0f, 0.7f, 0.7f, 0.7f, 0.0f, 20.0f, -20.0f, 1.0f, true);
+        new CLumiere(0.1f, 0.1f, 0.1f,
+            0.5f, 0.5f, 1.0f,
+            0.7f, 0.7f, 0.7f,
+            0.0f, 20.0f, -20.0f,
+            1.0f, true);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierConstAtt(1.1f);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierLinAtt(0.0);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierQuadAtt(0.0);
 
     // LUMIÈRE SPOT (enum : LumSpot - 1)
-    CVar::lumieres[ENUM_LUM::LumSpot] = new CLumiere(0.2f, 0.2f, 0.2f, 0.9f, 0.8f, 0.4f, 1.0f, 1.0f, 1.0f, 10.0f, 10.0f,
-                                                     -10.0f, 1.0f, true, -0.5f, -1.0f, 1.0f, 5.f, 60.0);
+    CVar::lumieres[ENUM_LUM::LumSpot] = new CLumiere(0.2f, 0.2f, 0.2f,
+        0.9f, 0.8f, 0.4f,
+        1.0f, 1.0f, 1.0f,
+        10.0f, 10.0f,-10.0f,
+        1.0f, true, -0.5f,
+        -1.0f, 1.0f, 5.f, 60.0);
 
     // LUMIÈRE DIRECTIONNELLE (enum : LumDirectionnelle - 2)
     CVar::lumieres[ENUM_LUM::LumDirectionnelle] =
-        new CLumiere(0.1f, 0.1f, 0.1f, 0.8f, 0.8f, 0.8f, 0.4f, 0.4f, 0.4f, 5.0f, -10.0f, -5.0f, 0.0f, true);
+        new CLumiere(1.f, 0.9f, 0.53f,
+            1.f, 0.9f, 0.53f,
+            0.4f, 0.4f, 0.4f,
+            5.0f, -10.0f, -5.0f,
+            0.0f, true);
 
     // construire le skybox avec les textures
     skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
-    
-
-    //initializeSea();
+   
     
     seaModelMatrix = getModelMatrixSea();
 
@@ -504,23 +514,16 @@ void drawScene()
 
     //////////////////     Afficher les objets:  ///////////////////////////
 
-
     glDisable(GL_DEPTH_TEST);
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
+
     glUseProgram(progNuanceurGazon.getProg());
     attribuerValeursLumieres( progNuanceurGazon.getProg() );
     attribuerValeursMateriel( progNuanceurGazon.getProg() );
 
-    //glBindVertexArray(g_vao_quad);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
-
     if( !glm::all(glm::equal(cam_position, prev_cam_position )));
         createTree(0, 0, 0, 1000, 1000, cam_position);
-
-    renderSea(progNuanceurGazon, cam_position);
-    //drawSea();
-
 
     // Flush les derniers vertex du pipeline graphique
     glFlush();
