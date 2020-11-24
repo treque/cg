@@ -17,7 +17,7 @@ struct SurfaceNode
 	float width;
 	float height;
 
-	unsigned int vboId;
+	unsigned int vaoId;
 
 	int type;  // child #, 0 = root
 
@@ -134,7 +134,7 @@ void createNodeVao( SurfaceNode* node )
 
 	glBindVertexArray( 0 );
 	
-	node->vboId = nBuffers;
+	node->vaoId = nBuffers;
 	nBuffers++;
 }
 
@@ -308,7 +308,7 @@ void createTree(float x, float y, float z, float width, float height, glm::vec3 
 
 	glBindVertexArray( 0 );
 	//
-	surfaceTreeTail->vboId = nBuffers;
+	surfaceTreeTail->vaoId = nBuffers;
 	nBuffers++;
 
 	// Recursively subdivide the terrain
@@ -419,7 +419,7 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "eyePos");
 	glUniform3fv(handle, 1, &cam_position[0]);
 
-	glBindVertexArray( vaos[ node->vboId ] );
+	glBindVertexArray( vaos[ node->vaoId ] );
     if( CVar::isSeaGrid )
     {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
