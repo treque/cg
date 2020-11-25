@@ -114,10 +114,6 @@ uniform int pointLightOn;
 uniform int spotLightOn;
 uniform int dirLightOn;
 
-out vec3 fragLight0Vect;
-out vec3 fragLight1Vect;
-out vec3 fragLight2Vect;
-
 in vec3 cPosition[];
 in vec3 color[];
 out vec3 colorOut;
@@ -144,7 +140,7 @@ vec4 height( vec4 pos )
     float noiseVal;
     noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
-	return M * (pos + vec4(0 , noiseVal * 2 , 0 , 0));
+	return M * (pos + vec4(0 , noiseVal * 10 , 0 , 0));
 }
 
 vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
@@ -157,9 +153,8 @@ vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
     return normalize(cross(e1, e2));
 }
 
-out vec3 Light0HV;
-out vec3 Light1HV;
-out vec3 Light2HV;
+out vec4 pos;
+
 
 void main()
 {
@@ -167,7 +162,7 @@ void main()
     vec3 p1 = cPosition[1];
     vec3 p2 = cPosition[2];
     vec3 p3 = cPosition[3];
-    vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
+    pos = vec4(interpole( p0, p1, p2, p3 ), 1);
 
 	vec4 posInterpol = height(pos);
 	// The 0.1 step need to be reworked, we need to calculate it from the levels
@@ -177,16 +172,5 @@ void main()
     gl_Position = P * V * posInterpol;
     colorOut = color[0];
 
-	normal = mat3(V) * getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz).xyz;
 
-	vec4 ecPosition = V * posInterpol;
-	vec3 ecPosition3;
-	ecPosition3 = (vec3 (ecPosition)) / ecPosition.w;
-	fragLight0Vect = vec3 (Lights[0].Position) - ecPosition3;
-    fragLight1Vect = vec3 (Lights[1].Position) - ecPosition3;
-    fragLight2Vect = vec3 (-Lights[2].Position);
-
-	Light0HV = normalize(fragLight0Vect - ecPosition.xyz);
-	Light1HV = normalize(fragLight1Vect - ecPosition.xyz);
-	Light2HV = normalize(-fragLight2Vect);
 }

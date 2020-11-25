@@ -68,6 +68,8 @@ static glm::vec3 direction    = glm::vec3(0.f, 0.f, -1.0f);
 static glm::vec3 cam_right    = glm::vec3(1.f, 0.f, 0.f);
 static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 
+bool stopTime = false;
+
 // Models matrix
 static glm::mat4 seaModelMatrix;
 GLuint quadIndicies[] = { 0, 3, 2, 0, 2, 1 };
@@ -522,8 +524,12 @@ void drawScene()
     attribuerValeursLumieres( progNuanceurGazon.getProg() );
     attribuerValeursMateriel( progNuanceurGazon.getProg() );
 
-    if( !glm::all(glm::equal(cam_position, prev_cam_position )));
-        createTree(0, 0, 0, 1000, 1000, cam_position);
+    if( !stopTime )
+    {
+        if( !glm::all( glm::equal( cam_position, prev_cam_position ) ) );
+            createTree( 0, 0, 0, 1000, 1000, cam_position );
+    }
+
 
     renderSea(progNuanceurGazon, cam_position);
     // Flush les derniers vertex du pipeline graphique
@@ -701,7 +707,7 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
     {
         if (action == GLFW_PRESS)
         {
-            TessLevelInner++;
+            stopTime = !stopTime;
         }
         break;
     }
