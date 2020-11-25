@@ -1,6 +1,9 @@
 #version 420
 layout(quads, fractional_even_spacing) in;
 
+// The code related to the 3d simplex noise come from:
+// https://www.shadertoy.com/view/XsX3zB
+
 struct Light
 {
         vec3 Ambient; 
@@ -22,23 +25,16 @@ struct Mat
         float Shininess;
 };
 
-//
 ///* skew constants for 3d simplex functions */
 const float F3 =  0.3333333;
 const float G3 =  0.1666667;
-//
 
-//
 ///* const matrices for 3d rotation */
 const mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);
 const mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);
 const mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);
-//
 
-
-//
 // Uniforms
-//
 uniform float Time;
 uniform	mat4 M;
 uniform	mat4 V;
@@ -53,17 +49,14 @@ uniform int pointLightOn;
 uniform int spotLightOn;
 uniform int dirLightOn;
 
-out vec3 fragLight0Vect;
-out vec3 fragLight1Vect;
-out vec3 fragLight2Vect;
-
-//
 // Inputs\outputs
-//
-
 in vec3 cPosition[];
 out vec3 colorOut;
 out vec3 normal;
+
+out vec3 fragLight0Vect;
+out vec3 fragLight1Vect;
+out vec3 fragLight2Vect;
 
 vec3 random3(vec3 c) {
 	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));

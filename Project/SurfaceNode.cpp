@@ -53,14 +53,13 @@ SurfaceNode* surfaceTree;
 SurfaceNode* surfaceTreeTail;
 int numSurfaceNodes = 0;
 
-///ds le main
+///From the main
 glm::mat4 sea_M;	    // Model matrix
 glm::mat4 sea_V;	    // View matrix
 glm::mat4 sea_P;	    // Projection matrix
 glm::mat4 sea_MV;	    // Movel view matrix
-glm::mat4 sea_MVP;	// Model-view-projection matrix
-glm::mat3 sea_N;       // Normal matrix
-///
+glm::mat4 sea_MVP;		// Model-view-projection matrix
+glm::mat3 sea_N;        // Normal matrix
 
 #define MAX_SURFACE_NODES 500
 GLuint vaos[ MAX_SURFACE_NODES ];
