@@ -18,6 +18,8 @@ in vec3 vPosition[];
 out vec3 cPosition[];
 out vec3 color[];
 
+// Rely heavily on victor bush code:
+// https://bitbucket.org/victorbush/ufl.cap5705.terrain/src/master/
 float dlodCameraDistance(vec4 p0, vec4 p1)
 {
 
@@ -68,7 +70,8 @@ void main(void)
 
         color[gl_InvocationID] = vec3(0,0,1);
 
-        // RELY heavily on victor bush
+        // Rely heavily on victor bush code:
+		// https://bitbucket.org/victorbush/ufl.cap5705.terrain/src/master/
         gl_TessLevelOuter[0] = dlodCameraDistance(gl_in[3].gl_Position, gl_in[0].gl_Position);
 	    gl_TessLevelOuter[1] = dlodCameraDistance(gl_in[0].gl_Position, gl_in[1].gl_Position);
 	    gl_TessLevelOuter[2] = dlodCameraDistance(gl_in[1].gl_Position, gl_in[2].gl_Position);

@@ -1,3 +1,6 @@
+// The code here is initially from:
+// https://bitbucket.org/victorbush/ufl.cap5705.terrain/src/master/
+
 #include <stdio.h>
 #include <cstring>
 #include <cstdlib>
