@@ -95,69 +95,41 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cst.cpp" />
-    <ClCompile Include="FBO.cpp" />
-    <ClCompile Include="Gazon.cpp" />
-    <ClCompile Include="GrilleQuads.cpp" />
     <ClCompile Include="Lumiere.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Materiau.cpp" />
     <ClCompile Include="Modele3DAbstrait.cpp" />
-    <ClCompile Include="Modele3DOBJ.cpp" />
     <ClCompile Include="NuanceurProg.cpp" />
-    <ClCompile Include="ObjParser\ObjParser.cpp" />
-    <ClCompile Include="ObjParser\ParserTextAbstrait.cpp" />
-    <ClCompile Include="ObjParser\StringUtils.cpp" />
     <ClCompile Include="ObjParser\Vecteur3.cpp" />
     <ClCompile Include="Skybox.cpp" />
-    <ClCompile Include="SurfaceBSplinaire.cpp" />
     <ClCompile Include="SurfaceNode.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="TextureAbstraite.cpp" />
     <ClCompile Include="TextureCubemap.cpp" />
     <ClCompile Include="Var.cpp" />
-    <ClCompile Include="noise.cpp" />
     <ClCompile Include="textfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cst.h" />
-    <ClInclude Include="FBO.h" />
-    <ClInclude Include="Gazon.h" />
-    <ClInclude Include="GrilleQuads.h" />
     <ClInclude Include="Lumiere.h" />
-    <ClInclude Include="Materiau.h" />
     <ClInclude Include="Modele3DAbstrait.h" />
-    <ClInclude Include="Modele3DOBJ.h" />
     <ClInclude Include="NuanceurProg.h" />
     <ClInclude Include="ObjParser\Geometry.h" />
     <ClInclude Include="ObjParser\MathUtils.h" />
-    <ClInclude Include="ObjParser\ObjParser.h" />
-    <ClInclude Include="ObjParser\ParserTextAbstrait.h" />
-    <ClInclude Include="ObjParser\StringUtils.h" />
     <ClInclude Include="ObjParser\Vecteur3.h" />
     <ClInclude Include="Skybox.h" />
-    <ClInclude Include="SurfaceBSplinaire.h" />
     <ClInclude Include="SurfaceNode.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TextureAbstraite.h" />
     <ClInclude Include="TextureCubemap.h" />
     <ClInclude Include="Var.h" />
-    <ClInclude Include="noise.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="textfile.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Nuanceurs\blurFXFragments.glsl" />
-    <None Include="Nuanceurs\blurFXSommets.glsl" />
-    <None Include="Nuanceurs\debugFragments.glsl" />
-    <None Include="Nuanceurs\debugSommets.glsl" />
-    <None Include="Nuanceurs\gazonFragments.glsl" />
-    <None Include="Nuanceurs\gazonSommets.glsl" />
-    <None Include="Nuanceurs\modele3DFragments.glsl" />
-    <None Include="Nuanceurs\modele3DSommets.glsl" />
+    <None Include="Nuanceurs\seaFragments.glsl" />
+    <None Include="Nuanceurs\seaSommets.glsl" />
     <None Include="Nuanceurs\nuanceurTessCtrl.glsl" />
     <None Include="Nuanceurs\nuanceurTessEval.glsl" />
-    <None Include="Nuanceurs\shadowFragments.glsl" />
-    <None Include="Nuanceurs\shadowSommets.glsl" />
     <None Include="Nuanceurs\skyBoxFragments.glsl" />
     <None Include="Nuanceurs\skyBoxSommets.glsl" />
   </ItemGroup>

@@ -24,11 +24,6 @@
 #include <glm/gtx/transform.hpp>
 
 #include "Cst.h"
-#include "FBO.h"
-#include "Gazon.h"
-#include "GrilleQuads.h"
-#include "Materiau.h"
-#include "Modele3dObj.h"
 #include "NuanceurProg.h"
 #include "ObjParser/MathUtils.h"
 #include "Skybox.h"
@@ -47,13 +42,11 @@ using namespace Math3D;
 
 // Shaders
 static CNuanceurProg progNuanceurSkybox( "Nuanceurs/skyBoxSommets.glsl", "Nuanceurs/skyBoxFragments.glsl", false );
-static CNuanceurProg progNuanceurGazon( "Nuanceurs/gazonSommets.glsl", "Nuanceurs/gazonFragments.glsl", 
-                                        "Nuanceurs/nuanceurTessCtrl.glsl", "Nuanceurs/nuanceurTessEval.glsl", false );
+static CNuanceurProg progNuanceurSea( "Nuanceurs/seaSommets.glsl", "Nuanceurs/seaFragments.glsl", 
+                                      "Nuanceurs/nuanceurTessCtrl.glsl", "Nuanceurs/nuanceurTessEval.glsl", false );
 
 // Graphic Objects
 static CSkybox*         skybox;
-static CSea*         gazon;
-//static CFBO*            fbo = nullptr;
 
 // Camera Attributes
 static float horizontalAngle = 0.f;
@@ -70,36 +63,6 @@ static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 
 // Models matrix
 static glm::mat4 seaModelMatrix;
-GLuint quadIndicies[] = { 0, 3, 2, 0, 2, 1 };
-GLuint quadPatchInd[] = { 0, 1, 2, 3 };
-GLuint g_vbo_quad; // Vertex buffer object
-GLuint g_vao_quad; // Vertex attribute object
-GLuint g_ibo_quad; // Index buffer object
-float quadData[] = {
-    // Vert 1
-    -1.0f, 0.0f, -1.0f, 1.0,	// Position
-    0.18f, 0.91f, 0.46f, 1.0,	// Color
-    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
-    0.0f, 2.0f,					// Tex coord (u,v)
-
-    // Vert 2
-    1.0f, 0.0f, -1.0f, 1.0,		// Position
-    0.18f, 0.91f, 0.46f, 1.0,	// Color
-    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
-    2.0f, 2.0f,					// Tex coord (u,v)
-
-    // Vert 3
-    1.0f, 0.0f, 1.0f, 1.0,		// Position
-    0.18f, 0.91f, 0.46f, 1.0,	// Color
-    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
-    2.0f, 0.0f,					// Tex coord (u,v)
-
-    // Vert 4
-    -1.0f, 0.0f, 1.0f, 1.0,		// Position
-    0.18f, 0.91f, 0.46f, 1.0,	// Color
-    0.0f, 1.0f, 0.0f, 0.0f,		// Normal
-    0.0f, 0.0f,					// Tex coord (u,v)
-};
 
 // Debug tessellation levels
 static GLfloat TessLevelInner = 1;
@@ -273,19 +236,19 @@ void attribuerValeursMateriel( const GLuint progNuanceur )
     GLint handle;
     GLfloat component[ 4 ] = { 0.1f , 0.26f , 0.55f , 1.0f };
 
-    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Ambient" );
+    handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Ambient" );
     glUniform4fv( handle, 1, component );
 
-    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Diffuse" );
+    handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Diffuse" );
     glUniform4fv( handle, 1, component );
 
-    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Specular" );
+    handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Specular" );
     glUniform4fv( handle, 1, component );
 
-    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Exponent" );
+    handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Exponent" );
     glUniform4fv( handle, 1, component );
 
-    handle = glGetUniformLocation( progNuanceurGazon.getProg(), "Material.Shininess" );
+    handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Shininess" );
     glUniform1f( handle, 400.0f );
 }
 
@@ -404,19 +367,6 @@ void initialisation(void)
     seaModelMatrix = getModelMatrixSea();
 
     surfaceInit();
-    glGenBuffers(1, &g_vbo_quad);
-    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
-    glBufferData(GL_ARRAY_BUFFER, 14 * 4 * sizeof(float), quadData, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glGenBuffers(1, &g_ibo_quad);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ibo_quad);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(float), quadPatchInd, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    glGenVertexArrays(1, &g_vao_quad);
-    glBindVertexArray(g_vao_quad);
-    glBindBuffer(GL_ARRAY_BUFFER, g_vbo_quad);
 
     // fixer la couleur de fond
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -518,14 +468,14 @@ void drawScene()
     drawSkybox();
     glEnable(GL_DEPTH_TEST);
 
-    glUseProgram(progNuanceurGazon.getProg());
-    attribuerValeursLumieres( progNuanceurGazon.getProg() );
-    attribuerValeursMateriel( progNuanceurGazon.getProg() );
+    glUseProgram(progNuanceurSea.getProg());
+    attribuerValeursLumieres( progNuanceurSea.getProg() );
+    attribuerValeursMateriel( progNuanceurSea.getProg() );
 
     if( !glm::all(glm::equal(cam_position, prev_cam_position )));
         createTree(0, 0, 0, 1000, 1000, cam_position);
 
-    renderSea(progNuanceurGazon, cam_position);
+    renderSea(progNuanceurSea, cam_position);
     // Flush les derniers vertex du pipeline graphique
     glFlush();
 }
@@ -950,5 +900,5 @@ void compileShaders()
     progNuanceurSkybox.compilerEtLier();
     progNuanceurSkybox.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
 
-    progNuanceurGazon.compilerEtLier();
+    progNuanceurSea.compilerEtLier();
 }
