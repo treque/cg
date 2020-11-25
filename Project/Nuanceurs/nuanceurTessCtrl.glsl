@@ -6,7 +6,6 @@ uniform	mat4 M;
 uniform	mat4 P;
 uniform	mat4 MV;
 uniform	mat4 MVP;
-uniform	mat3 N;
 uniform vec3 eyePos;
 
 uniform float tscale_negx;
