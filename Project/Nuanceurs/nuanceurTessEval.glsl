@@ -62,7 +62,6 @@ out vec3 fragLight2Vect;
 //
 
 in vec3 cPosition[];
-in vec3 color[];
 out vec3 colorOut;
 out vec3 normal;
 
@@ -178,7 +177,6 @@ void main()
 	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
 
     gl_Position = P * V * posInterpol;
-    colorOut = color[0];
 
 	normal = mat3(V) * getNormal(posInterpolZP.xyz, posInterpol.xyz, posInterpolXP.xyz).xyz;
 

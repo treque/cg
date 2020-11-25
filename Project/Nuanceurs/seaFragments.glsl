@@ -21,15 +21,13 @@ struct Mat
         float Shininess;
 };
 
-// Déclaration des variables passées par le nuanceur de sommets:
-in vec3 colorOut;
-in vec3 normal;
-
 uniform Light Lights[3];
 uniform Mat Material;
 uniform int pointLightOn;
 uniform int spotLightOn;
 uniform int dirLightOn;
+
+in vec3 normal;
 
 in vec3 Light0HV;
 in vec3 Light1HV;
@@ -46,7 +44,6 @@ layout(location = 0) out vec4 fragColor;
 vec4 Ambient;
 vec4 Diffuse;
 vec4 specular;
-
 
 // Calcule la spécularité d'une source lumineuse
 vec4 lightSpec(in int i, in vec3 normal, in vec3 halfVector, in float shininess)
@@ -154,7 +151,6 @@ void spotLight(in vec3 lightVect)
 vec4 flight()
 {
     vec4 color;
-    vec3 ecPosition3;
 
     // Réinitialiser les accumulateurs
     Ambient  = vec4 (0.0);
@@ -173,24 +169,14 @@ vec4 flight()
         spotLight(fragLight1Vect);
     }
 
-    //color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse);
-    color = (Ambient * Material.Ambient + Diffuse  * Material.Diffuse + specular * Material.Specular);
+    color = Ambient * Material.Ambient
+            + Diffuse  * Material.Diffuse 
+            + specular * Material.Specular;
     color = clamp( color, 0.0, 1.0 );
     return color;
 }
 
 void main () {
 
-    // À changer:
-	//fragColor = vec4(normal, 1.0f);
-	//fragColor = flight(normal);
-    //Ambient  = vec4 (0.0);
-    //Diffuse  = vec4 (0.0);
-    //specular = vec4(0.0);
-
-    //pointLight(fragLight0Vect);
-    //spotLight(fragLight1Vect);
-    //directionalLight(fragLight2Vect);
-	//fragColor = (Ambient * 1.0f + Diffuse  * 1.0f + specular * 1.0f);
 	fragColor = flight();
 }

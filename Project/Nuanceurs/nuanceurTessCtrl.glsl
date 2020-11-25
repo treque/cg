@@ -15,7 +15,6 @@ uniform float tscale_posz;
 
 in vec3 vPosition[];
 out vec3 cPosition[];
-out vec3 color[];
 
 // Rely heavily on victor bush code:
 // https://bitbucket.org/victorbush/ufl.cap5705.terrain/src/master/
@@ -66,8 +65,6 @@ void main(void)
     if ( gl_InvocationID == 0 )
     {
         vec3 eyeWorldPos = eyePos;
-
-        color[gl_InvocationID] = vec3(0,0,1);
 
         // Rely heavily on victor bush code:
 		// https://bitbucket.org/victorbush/ufl.cap5705.terrain/src/master/
