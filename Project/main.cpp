@@ -65,9 +65,7 @@ static glm::vec3 cam_up       = glm::vec3(0.f, 1.f, 0.f);
 static glm::mat4 seaModelMatrix;
 
 // Debug tessellation levels
-static GLfloat TessLevelInner = 1;
-static GLfloat TessLevelOuter = 1;
-static GLboolean debugCustomTessellationLevels = false;
+static GLboolean stopComputingTree = false;
 
 ///////////////////////////////////////////////
 // PROTOTYPES DES FONCTIONS DU MAIN          //
@@ -468,8 +466,11 @@ void drawScene()
     attribuerValeursLumieres( progNuanceurSea.getProg() );
     attribuerValeursMateriel( progNuanceurSea.getProg() );
 
-    if( !glm::all(glm::equal(cam_position, prev_cam_position )));
-        createTree(0, 0, 0, 1000, 1000, cam_position);
+    if( !stopComputingTree )
+    {
+        if( !glm::all( glm::equal( cam_position, prev_cam_position ) ) );
+        createTree( 0, 0, 0, 1000, 1000, cam_position );
+    }
 
     renderSea(progNuanceurSea, cam_position);
     // Flush les derniers vertex du pipeline graphique
@@ -643,47 +644,11 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
         break;
     }
 
-    case GLFW_KEY_Y:
-    {
-        if (action == GLFW_PRESS)
-        {
-            TessLevelInner++;
-        }
-        break;
-    }
-
-    case GLFW_KEY_H:
-    {
-        if (action == GLFW_PRESS)
-        {
-            if (--TessLevelInner < 1) TessLevelInner = 1;
-        }
-        break;
-    }
-
-    case GLFW_KEY_U:
-    {
-        if (action == GLFW_PRESS)
-        {
-            TessLevelOuter++;
-        }
-        break;
-    }
-
-    case GLFW_KEY_J:
-    {
-        if (action == GLFW_PRESS)
-        {
-            if (--TessLevelOuter < 1) TessLevelOuter = 1;
-        }
-        break;
-    }
-
     case GLFW_KEY_T:
     {
         if (action == GLFW_PRESS)
         {
-            debugCustomTessellationLevels = !debugCustomTessellationLevels;
+            stopComputingTree = !stopComputingTree;
         }
         break;
     }
