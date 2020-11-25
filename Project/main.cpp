@@ -224,9 +224,6 @@ int main(int /*argc*/, char* /*argv*/[])
     delete skybox;
     surfaceShutdown();
 
-    //if (fbo)
-    //    delete fbo;
-
     // le programme n'arrivera jamais jusqu'ici
     return EXIT_SUCCESS;
 }
@@ -425,7 +422,6 @@ void drawSkybox()
     rotationMatrix = glm::rotate(a, rotationAxis);
 
     glm::mat4 translationMatrix = glm::translate(cam_position);
-    // glm::mat4 translationMatrix = glm::translate(glm::vec3(0.0f, 0.0f, 0.0f));
     glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scalingMatrix;
 
     // Matrice Model-Vue-Projection:
