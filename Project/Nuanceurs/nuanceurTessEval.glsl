@@ -153,7 +153,9 @@ vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)
     return normalize(cross(e1, e2));
 }
 
-out vec4 pos;
+out vec4 posInterpol;
+out vec4 posInterpolXP;
+out vec4 posInterpolZP;
 
 
 void main()
@@ -162,12 +164,12 @@ void main()
     vec3 p1 = cPosition[1];
     vec3 p2 = cPosition[2];
     vec3 p3 = cPosition[3];
-    pos = vec4(interpole( p0, p1, p2, p3 ), 1);
+    vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
 
-	vec4 posInterpol = height(pos);
+	posInterpol = height(pos);
 	// The 0.1 step need to be reworked, we need to calculate it from the levels
-	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
-	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
+	posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
+	posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
 
     gl_Position = P * V * posInterpol;
     colorOut = color[0];
