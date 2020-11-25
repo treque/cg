@@ -97,30 +97,24 @@
     <ClCompile Include="Cst.cpp" />
     <ClCompile Include="Lumiere.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Modele3DAbstrait.cpp" />
     <ClCompile Include="NuanceurProg.cpp" />
     <ClCompile Include="ObjParser\Vecteur3.cpp" />
-    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SurfaceNode.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="TextureAbstraite.cpp" />
-    <ClCompile Include="TextureCubemap.cpp" />
     <ClCompile Include="Var.cpp" />
     <ClCompile Include="textfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cst.h" />
     <ClInclude Include="Lumiere.h" />
-    <ClInclude Include="Modele3DAbstrait.h" />
     <ClInclude Include="NuanceurProg.h" />
     <ClInclude Include="ObjParser\Geometry.h" />
     <ClInclude Include="ObjParser\MathUtils.h" />
     <ClInclude Include="ObjParser\Vecteur3.h" />
-    <ClInclude Include="Skybox.h" />
     <ClInclude Include="SurfaceNode.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="TextureAbstraite.h" />
-    <ClInclude Include="TextureCubemap.h" />
     <ClInclude Include="Var.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="textfile.h" />
@@ -130,8 +124,6 @@
     <None Include="Nuanceurs\seaSommets.glsl" />
     <None Include="Nuanceurs\nuanceurTessCtrl.glsl" />
     <None Include="Nuanceurs\nuanceurTessEval.glsl" />
-    <None Include="Nuanceurs\skyBoxFragments.glsl" />
-    <None Include="Nuanceurs\skyBoxSommets.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

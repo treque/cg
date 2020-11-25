@@ -26,7 +26,6 @@
 #include "Cst.h"
 #include "NuanceurProg.h"
 #include "ObjParser/MathUtils.h"
-#include "Skybox.h"
 #include "Texture2D.h"
 #include "Var.h"
 #include "textfile.h"
@@ -41,12 +40,8 @@ using namespace Math3D;
 ///////////////////////////////////////////////
 
 // Shaders
-static CNuanceurProg progNuanceurSkybox( "Nuanceurs/skyBoxSommets.glsl", "Nuanceurs/skyBoxFragments.glsl", false );
 static CNuanceurProg progNuanceurSea( "Nuanceurs/seaSommets.glsl", "Nuanceurs/seaFragments.glsl", 
                                       "Nuanceurs/nuanceurTessCtrl.glsl", "Nuanceurs/nuanceurTessEval.glsl", false );
-
-// Graphic Objects
-static CSkybox*         skybox;
 
 // Camera Attributes
 static float horizontalAngle = 0.f;
@@ -71,7 +66,6 @@ static GLboolean stopComputingTree = false;
 // PROTOTYPES DES FONCTIONS DU MAIN          //
 ///////////////////////////////////////////////
 void      initialisation(void);
-void      drawSkybox(void);
 void      drawScene(void);
 glm::mat4 getModelMatrixSea(void);
 void      setLightsAttributes(const GLuint progNuanceur);
@@ -219,7 +213,6 @@ int main(int /*argc*/, char* /*argv*/[])
     delete CVar::lumieres[ENUM_LUM::LumPonctuelle];
     delete CVar::lumieres[ENUM_LUM::LumDirectionnelle];
     delete CVar::lumieres[ENUM_LUM::LumSpot];
-    delete skybox;
     surfaceShutdown();
 
     // le programme n'arrivera jamais jusqu'ici
@@ -354,10 +347,6 @@ void initialisation(void)
             0.4f, 0.4f, 0.4f,
             5.0f, -10.0f, -5.0f,
             0.0f, true);
-
-    // construire le skybox avec les textures
-    skybox = new CSkybox("Textures/uffizi_cross_LDR.bmp", CCst::grandeurSkybox);
-   
     
     seaModelMatrix = getModelMatrixSea();
 
@@ -395,73 +384,24 @@ glm::mat4 getModelMatrixSea(void)
     return translationMatrix;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-///  global public  dessinerSkybox \n
-///
-///  fonction de d'affichage pour le modele du Skybox
-///
-///
-///  @return Aucune
-///
-///  @author Félix G. Harvey
-///  @date   2016
-///
-///////////////////////////////////////////////////////////////////////////////
-void drawSkybox()
-{
-    progNuanceurSkybox.activer();
-    glm::vec3 s(CCst::grandeurSkybox, CCst::grandeurSkybox, CCst::grandeurSkybox);
-    glm::mat4 scalingMatrix = glm::scale(s);
-
-    glm::mat4 rotationMatrix;
-    glm::vec3 rotationAxis(1.0f, 0.0f, 0.0f);
-    float     a    = glm::radians(0.f);
-    rotationMatrix = glm::rotate(a, rotationAxis);
-
-    glm::mat4 translationMatrix = glm::translate(cam_position);
-    glm::mat4 modelMatrix = translationMatrix * rotationMatrix * scalingMatrix;
-
-    // Matrice Model-Vue-Projection:
-    glm::mat4 mvp = CVar::projection * CVar::vue * modelMatrix;
-
-    GLint handle;
-
-    handle = glGetUniformLocation(progNuanceurSkybox.getProg(), "MVP");
-    glUniformMatrix4fv(handle, 1, GL_FALSE, &mvp[0][0]);
-
-    //skybox->dessiner();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 ///  global public  dessinerScene \n
 ///
 ///  fonction de d'affichage pour la scène au complet.
 ///	 Appelle la fonction dessiner de chaque modèle présent
 ///
-///
 ///  @return Aucune
-///
-///  @author Félix G. Harvey
-///  @date   2016
 ///
 ///////////////////////////////////////////////////////////////////////////////
 void drawScene()
 {
     //////////////////	 Préparer l'affichage:	//////////////////
-
-    // TODO Décommenter les conditions:
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, CVar::currentW, CVar::currentH);
     
 
     //////////////////     Afficher les objets:  ///////////////////////////
-
-    glDisable(GL_DEPTH_TEST);
-    drawSkybox();
-    glEnable(GL_DEPTH_TEST);
-
     glUseProgram(progNuanceurSea.getProg());
     attribuerValeursLumieres( progNuanceurSea.getProg() );
     attribuerValeursMateriel( progNuanceurSea.getProg() );
@@ -469,7 +409,7 @@ void drawScene()
     if( !stopComputingTree )
     {
         if( !glm::all( glm::equal( cam_position, prev_cam_position ) ) );
-        createTree( 0, 0, 0, 1000, 1000, cam_position );
+            createTree( 0, 0, 0, 1000, 1000, cam_position );
     }
 
     renderSea(progNuanceurSea, cam_position);
@@ -858,8 +798,5 @@ void refreshCamera(GLFWwindow* fenetre, double deltaT)
 void compileShaders()
 {
     // on compiler ici les programmes de nuanceurs qui furent prédéfinis
-    progNuanceurSkybox.compilerEtLier();
-    progNuanceurSkybox.enregistrerUniformInteger("colorMap", CCst::texUnit_0);
-
     progNuanceurSea.compilerEtLier();
 }
