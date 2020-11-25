@@ -1,6 +1,5 @@
 #version 420
-
-uniform float Time;
+layout(quads, fractional_even_spacing) in;
 
 struct Light
 {
@@ -23,6 +22,50 @@ struct Mat
         float Shininess;
 };
 
+//
+///* skew constants for 3d simplex functions */
+const float F3 =  0.3333333;
+const float G3 =  0.1666667;
+//
+
+//
+///* const matrices for 3d rotation */
+const mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);
+const mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);
+const mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);
+//
+
+
+//
+// Uniforms
+//
+uniform float Time;
+uniform	mat4 M;
+uniform	mat4 V;
+uniform	mat4 P;
+uniform	mat4 MV;
+uniform	mat4 MVP;
+uniform	mat3 N;
+
+uniform Light Lights[3];
+uniform Mat Material;
+uniform int pointLightOn;
+uniform int spotLightOn;
+uniform int dirLightOn;
+
+out vec3 fragLight0Vect;
+out vec3 fragLight1Vect;
+out vec3 fragLight2Vect;
+
+//
+// Inputs\outputs
+//
+
+in vec3 cPosition[];
+in vec3 color[];
+out vec3 colorOut;
+out vec3 normal;
+
 vec3 random3(vec3 c) {
 	float j = 4096.0*sin(dot(c,vec3(17.0, 59.4, 15.0)));
 	vec3 r;
@@ -33,11 +76,7 @@ vec3 random3(vec3 c) {
 	r.y = fract(512.0*j);
 	return r-0.5;
 }
-//
-///* skew constants for 3d simplex functions */
-const float F3 =  0.3333333;
-const float G3 =  0.1666667;
-//
+
 ///* 3d simplex noise */
 float simplex3d(vec3 p) {
 	 /* 1. find current tetrahedron T and it's four vertices */
@@ -84,12 +123,7 @@ float simplex3d(vec3 p) {
 	 /* 3. return the sum of the four surflets */
 	 return dot(d, vec4(52.0));
 }
-//
-///* const matrices for 3d rotation */
-const mat3 rot1 = mat3(-0.37, 0.36, 0.85,-0.14,-0.93, 0.34,0.92, 0.01,0.4);
-const mat3 rot2 = mat3(-0.55,-0.39, 0.74, 0.33,-0.91,-0.24,0.77, 0.12,0.63);
-const mat3 rot3 = mat3(-0.71, 0.52,-0.47,-0.08,-0.72,-0.68,-0.7,-0.45,0.56);
-//
+
 ///* directional artifacts can be reduced by rotating each octave */
 float simplex3d_fractal(vec3 m) {
     return   0.5333333*simplex3d(m*rot1)
@@ -97,36 +131,6 @@ float simplex3d_fractal(vec3 m) {
 			+0.1333333*simplex3d(4.0*m*rot3)
 			+0.0666667*simplex3d(8.0*m);
 }
-
-//
-// Uniforms
-//
-uniform	mat4 M;
-uniform	mat4 V;
-uniform	mat4 P;
-uniform	mat4 MV;
-uniform	mat4 MVP;
-uniform	mat3 N;
-
-uniform Light Lights[3];
-uniform Mat Material;
-uniform int pointLightOn;
-uniform int spotLightOn;
-uniform int dirLightOn;
-
-out vec3 fragLight0Vect;
-out vec3 fragLight1Vect;
-out vec3 fragLight2Vect;
-
-in vec3 cPosition[];
-in vec3 color[];
-out vec3 colorOut;
-out vec3 normal;
-
-//
-// Inputs
-//
-layout(quads, fractional_even_spacing) in;
 
 vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
 {
@@ -170,7 +174,6 @@ void main()
     vec4 pos = vec4(interpole( p0, p1, p2, p3 ), 1);
 
 	vec4 posInterpol = height(pos);
-	// The 0.1 step need to be reworked, we need to calculate it from the levels
 	vec4 posInterpolXP = height(pos + vec4(0.1, 0, 0, 0));
 	vec4 posInterpolZP = height(pos + vec4(0, 0, 0.1, 0));
 
