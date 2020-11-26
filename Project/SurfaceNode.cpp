@@ -408,6 +408,9 @@ void renderNode(SurfaceNode* node, CNuanceurProg& progNuanceurGazon, glm::vec3 c
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "N");
 	glUniformMatrix3fv(handle, 1, GL_FALSE, &sea_N[0][0]);
 
+	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "waveSize");
+	glUniform1ui( handle, CVar::waveSize );
+
 	// Send patch neighbor edge tess scale factors
 	handle = glGetUniformLocation(progNuanceurGazon.getProg(), "tscale_negx");
 	glUniform1f(handle, node->tscale_negx);

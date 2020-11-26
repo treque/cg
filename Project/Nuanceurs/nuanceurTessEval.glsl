@@ -42,6 +42,7 @@ uniform	mat4 P;
 uniform	mat4 MV;
 uniform	mat4 MVP;
 uniform	mat3 N;
+uniform	unsigned int waveSize;
 
 uniform Light Lights[3];
 uniform Mat Material;
@@ -140,7 +141,8 @@ vec4 height( vec4 pos )
     float noiseVal;
     noiseVal = simplex3d_fractal(p4 * 20 + 20);
     noiseVal = 0.5 + 0.5 * noiseVal;
-	return M * (pos + vec4(0 , noiseVal * 2 , 0 , 0));
+	float heightVal = noiseVal * waveSize;
+	return M * (pos + vec4(0 , heightVal , 0 , 0));
 }
 
 vec3 getNormal(vec3 ws_p1, vec3 ws_p2, vec3 ws_p3)

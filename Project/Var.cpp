@@ -37,6 +37,7 @@ bool                   CVar::dirLightOn    = true;
 bool                   CVar::spotLightOn   = true;
 bool                   CVar::showDebugInfo = false;
 bool CVar::isSeaGrid = false;
+GLint CVar::waveSize = 2;
 
 double CVar::theta = Deg2Rad(270.0);
 double CVar::phi   = Deg2Rad(90.0);

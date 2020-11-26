@@ -138,4 +138,5 @@ public:
 
     static bool showDebugInfo;
     static bool isSeaGrid;
+    static GLint waveSize;
 };

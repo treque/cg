@@ -592,6 +592,27 @@ void keyboard(GLFWwindow* fenetre, int touche, int /* scancode */, int action, i
         }
         break;
     }
+    case GLFW_KEY_Y:
+    {
+        if (action == GLFW_PRESS)
+        {
+            CVar::waveSize++;
+            std::cout << "waveSize = " << CVar::waveSize;
+            std::cout << "\n";
+        }
+        break;
+    }
+    case GLFW_KEY_U:
+    {
+        if (action == GLFW_PRESS)
+        {
+            if(CVar::waveSize > 0 )
+                CVar::waveSize--;
+            std::cout << "waveSize = " << CVar::waveSize;
+            std::cout << "\n";
+        }
+        break;
+    }
     }
 }
 
