@@ -237,7 +237,7 @@ void attribuerValeursMateriel( const GLuint progNuanceur )
     glUniform4fv( handle, 1, component );
 
     handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Shininess" );
-    glUniform1f( handle, 400.0f );
+    glUniform1f( handle, 100.f );
 }
 
 void attribuerValeursLumieres( const GLuint progNuanceur )
@@ -325,7 +325,7 @@ void initialisation(void)
     CVar::lumieres[ENUM_LUM::LumPonctuelle] =
         new CLumiere(0.1f, 0.1f, 0.1f,
             0.5f, 0.5f, 1.0f,
-            0.7f, 0.7f, 0.7f,
+            1.f, 1.f, 1.f,
             0.0f, 20.0f, -20.0f,
             1.0f, true);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierConstAtt(1.1f);
