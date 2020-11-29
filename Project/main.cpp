@@ -222,7 +222,7 @@ int main(int /*argc*/, char* /*argv*/[])
 void attribuerValeursMateriel( const GLuint progNuanceur )
 {
     GLint handle;
-    GLfloat component[ 4 ] = { 0.1f , 0.26f , 0.55f , 1.0f };
+    GLfloat component[ 4 ] = { 0.15f , 0.26f , 0.55f , 1.0f };
 
     handle = glGetUniformLocation( progNuanceurSea.getProg(), "Material.Ambient" );
     glUniform4fv( handle, 1, component );
@@ -323,9 +323,9 @@ void initialisation(void)
 
     // LUMIÈRE PONCTUELLE (enum : LumPonctuelle - 0)
     CVar::lumieres[ENUM_LUM::LumPonctuelle] =
-        new CLumiere(0.1f, 0.1f, 0.1f,
-            0.5f, 0.5f, 1.0f,
-            1.f, 1.f, 1.f,
+        new CLumiere(0.3f, 0.53f, 0.9f,
+            0.3f, 0.53f, 0.9f,
+            0.4f, 0.4f, 0.7f,
             0.0f, 20.0f, -20.0f,
             1.0f, true);
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierConstAtt(1.1f);
@@ -333,18 +333,18 @@ void initialisation(void)
     CVar::lumieres[ENUM_LUM::LumPonctuelle]->modifierQuadAtt(0.0);
 
     // LUMIÈRE SPOT (enum : LumSpot - 1)
-    CVar::lumieres[ENUM_LUM::LumSpot] = new CLumiere(0.2f, 0.2f, 0.2f,
-        0.9f, 0.8f, 0.4f,
-        1.0f, 1.0f, 1.0f,
+    CVar::lumieres[ENUM_LUM::LumSpot] = new CLumiere(0.3f, 0.53f, 0.9f,
+        0.3f, 0.53f, 0.9f,
+        0.4f, 0.4f, 0.7f,
         10.0f, 10.0f,-10.0f,
         1.0f, true, -0.5f,
         -1.0f, 1.0f, 5.f, 60.0);
 
     // LUMIÈRE DIRECTIONNELLE (enum : LumDirectionnelle - 2)
     CVar::lumieres[ENUM_LUM::LumDirectionnelle] =
-        new CLumiere(1.f, 0.9f, 0.53f,
-            1.f, 0.9f, 0.53f,
-            0.4f, 0.4f, 0.4f,
+        new CLumiere(0.3f, 0.53f, 0.9f,
+            0.3f, 0.53f, 0.9f,
+            0.4f, 0.4f, 0.7f,
             5.0f, -10.0f, -5.0f,
             0.0f, true);
     

@@ -127,7 +127,6 @@ float simplex3d_fractal(vec3 m) {
 
 vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
 {
-    // mix( x, y, f ) = x * (1-f) + y * f.
     vec3 v01 = mix( v0, v1, gl_TessCoord.x );
     vec3 v32 = mix( v3, v2, gl_TessCoord.x );
     return mix( v01, v32, gl_TessCoord.y );
@@ -135,13 +134,12 @@ vec3 interpole( vec3 v0, vec3 v1, vec3 v2, vec3 v3 )
 
 vec4 height( vec4 pos )
 {
-	vec2 p = (M * pos).xz / 500.f;
-    vec3 p4 = vec3(p, Time * 0.003);
+	vec2 worldPos = (M * pos).xz / 500.f;
+    vec3 params = vec3(worldPos, Time * 0.003);
 
-    float noiseVal;
-    noiseVal = simplex3d_fractal(p4 * 20 + 20);
-    noiseVal = 0.5 + 0.5 * noiseVal;
-	float heightVal = noiseVal * waveSize;
+    float height = simplex3d_fractal(params * 20 + 20);
+	height = 0.5 + 0.5 * height;
+	float heightVal = height * waveSize;
 	return M * (pos + vec4(0 , heightVal , 0 , 0));
 }
 
