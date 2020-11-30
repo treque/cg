@@ -287,35 +287,6 @@ void createTree(float x, float y, float z, float width, float height, glm::vec3 
 	surfaceTree->east = NULL;
 	surfaceTree->west = NULL;
 
-	// Generate buffers
-	glGenVertexArrays( 1, &vaos[nBuffers] );
-	glBindVertexArray( vaos[ nBuffers ] );
-
-	float positions[] =
-	{ x + width / 2, y, z + height / 2,
-	  x + width / 2, y, z - height / 2,
-	  x - width / 2, y, z - height / 2,
-	  x - width / 2, y, z + height / 2,
-	};
-
-	glGenBuffers( 1, &vbos[ nBuffers ] );
-
-	// Link buffers and data:
-	// Positions
-	glBindBuffer( GL_ARRAY_BUFFER, vbos[ nBuffers ] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( positions ), positions, GL_STATIC_DRAW );
-	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 0, 0 );
-
-	glEnableVertexAttribArray( 0 ); // layout location 0?
-
-	// Indexes
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, sea_ibo );
-
-	glBindVertexArray( 0 );
-	//
-	surfaceTreeTail->vaoId = nBuffers;
-	nBuffers++;
-
 	// Recursively subdivide the terrain
 	divideNode(surfaceTree, cam_position);
 }
