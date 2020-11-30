@@ -99,6 +99,10 @@ void surfaceShutdown()
     free(surfaceTree);
     surfaceTree = NULL;
     surfaceTreeTail = NULL;
+
+	glDeleteVertexArrays( nBuffers + 1, vaos );
+	glDeleteBuffers( nBuffers + 1, vbos );
+	nBuffers = 0;
 }
 
 void createNodeVao( SurfaceNode* node )
@@ -287,7 +291,6 @@ void createTree(float x, float y, float z, float width, float height, glm::vec3 
 	glGenVertexArrays( 1, &vaos[nBuffers] );
 	glBindVertexArray( vaos[ nBuffers ] );
 
-	//9x * 9y * 3vertex
 	float positions[] =
 	{ x + width / 2, y, z + height / 2,
 	  x + width / 2, y, z - height / 2,
